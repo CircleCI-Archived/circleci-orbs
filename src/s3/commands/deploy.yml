@@ -1,0 +1,16 @@
+description: "A simple encapsulation of doing an s3 sync"
+parameters:
+  from:
+    type: string
+    description: A directory path local to the job to deploy to S3
+  to:
+    type: string
+    description: A URI to an S3 bucket
+  overwrite:
+    type: string
+    default: "false"
+    type: boolean
+steps:
+  - run:
+      name: Deploy to S3
+      command: "aws s3 sync << parameters.from >> << parameters.to >><<# parameters.overwrite >> --delete<</ parameters.overwrite >>"
