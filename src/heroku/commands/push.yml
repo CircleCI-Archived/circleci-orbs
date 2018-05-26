@@ -1,0 +1,16 @@
+description: "Does a `git push` style deployment to heroku on a given branch"
+parameters:
+  branch:
+    type: string
+    default: master
+  api_key:
+    type: string
+    description: The API key used to deploy - typically you'd pass in as an environment variable rather than hard code it.
+  app_name:
+    type: string
+    description: The name of your heroku application - you could pass this as environment variable rather than hard code it.
+steps:
+  - run:
+      name: Deploy << parameters.branch >> to Heroku
+      command: |
+        git push https://heroku:<< parameters.api_key >>@git.heroku.com/<< parameters.app_name >>.git << parameters.branch >>
