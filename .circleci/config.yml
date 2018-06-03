@@ -1,18 +1,10 @@
-# executors:
-#   default:
-#     machine: true
+version: 2
 
 workflows:
+  version: 2
   main:
     jobs:
       - test
-  # release-orbs:
-  #   filters:
-  #     branches: 
-  #       only: master
-  #   jobs:
-  #     - release
-
 
 jobs:
   test:
@@ -20,9 +12,10 @@ jobs:
       - image: singapore/lint-condo
     steps:
       - checkout
-      - yamllint .
+      - run: yamllint .
 
   release:
+    machine: true
     steps:
       - checkout
       ## install the cirlceci cli (or get it into a Docker image we use in the executor)
