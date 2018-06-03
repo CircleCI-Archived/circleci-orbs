@@ -1,23 +1,27 @@
-schema: 2.1
-
-defaults:
-  jobs:
-    executor: default
-
-executors:
-  default:
-    machine: true
+# executors:
+#   default:
+#     machine: true
 
 workflows:
-  release-orbs:
-    filters:
-      branches: 
-        only: master
+  main:
     jobs:
-      - release
+      - test
+  # release-orbs:
+  #   filters:
+  #     branches: 
+  #       only: master
+  #   jobs:
+  #     - release
 
 
 jobs:
+  test:
+    docker:
+      - image: singapore/lint-condo
+    steps:
+      - checkout
+      - yamllint .
+
   release:
     steps:
       - checkout
