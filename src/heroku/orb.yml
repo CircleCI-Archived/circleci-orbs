@@ -20,7 +20,7 @@ commands:
         # enum: [“x64”, “x86”, “arm”]
 
     steps:
-      - run: 
+      - run:
           name: "Install Heroku CLI, if necessary"
           # TODO: the assumption of wget, etc. below likely wouldn't work in all cases, especially windows.
           command: |
