@@ -12,8 +12,7 @@ jobs:
       - image: singapore/lint-condo
     steps:
       - checkout
-      - run: |
-          yamllint -d relaxed .
+      - run: yamllint -d relaxed .
 
   release:
     machine: true
