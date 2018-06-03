@@ -12,7 +12,7 @@ jobs:
       - image: singapore/lint-condo
     steps:
       - checkout
-      - run: yamllint .
+      - run: yamllint -d "{rules: {line-length: disable}}" .
 
   release:
     machine: true
