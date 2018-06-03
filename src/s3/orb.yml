@@ -1,1 +1,33 @@
 description: A simple example of doing S3 deployment
+
+commands:
+  deploy:
+    description: "A simple encapsulation of doing an s3 sync"
+    parameters:
+      from:
+        type: string
+        description: A directory path local to the job to deploy to S3
+      to:
+        type: string
+        description: A URI to an S3 bucket
+      overwrite:
+        default: "false"
+        type: boolean
+    steps:
+      - run:
+          name: Deploy to S3
+          command: "aws s3 sync << parameters.from >> << parameters.to >><<# parameters.overwrite >> --delete<</ parameters.overwrite >>"
+
+usage:
+  version: 2
+  import:
+    s3: circleci/s3@latest
+  jobs:
+    build:
+      docker:
+        - image: circleci/node:latest
+      steps:
+        - s3/deploy:
+            from: "somepath/thing"
+            to: "S3_bucket_URI_goes_here"
+            overwrite: "false"
