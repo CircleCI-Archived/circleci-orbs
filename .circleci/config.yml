@@ -13,7 +13,7 @@ jobs:
     steps:
       - checkout
       - run: |
-          yamllint -d '{rules: {line-length: disable}}' .
+          yamllint -d relaxed .
 
   release:
     machine: true
