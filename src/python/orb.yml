@@ -1,0 +1,34 @@
+version: 2
+
+executors:
+  default:
+    parameters:
+      tag:
+        default: 3.6.2-stretch-browsers
+    docker:
+      - image: circleci/python:<< parameters.tag >>
+
+commands:
+  install-dependencies:
+    parameters:
+      requirements-file:
+        type: string
+        default: "requirements.txt"
+      cache:
+        type: boolean
+        default: true
+    steps:
+      - when:
+          condition: << parameters.cache >>
+          steps:
+            - restore_cache:
+                key: pydeps-{{ .Branch }}-{{ checksum "<< parameters.requirements-file >>" }}
+      - run:
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r << parameters.requirements-file >>
+      - save_cache:
+          key: pydeps-{{ .Branch }}-{{ checksum "<< parameters.requirements-file >>" }}
+          paths:
+            - "venv"
