@@ -32,3 +32,17 @@ commands:
           key: pydeps-{{ .Branch }}-{{ checksum "<< parameters.requirements-file >>" }}
           paths:
             - "venv"
+usage:
+  default:
+    version: 2
+
+    orbs:
+      python: circleci/python@latest
+
+    jobs:
+      build:
+        executor: python/default
+        steps:
+          - checkout
+          - python/install-dependencies
+          # add your test run here
