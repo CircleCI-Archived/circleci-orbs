@@ -1,0 +1,39 @@
+description: "Provides basic caching of a single path based on the checksum of a particular file."
+parameters:
+  path:
+    description: "The path to cache. The value becomes the first items in the `paths` parameter of the built-in `save_cache` command."
+    type: string
+  file:
+    description: "Path relative to the current working directory of the file to use when evaluating the checksum."
+    type: string
+  steps:
+    description: "The steps to run after the cache is restored and before it's saved again."
+    type: steps
+  key-root:
+    description: "A string that will be prefixed to the cache keys. You can pass in a new value if you need to recache for the same checksum."
+    type: string
+    default: simple-checksum-cache
+  suppress-restore:
+    description: "When true, do not perform the restore steps."
+    type: boolean
+    default: false
+  suppress-save:
+    description: "When true, do not perform the save steps."
+    type: boolean
+    default: false
+steps:
+  - unless:
+      condition: << parameters.supress-restore >>
+      steps:
+        - restore_cache:
+            keys:
+              - << parameters.key-root >>-{{ checksum "<< parameters.file >>" }}
+  - << parameters.steps >>
+  - unless:
+      condition: << parameters.supress-save >>
+      steps:
+        - save_cache:
+            key: << parameters.key-root >>-{{ checksum "<< parameters.file >>" }}
+            paths:
+              - "<< parameters.path >>"
+
