@@ -11,6 +11,10 @@ jobs:
         description: cache key to use, if this is likely to share cache with another job. currently only supports one key.
         type: string
         default: code-coverage-{{ checksum "project.clj" }}
+      circlecitest:
+        description: tests are run with the circleci.test test runner instead of clojure.test
+        type: boolean
+        default: false
     docker:
       - image: circleci/clojure
     steps:
@@ -18,7 +22,7 @@ jobs:
       - restore_cache:
           keys:
             - << parameters.cache-key >>
-      - run: lein cloverage --codecov --runner circleci.test
+      - run: lein cloverage --codecov <<# parameters.circlecitest >> --runner circleci.test <</ parameters.circlecitest >>
       - save_cache:
           paths:
             - ~/.m2
