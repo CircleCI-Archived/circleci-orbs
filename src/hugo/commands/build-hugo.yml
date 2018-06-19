@@ -1,6 +1,6 @@
 description: "Runs the `hugo` CLI against a given source (default: current path) in a given env (default: production)"
 parameters:
-  env: 
+  env:
     description: "Passed in as the value of HUGO_ENV prior to running the hugo command"
     type: string
     default: "production"
