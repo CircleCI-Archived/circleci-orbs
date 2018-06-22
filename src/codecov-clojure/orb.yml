@@ -1,0 +1,46 @@
+description: provides a job for reporting code coverage of clojure projects to codecov
+
+jobs:
+  code-coverage:
+    parameters:
+      coverage-file:
+        description: the path to coverage.json
+        type: string
+        default: target/coverage/codecov.json
+      cache-key:
+        description: cache key to use, if this is likely to share cache with another job. currently only supports one key.
+        type: string
+        default: code-coverage-{{ checksum "project.clj" }}
+      circlecitest:
+        description: tests are run with the circleci.test test runner instead of clojure.test
+        type: boolean
+        default: false
+    docker:
+      - image: circleci/clojure
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - << parameters.cache-key >>
+      - run: lein cloverage --codecov <<# parameters.circlecitest >> --runner circleci.test <</ parameters.circlecitest >>
+      - save_cache:
+          paths:
+            - ~/.m2
+            - ~/.lein
+          key: << parameters.cache-key >>
+      - store_artifacts:
+          path: target/coverage
+      - run:
+          name: Upload Coverage Results
+          command: |
+            curl --request POST --retry 3 --silent --show-error --fail --data-binary @<< parameters.coverage-file >> \
+            "https://codecov.io/upload/v2?\
+            service=circleci\
+            &token=$CODECOV_TOKEN\
+            &commit=$CIRCLE_SHA1\
+            &branch=$CIRCLE_BRANCH\
+            &build=$CIRCLE_BUILD_NUM\
+            &job=$CIRCLE_NODE_INDEX\
+            &build_url=$CIRCLE_BUILD_URL\
+            &slug=$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME\
+            &pr=$CIRCLE_PR_NUMBER"
