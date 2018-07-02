@@ -1,0 +1,29 @@
+description: 'Run the steps provided only one time per branch. Note: If your steps do not all execute successfully they will run again on a subsequent run because the underlying mechanism uses build caching that assumes the steps have all run, then a special file is cached.'
+parameters:
+  steps:
+    type: steps
+    description: The steps you want to run only once per branch  
+  key-prefix:
+    type: string
+    default: "circleci-once-per-branch-cache-"
+    description: "This key will be used for the underlying caching that makes this command possible. You almost certainly can use the default value without change."
+  cached-file-name:
+    type: string
+    default: "circleci-once-per-branch-indicator"
+    description: "You almost certainly can use the default value without change."
+steps:
+  - restore_cache:
+      keys:
+        - << parameters.key-prefix >>-{{ .Branch }}
+  - run: |
+      if [[ -e ~/.<< parameters.cached-file-name >> ]]; then
+          echo "Halting execution in the command `once-per-branch` "
+          circleci step halt
+      fi
+  - << parameters.steps >>
+  - run: "touch ~/.<< parameters.cached-file-name >>"
+  - save_cache:
+      key: << parameters.key-prefix >>-{{ .Branch }}
+      paths:
+        - "~/.<< parameters.cached-file-name >>"
+
