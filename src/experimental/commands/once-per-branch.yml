@@ -2,7 +2,7 @@ description: 'Run the steps provided only one time per branch. Note: If your ste
 parameters:
   steps:
     type: steps
-    description: The steps you want to run only once per branch  
+    description: The steps you want to run only once per branch
   key-prefix:
     type: string
     default: "circleci-once-per-branch-cache-"
