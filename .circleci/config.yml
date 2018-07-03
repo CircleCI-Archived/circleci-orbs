@@ -4,15 +4,24 @@ workflows:
   version: 2
   main:
     jobs:
-      - test
+      - lint
+      - build
 
 jobs:
-  test:
+  lint:
     docker:
       - image: singapore/lint-condo
     steps:
       - checkout
       - run: yamllint -d relaxed .
+
+  build:
+    docker:
+      - image: circlecidx/circleci-cli:0.1.228
+    steps:
+      - checkout
+      - run: "echo -e \"token: placeholder\nverbose: false > ~/.circleci/cli.yml\""
+      - run: "for ORB in src/*; do circleci orb validate --path $ORB/orb.yml; done"
 
   release:
     machine: true
