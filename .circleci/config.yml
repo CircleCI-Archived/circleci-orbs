@@ -21,7 +21,7 @@ jobs:
     steps:
       - checkout
       - run: "echo -e \"token: placeholder\nverbose: false > ~/.circleci/cli.yml\""
-      - run: "for ORB in src/*; if [ ! -f $ORB/orb.yml ]; then circleci collapse -r $ORB > $ORB/orb.yml ; fi; do circleci orb validate --path $ORB/orb.yml; done"
+      - run: "for ORB in src/*; do if [ ! -f $ORB/orb.yml ]; then circleci collapse -r $ORB > $ORB/orb.yml ; fi; circleci orb validate --path $ORB/orb.yml; done"
   release:
     machine: true
     steps:
