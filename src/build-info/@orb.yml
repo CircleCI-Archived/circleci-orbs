@@ -17,7 +17,7 @@ commands:
             echo "RUNNING JOB: ${CIRCLE_JOB}"
             echo "JOB PARALLELISM: ${CIRCLE_NODE_TOTAL}"
             echo "CIRCLE_REPOSITORY_URL: ${CIRCLE_REPOSITORY_URL}"
-  
+
   show_system_info:
     steps:
       - run:

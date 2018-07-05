@@ -1,5 +1,5 @@
 version: 2
-orbs: 
+orbs:
   build-info: circleci/build-info@volatile
 
 workflows:
