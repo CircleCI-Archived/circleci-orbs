@@ -1,0 +1,34 @@
+description: "An orb with a set of commands to output build information."
+
+executors:
+  simple:
+    docker:
+      - image: bash:4.4.23
+commands:
+  show_build_info:
+    steps:
+      - run:
+          name: "Show runtime env vars and other info about the build"
+          command: |
+            echo "TRIGGERER: ${CIRCLE_USERNAME}"
+            echo "BUILD_NUMBER: ${CIRCLE_BUILD_NUM}"
+            echo "BUILD_URL: ${CIRCLE_BUILD_URL}"
+            echo "BRANCH: ${CIRCLE_BRANCH}"
+            echo "RUNNING JOB: ${CIRCLE_JOB}"
+            echo "JOB PARALLELISM: ${CIRCLE_NODE_TOTAL}"
+            echo "CIRCLE_REPOSITORY_URL: ${CIRCLE_REPOSITORY_URL}"
+  
+  show_system_info:
+    steps:
+      - run:
+          name: "Show system information"
+          command: |
+            echo "uname:" $(uname -a)
+            echo "arch: " $(arch)
+
+jobs:
+  dump:
+    executor: simple
+    steps:
+      - show_build_info
+      - show_system_info
