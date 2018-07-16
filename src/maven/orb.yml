@@ -1,0 +1,51 @@
+executor:
+  maven:
+    description: The docker container to use when running Maven builds
+    docker:
+      - image: circleci/openjdk:8-jdk-node
+
+commands:
+  with_cache:
+    description: |
+      Run a set of steps with Maven dependencies cached.
+
+      This command will first restore a cache of maven dependencies, if one was
+      saved by a previous build. The provided `steps` will then be executed, and
+      if successful, then a fresh cache will be saved, if required.
+
+      The contents of the `~/.m2` directory is cached, which will substantially
+      improve build times for projects with many dependencies.
+
+      The cache-key is generated from any files named `pom.xml` that are
+      present in the `working_directory`.
+    parameters:
+      steps:
+        type: steps
+    steps:
+      - run:
+          name: Generate Cache Checksum
+          command: find . -name 'pom.xml' -exec cat {} + | shasum | awk '{print $1}' > /tmp/maven_cache_seed
+      - restore_cache:
+          key: maven-{{ checksum "/tmp/maven_cache_seed" }}
+      - << parameters.steps >>
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: maven-{{ checksum "/tmp/maven_cache_seed" }}
+
+jobs:
+  test:
+    description: |
+      Checkout, build and test a Maven project.
+    executor: maven
+    parameters:
+      command:
+        type: string
+        default: verify
+    steps:
+      - checkout
+      - with_cache:
+          steps:
+            - run:
+                name: Run Tests
+                command: mvn {{ parameters.command }}
