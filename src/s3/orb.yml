@@ -20,7 +20,7 @@ commands:
 
 usage:
   version: 2
-  import:
+  orbs:
     s3: circleci/s3@latest
   jobs:
     build:
