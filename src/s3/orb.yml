@@ -21,11 +21,11 @@ commands:
 usage:
   version: 2
   orbs:
-    s3: circleci/s3@latest
+    s3: circleci/s3@volatile
   jobs:
     build:
       docker:
-        - image: circleci/node:latest
+        - image: circleci/node:volatile
       steps:
         - s3/deploy:
             from: "somepath/thing"

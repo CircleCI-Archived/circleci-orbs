@@ -1,6 +1,6 @@
 version: 2
 orbs:
-  hugo: circleci/hugo@latest
+  hugo: circleci/hugo@volatile
 
 workflows:
   build-hugo:
