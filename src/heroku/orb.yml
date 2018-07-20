@@ -2,7 +2,86 @@ version: 2
 description: "Provides basic functionality for deploying to Heroku"
 
 commands:
+  deploy:
+    description: "Performs a basic deployment to Heroku"
+    parameters:
+      app-name:
+        description: >
+          The name of your Heroku App.
+          For backwards compatibility the literal value
+          `$HEROKU_APP` is the default, so you can
+          easily use this command by setting an environment
+          variable called HEROKU_APP
+        type: string
+        default: $HEROKU_APP
+      do-setup:
+        type: boolean
+        default: true
+      branch-to-deploy:
+        type: string
+        description: "When provided, only do the deploy for the given branch. The default value of empty string means do the deploy regardless of branch."
+        default: ""
+    steps:
+      - when:
+          condition: << parameters.do-setup >>
+          steps:
+            - setup
+      - deploy:
+          name: Deploy to Heroku if tests pass and branch is master
+          command: |
+            if [ "<< paramaters.branch-to-deploy >>" == "" || "${CIRCLE_BRANCH}" == "<< paramaters.branch-to-deploy >>" ]; then
+              git push --force git@heroku.com:$HEROKU_APP_NAME.git HEAD:refs/heads/"${CIRCLE_
+              # git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP.git master
+            fi
+  setup:
+    description: "Performs setup in the environment for Heroku. Generally, you don't need to do this because it is called from the deploy job."
+    parameters:
+      login:
+        description: >
+          Your login for Heroku.
+          Generally this is done using environment variables to avoid hard-coding
+          credentials in your code. For backward compatibility reasons the default
+          value is "$HEROKU_LOGIN", so the easiest way to use this command is make an
+          environmenbt variable named HEROKU_LOGIN.
+        type: string
+        default: $HEROKU_LOGIN
+      api-key:
+        description: >
+          Your API Key for Heroku.
+          We recommend you pass the string literal to reference an environment variable that will be
+          evaluated at runtime. Avoid hard-coding credentials in your code.
+          For backward compatibility reasons the default
+          value is "$HEROKU_API_KEY", so the easiest way to use this command is make an
+          environmenbt variable named HEROKU_API_KEY.
+        type: string
+        default: $HEROKU_API_KEY
+      ssh_key_fingerprint:
+        description: >
+          The SSH Fingerprint for your Heroku SSH key. For backward compatibility reasons the default
+          value is "$HEROKU_SSH_FINGERPRINT", so the easiest way to use this command is make an
+          environmenbt variable named HEROKU_SSH_FINGERPRINT.
+        type: string
+        default: $HEROKU_SSH_FINGERPRINT
+    steps:
+      - run:
+          name: "Basic setup for Heroku"
+          command: |
+            ssh-keyscan -H heroku.com >> ~/.ssh/known_hosts
+            cat > ~/.netrc << EOF
+            machine api.heroku.com
+              login << parameters.login >>
+              password << parameters.api-key >>
+            EOF
+            cat >> ~/.ssh/config \<< EOF
+            VerifyHostKeyDNS yes
+            StrictHostKeyChecking no
+            EOF
+      - add_ssh_keys:
+          fingerprints:
+            - << parameters.ssh_key_fingerprint >>
+
   install:
+    description: "Installs the heroku CLI, if necessary"
     parameters:
       os:
         default: “linux”
