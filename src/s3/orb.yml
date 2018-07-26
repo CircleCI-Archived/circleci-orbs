@@ -1,4 +1,11 @@
+version: 2
 description: A simple example of doing S3 deployment
+
+orbs:
+  aws-cli: circleci/aws-cli@volatile
+
+executors:
+  default: aws-cli/default
 
 commands:
   deploy:
@@ -14,6 +21,7 @@ commands:
         default: "false"
         type: boolean
     steps:
+      - aws-cli/install
       - run:
           name: Deploy to S3
           command: "aws s3 sync << parameters.from >> << parameters.to >><<# parameters.overwrite >> --delete<</ parameters.overwrite >>"
@@ -24,8 +32,7 @@ usage:
     s3: circleci/s3@volatile
   jobs:
     build:
-      docker:
-        - image: circleci/node:volatile
+      executor: s3/default
       steps:
         - s3/deploy:
             from: "somepath/thing"
