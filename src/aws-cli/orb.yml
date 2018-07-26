@@ -1,0 +1,25 @@
+version: 2
+description: "Installs a ready to go awscli"
+executor:
+  default:
+    description: The debian based docker container to use when running the AWS CLI
+    parameters:
+      python_version:
+        type: string
+        default: "2.7"
+      debian_release:
+        type: string
+        default: "stretch"
+    docker:
+      - image: circleci/python:<< parameters.python_version >>-<< parameters.debian_release >>
+
+commands:
+  install:
+    description: |
+      Install the AWS CLI using pip.
+    steps:
+      if [[ $(command -v aws) == "" ]]; then
+        sudo pip install awscli
+      else
+        echo "AWS CLI is already installed."
+      fi
