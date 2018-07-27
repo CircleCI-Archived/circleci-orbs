@@ -1,11 +1,9 @@
 version: 2
 description: A simple example of doing S3 deployment
 
-orbs:
-  aws-cli: circleci/aws-cli@volatile
-
-executors:
-  default: aws-cli/default
+# Not valid yet
+# orbs:
+#   aws-cli: circleci/aws-cli@volatile
 
 commands:
   deploy:
@@ -21,21 +19,27 @@ commands:
         default: "false"
         type: boolean
     steps:
-      - aws-cli/install
-      - aws-cli/configure:
-          aws_access_key_id: $AWS_ACCESS_KEY_ID
-          aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
-          region: $AWS_REGION
+      # Not valid yet
+      # - aws-cli/install
+      # - aws-cli/configure:
+      #     aws_access_key_id: $AWS_ACCESS_KEY_ID
+      #     aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
+      #     region: $AWS_REGION
+      - deploy:
+          name: Deploy to S3
+          command: aws s3 sync << parameters.from >> << parameters.to >><<# parameters.overwrite >> --delete<</ parameters.overwrite >>
 
-usage:
-  version: 2
-  orbs:
-    s3: circleci/s3@volatile
-  jobs:
-    build:
-      executor: s3/default
-      steps:
-        - s3/deploy:
-            from: "somepath/thing"
-            to: "S3_bucket_URI_goes_here"
-            overwrite: "false"
+# usage:
+#   version: 2
+#   orbs:
+#     aws-cli: circleci/aws-cli@volatile
+#     s3: circleci/s3@volatile
+#   jobs:
+#     build:
+#       executor: aws-cli/default
+#       steps:
+#         - s3/deploy:
+#             from: "somepath/thing"
+#             to: "S3_bucket_URI_goes_here"
+#             overwrite: "false"
+#
