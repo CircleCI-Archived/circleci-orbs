@@ -19,7 +19,7 @@ commands:
       Install the AWS CLI using pip.
     steps:
       - install:
-          name: Install AWS CLIj
+          name: Install AWS CLI
           command: |
             if [[ $(command -v aws) == "" ]]; then
               sudo pip install awscli
