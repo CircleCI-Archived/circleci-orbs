@@ -22,9 +22,10 @@ commands:
         type: boolean
     steps:
       - aws-cli/install
-      - run:
-          name: Deploy to S3
-          command: "aws s3 sync << parameters.from >> << parameters.to >><<# parameters.overwrite >> --delete<</ parameters.overwrite >>"
+      - aws-cli/configure:
+          aws_access_key_id: $AWS_ACCESS_KEY_ID
+          aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
+          region: $AWS_REGION
 
 usage:
   version: 2

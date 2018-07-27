@@ -18,7 +18,7 @@ commands:
     description: |
       Install the AWS CLI using pip.
     steps:
-      - run:
+      - install:
           name: Install AWS CLIj
           command: |
             if [[ $(command -v aws) == "" ]]; then
@@ -26,3 +26,29 @@ commands:
             else
               echo "AWS CLI is already installed."
             fi
+  configure:
+    description: |
+      Apply configure to `~/.aws/credentials` and `~/.aws/config`
+    parameters:
+      profile_name:
+        description: Profile name to be configured.
+        type: string
+        default: "default"
+      aws_access_key_id:
+        description: AWS access key id for IAM role, preferably passed in as an ENV var.
+        type: string
+      aws_secret_access_key:
+        description: AWS secret key for IAM role, preferably passed in as an ENV var.
+        type: string
+      region:
+        description: Default region
+        type: string
+    steps:
+      - configure_credentials:
+          name: Configure cli credentials
+          command: |
+            aws configure set aws_access_key_id << parameters.aws_access_key_id >> --profile << parameters.profile_name >>
+            aws configure set aws_secret_access_key << parameters.aws_secret_access_key >> --profile << parameters.profile_name >>
+      - configure_region:
+          name: Configure default region
+          command: aws configure set region << parameters.region >> --profile << parameters.profile_name >>
