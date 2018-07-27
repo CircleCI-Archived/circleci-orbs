@@ -18,8 +18,11 @@ commands:
     description: |
       Install the AWS CLI using pip.
     steps:
-      if [[ $(command -v aws) == "" ]]; then
-        sudo pip install awscli
-      else
-        echo "AWS CLI is already installed."
-      fi
+      - run:
+          name: Install AWS CLIj
+          command: |
+            if [[ $(command -v aws) == "" ]]; then
+              sudo pip install awscli
+            else
+              echo "AWS CLI is already installed."
+            fi
