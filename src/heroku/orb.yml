@@ -3,13 +3,15 @@ description: "Provides basic functionality for deploying to Heroku"
 
 executors:
   default:
+    description:
+      Uses the basic buildpack-deps image, which has the 
+      prerequisites for installing heroku's CLI.
     parameters:
       tag:
         type: string
         default: "bionic"
     docker:
       - image: buildpack-deps:<< parameters.tag >>
-
 commands:
   install:
     steps:
@@ -21,10 +23,44 @@ commands:
             else
               echo "Heroku is already installed. No operation was performed."
             fi
-
   deploy:
+    parameters:
+      app-name:
+        description:
+          "The name of your Heroku App.
+          For backwards compatibility the literal value
+          `$HEROKU_APP_NAME` is the default, so you can
+          easily use this command by setting an environment
+          variable called HEROKU_APP_NAME"
+        type: string
+        default: $HEROKU_APP_NAME
+      api-key:
+        description:
+          "The API key to use. defaulting to the literal value $HEROKU_API_KEY, so you can 
+          populate the environment variable HEROKU_API_KEY and not need to declare a value in code."
+        type: string
+        default: $HEROKU_API_KEY
+      branch:
+        type: string
+        description:
+          Deploy the given branch. The default value is your current branch.
+        default: "$CIRCLE_BRANCH"
+      only-branch:
+        type: string
+        description: 
+          "If you specify an only-branch, the deploy will not occur for any other branch. The default value, 
+          an empty string, will result in the command running for all branches.
+          This is here mostly because for people moving from CircleCI 1.0 setting up a workflow
+          with branch filters may be more than they want to do, and this is a convenient way to filter
+          out deploys for all but one branch (a typical use would be to pass `master` as the value."
+        default: ""
     steps:
       - run:
-          name: Deploy Master to Heroku
+          name: Deploy branch to Heroku via git push
           command: |
-            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
+            if [ "<< paramaters.only-branch >>" == "" || "${CIRCLE_BRANCH}" == "<< paramaters.only-branch >>" ]; then
+              git push https://heroku:<< parameters.api-key >>@git.heroku.com/<< parameters.app-name >>.git << parameters.branch >>
+            fi
+      # TODO: consider adding a way to use the heroku CLI to turn on maintenance mode when deploying
+      # - heroku maintenance:on --app << parameters.app-name >>
+      # - heroku scale worker=0 --app << parameters.app-name >>
