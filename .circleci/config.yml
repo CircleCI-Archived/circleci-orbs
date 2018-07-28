@@ -13,7 +13,8 @@ jobs:
       - image: singapore/lint-condo
     steps:
       - checkout
-      - run: yamllint -d relaxed .
+      - run:
+          'yamllint -d "{extends: relaxed, rules: {line-length: {max: 200, allow-non-breakable-inline-mappings: true}}}" .'
 
   build:
     docker:
