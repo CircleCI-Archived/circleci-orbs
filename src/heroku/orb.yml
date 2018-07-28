@@ -4,7 +4,7 @@ description: "Provides basic functionality for deploying to Heroku"
 executors:
   default:
     description:
-      Uses the basic buildpack-deps image, which has the 
+      Uses the basic buildpack-deps image, which has the
       prerequisites for installing heroku's CLI.
     parameters:
       tag:
@@ -12,6 +12,7 @@ executors:
         default: "bionic"
     docker:
       - image: buildpack-deps:<< parameters.tag >>
+
 commands:
   install:
     steps:
@@ -36,7 +37,7 @@ commands:
         default: $HEROKU_APP_NAME
       api-key:
         description:
-          "The API key to use. defaulting to the literal value $HEROKU_API_KEY, so you can 
+          "The API key to use. defaulting to the literal value $HEROKU_API_KEY, so you can
           populate the environment variable HEROKU_API_KEY and not need to declare a value in code."
         type: string
         default: $HEROKU_API_KEY
@@ -47,7 +48,7 @@ commands:
         default: "$CIRCLE_BRANCH"
       only-branch:
         type: string
-        description: 
+        description:
           "If you specify an only-branch, the deploy will not occur for any other branch. The default value, 
           an empty string, will result in the command running for all branches.
           This is here mostly because for people moving from CircleCI 1.0 setting up a workflow
