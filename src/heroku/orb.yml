@@ -49,7 +49,7 @@ commands:
       only-branch:
         type: string
         description:
-          "If you specify an only-branch, the deploy will not occur for any other branch. The default value, 
+          "If you specify an only-branch, the deploy will not occur for any other branch. The default value,
           an empty string, will result in the command running for all branches.
           This is here mostly because for people moving from CircleCI 1.0 setting up a workflow
           with branch filters may be more than they want to do, and this is a convenient way to filter
