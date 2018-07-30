@@ -62,6 +62,48 @@ commands:
             if [ "<< paramaters.only-branch >>" == "" || "${CIRCLE_BRANCH}" == "<< paramaters.only-branch >>" ]; then
               git push https://heroku:<< parameters.api-key >>@git.heroku.com/<< parameters.app-name >>.git << parameters.branch >>
             fi
-      # TODO: consider adding a way to use the heroku CLI to turn on maintenance mode when deploying
-      # - heroku maintenance:on --app << parameters.app-name >>
-      # - heroku scale worker=0 --app << parameters.app-name >>
+jobs:
+  deploy:
+    parameters:
+      app-name:
+        description:
+          "The name of your Heroku App.
+          For backwards compatibility the literal value
+          `$HEROKU_APP_NAME` is the default, so you can
+          easily use this command by setting an environment
+          variable called HEROKU_APP_NAME"
+        type: string
+        default: $HEROKU_APP_NAME
+      maintenance-mode:
+        description:
+          "Use this to automatically enable mantainance mode before pre-deploy steps
+           and have it disabled after post-deploy steps have been run."
+        type: boolean
+        default: false
+      pre-deploy:
+        description:
+          "A list of pre-deploy steps that are run before deployment. This would
+           be an ideal place to scale any processes down."
+        type: steps
+        default: []
+      post-deploy:
+        description:
+          "A list of post-deploy steps that are run after deployment. This would
+           be an ideal place to scale any processes back up."
+        type: steps
+        default: []
+    executor: default
+    steps:
+      - install
+      - run: |
+          <<# parameters.maintenance-mode >>
+            heroku maintenance:on --app << parameters.app-name >>
+          <</ parameters.maintenance-mode >>
+      - << parameters.pre-deploy >>
+      - deploy:
+        app-name: << parameters.app-name >>
+      - << parameters.post-deploy >>
+      - run: |
+          <<# parameters.maintenance-mode >>
+            heroku maintenance:off --app << parameters.app-name >>
+          <</ parameters.maintenance-mode >>
