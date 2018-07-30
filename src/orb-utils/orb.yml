@@ -1,0 +1,67 @@
+version: 2
+commands:
+  install-circleci-cli:
+    parameters:
+      root-url:
+        description: the root URL used to generate the download link. You almost certainly can rely on the default value.
+        type: string
+        default: "https://github.com/CircleCI-Public/circleci-cli/releases/download/"
+      install-dir:
+        description: the directory into which the binary will be installed. The default of /usr/local/bin should work in most cases.
+        type: string
+        default: "/usr/local/bin"
+      tag:
+        description: When not empty string, get the specific tag release. When empty (default), retrieve latest.
+        type: string
+        default: ""
+    steps:
+      - run:
+          name: "Install `circleci` CLI"
+          command: |
+            echoerr ()
+            {
+                echo "$@" >&2
+            }
+            if [ $(uname) == "Darwin" ]; then
+              OS=darwin
+            elif [ $(expr substr $(uname -s) 1 5) == "Linux" ]; then
+              OS=linux
+            else
+              echoerr "This installer is only supported on Linux and MacOS"
+              exit 1
+            fi
+            ARCH="$(uname -m)"
+            if [ $ARCH == "x86_64" ]; then
+              ARCH=amd64
+            # we are not currently publishing an arm release anyway.
+            # elif [[ $ARCH == arm* ]]; then
+            #   ARCH=arm
+            else
+              echoerr "This installer does not support your architecture: $ARCH"
+              exit 1
+            fi
+            CIRCLECI_CLI_RELEASE_API_ROOT="https://api.github.com/repos/CircleCI-Public/circleci-cli/releases/"
+            if [ "<< parameters.tag >>" == "" ]; then
+              CIRCLECI_CLI_APPEND_VERSION="latest"
+            else
+              CIRCLECI_CLI_APPEND_VERSION="tags/<< parameters.tag >>"
+            fi
+            CIRCLECI_CLI_RELEASE_API_ENDPOINT=${CIRCLECI_CLI_RELEASE_API_ROOT}${CIRCLECI_CLI_APPEND_VERSION}
+            echo "Retrieve the latest version by looking for tag_name in ${CIRCLECI_CLI_RELEASE_API_ENDPOINT} "
+            CIRCLECI_CLI_INSTALL_VERSION=`curl --silent "${CIRCLECI_CLI_RELEASE_API_ENDPOINT}" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'`
+            if [ ! $CIRCLECI_CLI_INSTALL_VERSION ]; then
+              echoerr "The tag requested does not appear to be valid for the circleci CLI"
+              exit 1
+            fi
+            CIRCLECI_CLI_RELEASE_NAME="circleci-cli_${CIRCLECI_CLI_INSTALL_VERSION#v}_${OS}_${ARCH}"
+            download_url=<< parameters.root-url >>${CIRCLECI_CLI_INSTALL_VERSION}/${CIRCLECI_CLI_RELEASE_NAME}.tar.gz
+            echo "Download ${download_url}, untar it, then move it to << parameters.install-dir >>"
+            curl -L ${download_url} | tar -xvzf -
+            mv ${CIRCLECI_CLI_RELEASE_NAME}/circleci << parameters.install-dir >>
+            echo "Make sure the CLI is now installed and is ready for use."
+            if [ ! type circleci &>/dev/null ]; then
+              echoerr "Something went wrong installing the circleci CLI"
+              exit 1
+            fi
+            echo "Run circleci help"
+            circleci help
