@@ -109,13 +109,32 @@ commands:
         default: "zip"
     steps:
       - deploy: |
-          aws deploy create-deployment \
-            --application-name << parameters.application_name >> \
-            --deployment-group-name << parameters.deployment-group >> \
-            --deployment-config-name << parameters.deployment-config >> \
-            --s3-location bucket=<< parameters.bundle-bucket >>,\
-                          bundleType=<< parameters.bundle-type >>,\
-                          key=<< parameters.bundle-key >>
+          ID=$(aws deploy create-deployment \
+                 --application-name << parameters.application_name >> \
+                 --deployment-group-name << parameters.deployment-group >> \
+                 --deployment-config-name << parameters.deployment-config >> \
+                 --s3-location bucket=<< parameters.bundle-bucket >>,\
+                               bundleType=<< parameters.bundle-type >>,\
+                               key=<< parameters.bundle-key >>) \
+                 --output text \
+                 --query '[deploymentId]'
+          if [ -z "$ID" ]; then
+            echo "Something went wrong with the deployment."
+          else
+            STATUS=$(aws get-deployment \
+                      --deployment-id $ID
+                      --output text \
+                      --query '[deploymentInfo.status]')
+            while [[ "$STATUS" == "InProgress" || "$STATUS" == "Pending"]]; do
+              STATUS=$(aws get-deployment \
+                        --deployment-id $ID
+                        --output text \
+                        --query '[deploymentInfo.status]')
+              sleep 5
+            done
+              echo "Deployment created."
+              aws get-deployment -deployment-id $ID
+          fi
 
 jobs:
   deploy:
@@ -185,5 +204,4 @@ jobs:
 
 ## TODO:
 # - custom deployment configs
-# - monitor deployment after creation
 # - better defaults
