@@ -1,5 +1,5 @@
 version: 2
-description: "AWS code Deploy via the awscli"
+description: "AWS CodeDeploy"
 
 # orbs:
 #   aws-cli: circleci/aws-cli@volatile
@@ -9,7 +9,7 @@ commands:
     parameters:
       application_name:
         description:
-          ""
+          "The name of an AWS CodeDeploy application associated with the applicable IAM user or AWS account."
         type: string
     steps:
       - ensure-created: |
@@ -24,15 +24,15 @@ commands:
     parameters:
       application-name:
         description:
-          ""
+          "The name of an AWS CodeDeploy application associated with the applicable IAM user or AWS account."
         type: string
       deployment-group:
         description:
-          ""
+          "The name of a new deployment group for the specified application."
         type: string
       deployment-config:
         description:
-          ""
+          "Predefined deployment configuration name."
         type: string
         default: "CodeDeployDefault.OneAtATime"
     steps:
@@ -49,34 +49,64 @@ commands:
           else
             echo "Deployment group named << parameters.deployment-group >> already exists. Skipping creation."
           fi
-  deploy:
+  push-bundle:
     parameters:
       application-name:
         description:
-          ""
+          "The name of an AWS CodeDeploy application associated with the applicable IAM user or AWS account."
+        type: string
+      bundle-source:
+        description:
+          "The directory in your project to package up into an application revision."
+        type: string
+      bundle-bucket:
+        description:
+          "The s3 bucket where an application revision will be stored"
+        type: string
+      bundle-key:
+        description:
+          "A key under the s3 bucket where an application revision will be stored"
+        type: string
+      bundle-type:
+        description:
+          "The file type used for an application revision bundle. Currently defaults to 'zip'"
+        type: string
+        default: "zip"
+    steps:
+      - deploy: |
+          aws deploy push \
+            --application-name << parameters.application_name >> \
+            --source << parameters.bundle-source >> \
+            --s3-location s3://<< parameters.bundle-bucket >>/key=<< parameters.bundle-key >>.<< parameters.bundle-type >>
+
+  deploy-bundle:
+    parameters:
+      application-name:
+        description:
+          "The name of an AWS CodeDeploy application associated with the applicable IAM user or AWS account."
         type: string
       deployment-group:
         description:
-          ""
+          "The name of a new deployment group for the specified application."
         type: string
       deployment-config:
         description:
-          ""
+          "Predefined deployment configuration name."
         type: string
         default: "CodeDeployDefault.OneAtATime"
       bundle-bucket:
         description:
-          ""
+          "The s3 bucket where an application revision will be stored"
         type: string
       bundle-key:
         description:
-          ""
+          "A key under the s3 bucket where an application revision will be stored"
         type: string
       bundle-type:
         description:
-          ""
-        type: enum
-        enum: ["zip"]
+          "The file type used for an application revision bundle. Currently defaults to 'zip'"
+        type: string
+        default: "zip"
     steps:
       - deploy: |
           aws deploy create-deployment \
@@ -87,7 +117,73 @@ commands:
                           bundleType=<< parameters.bundle-type >>,\
                           key=<< parameters.bundle-key >>
 
+jobs:
+  deploy:
+    description:
+      "Ensures an application and deployment group exist then proceeds to
+       bundle and upload an application revision to S3. Once uploaded this
+       job will finally create a deployment based on that revision."
+    parameters:
+      region:
+        description:
+          "The AWS Region to deploy into"
+        type: string
+        default: $AWS_REGION
+      application-name:
+        description:
+          "The name of an AWS CodeDeploy application associated with the applicable IAM user or AWS account."
+        type: string
+      deployment-group:
+        description:
+          "The name of a new deployment group for the specified application."
+        type: string
+      deployment-config:
+        description:
+          "Predefined deployment configuration name."
+        type: string
+        default: "CodeDeployDefault.OneAtATime"
+      bundle-bucket:
+        description:
+          "The s3 bucket where an application revision will be stored"
+        type: string
+      bundle-key:
+        description:
+          "A key under the s3 bucket where an application revision will be stored"
+        type: string
+      bundle-type:
+        description:
+          "The file type used for an application revision bundle. Currently defaults to 'zip'"
+        type: string
+        default: "zip"
+#    executor: aws-cli/default
+    executor:
+      machine: true # TODO: remove this and replace with aws-cli/default
+    steps:
+      # - aws-cli/install
+      # - aws-cli/configure:
+      #     aws_access_key_id: $AWS_ACCESS_KEY_ID
+      #     aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
+      #     region: << parameters.region >>
+      - create-application:
+          application-name: << parameters.application-name >>
+      - create-deployment-group:
+          application-name: << parameters.application-name >>
+          deployment-group: << parameters.deployment-group >>
+          deployment-config: << parameters.deployment-config >>
+      - push-bundle:
+          application-name: << parameters.application-name >>
+          bundle-bucket: << parameters.bundle-bucket >>
+          bundle-key: << parameters.bundle-key >>
+          bundle-type: << parameters.bundle-type >>
+      - deploy-bundle:
+          application-name: << parameters.application-name >>
+          deployment-group: << parameters.deployment-group >>
+          deployment-config: << parameters.deployment-config >>
+          bundle-bucket: << parameters.bundle-bucket >>
+          bundle-key: << parameters.bundle-key >>
+          bundle-type: << parameters.bundle-type >>
+
 ## TODO:
-# - 'aws deploy push' bundle to s3 from repo dir
 # - custom deployment configs
 # - monitor deployment after creation
+# - better defaults
