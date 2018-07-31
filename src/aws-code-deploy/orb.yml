@@ -1,7 +1,7 @@
 version: 2
 description: "AWS code Deploy via the awscli"
 
-# orbs: 
+# orbs:
 #   aws-cli: circleci/aws-cli@volatile
 
 commands:
@@ -33,8 +33,8 @@ commands:
       deployment-config:
         description:
           ""
-         type: string
-         default: "CodeDeployDefault.OneAtATime"
+        type: string
+        default: "CodeDeployDefault.OneAtATime"
     steps:
       - ensure-created: |
           aws deploy get-deployment-group \
@@ -45,7 +45,7 @@ commands:
             aws deploy create-deployment-group \
               --application-name << parameters.application_name >> \
               --deployment-group-name << parameters.deployment-group >> \
-              --deployment-config-name << parameters.deployment-config >> 
+              --deployment-config-name << parameters.deployment-config >>
           else
             echo "Deployment group named << parameters.deployment-group >> already exists. Skipping creation."
           fi
@@ -62,8 +62,8 @@ commands:
       deployment-config:
         description:
           ""
-         type: string
-         default: "CodeDeployDefault.OneAtATime"
+        type: string
+        default: "CodeDeployDefault.OneAtATime"
       bundle-bucket:
         description:
           ""
