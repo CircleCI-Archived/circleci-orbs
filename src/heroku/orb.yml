@@ -95,15 +95,15 @@ jobs:
     executor: default
     steps:
       - install
-      - run: |
-          <<# parameters.maintenance-mode >>
-            heroku maintenance:on --app << parameters.app-name >>
-          <</ parameters.maintenance-mode >>
+      - when:
+          condition: << parameters.maintenance-mode >>
+          steps:
+            - run: heroku maintenance:on --app << parameters.app-name >>
       - << parameters.pre-deploy >>
       - deploy:
         app-name: << parameters.app-name >>
       - << parameters.post-deploy >>
-      - run: |
-          <<# parameters.maintenance-mode >>
-            heroku maintenance:off --app << parameters.app-name >>
-          <</ parameters.maintenance-mode >>
+      - when:
+          condition: << parameters.maintenance-mode >>
+          steps:
+            - run: heroku maintenance:off --app << parameters.app-name >>
