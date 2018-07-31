@@ -1,0 +1,93 @@
+version: 2
+description: "AWS code Deploy via the awscli"
+
+# orbs: 
+#   aws-cli: circleci/aws-cli@volatile
+
+commands:
+  create-application:
+    parameters:
+      application_name:
+        description:
+          ""
+        type: string
+    steps:
+      - ensure-created: |
+          aws deploy get-application --application-name << parameters.application_name >>
+          if [ $? -ne 0 ]; then
+            echo "No application named << parameters.application_name >> found. Trying to create a new one"
+            aws deploy create-application --application-name << parameters.application_name >>
+          else
+            echo "Application named << parameters.application_name >> already exists. Skipping creation."
+          fi
+  create-deployment-group:
+    parameters:
+      application-name:
+        description:
+          ""
+        type: string
+      deployment-group:
+        description:
+          ""
+        type: string
+      deployment-config:
+        description:
+          ""
+         type: string
+         default: "CodeDeployDefault.OneAtATime"
+    steps:
+      - ensure-created: |
+          aws deploy get-deployment-group \
+            --application-name << parameters.application_name >> \
+            --deployment-group-name << parameters.deployment-group >>
+          if [ $? -ne 0 ]; then
+            echo "No deployment group named << parameters.deployment-group >> found. Trying to create a new one"
+            aws deploy create-deployment-group \
+              --application-name << parameters.application_name >> \
+              --deployment-group-name << parameters.deployment-group >> \
+              --deployment-config-name << parameters.deployment-config >> 
+          else
+            echo "Deployment group named << parameters.deployment-group >> already exists. Skipping creation."
+          fi
+  deploy:
+    parameters:
+      application-name:
+        description:
+          ""
+        type: string
+      deployment-group:
+        description:
+          ""
+        type: string
+      deployment-config:
+        description:
+          ""
+         type: string
+         default: "CodeDeployDefault.OneAtATime"
+      bundle-bucket:
+        description:
+          ""
+        type: string
+      bundle-key:
+        description:
+          ""
+        type: string
+      bundle-type:
+        description:
+          ""
+        type: enum
+        enum: ["zip"]
+    steps:
+      - deploy: |
+          aws deploy create-deployment \
+            --application-name << parameters.application_name >> \
+            --deployment-group-name << parameters.deployment-group >> \
+            --deployment-config-name << parameters.deployment-config >> \
+            --s3-location bucket=<< parameters.bundle-bucket >>,\
+                          bundleType=<< parameters.bundle-type >>,\
+                          key=<< parameters.bundle-key >>
+
+## TODO:
+# - 'aws deploy push' bundle to s3 from repo dir
+# - custom deployment configs
+# - monitor deployment after creation
