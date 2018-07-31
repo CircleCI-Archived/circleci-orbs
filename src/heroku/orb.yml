@@ -35,12 +35,6 @@ commands:
           variable called HEROKU_APP_NAME"
         type: string
         default: $HEROKU_APP_NAME
-      api-key:
-        description:
-          "The API key to use. defaulting to the literal value $HEROKU_API_KEY, so you can
-          populate the environment variable HEROKU_API_KEY and not need to declare a value in code."
-        type: string
-        default: $HEROKU_API_KEY
       branch:
         type: string
         description:
@@ -60,7 +54,7 @@ commands:
           name: Deploy branch to Heroku via git push
           command: |
             if [ "<< paramaters.only-branch >>" == "" || "${CIRCLE_BRANCH}" == "<< paramaters.only-branch >>" ]; then
-              git push https://heroku:<< parameters.api-key >>@git.heroku.com/<< parameters.app-name >>.git << parameters.branch >>
+              git push https://heroku:$HEROKU_API_KEY@git.heroku.com/<< parameters.app-name >>.git << parameters.branch >>
             fi
 jobs:
   deploy:
