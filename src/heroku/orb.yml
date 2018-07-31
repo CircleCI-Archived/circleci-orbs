@@ -1,35 +1,109 @@
 version: 2
 description: "Provides basic functionality for deploying to Heroku"
 
+executors:
+  default:
+    description:
+      Uses the basic buildpack-deps image, which has the
+      prerequisites for installing heroku's CLI.
+    parameters:
+      tag:
+        type: string
+        default: "bionic"
+    docker:
+      - image: buildpack-deps:<< parameters.tag >>
+
 commands:
   install:
-    parameters:
-      os:
-        default: “linux”
-        description: The target Operating System for the heroku binary. Must be one of "linux", “darwin”, “win32”.
-        type: string
-        # enum types are not yet implemented.
-        # type: enum
-        # enum: ["linux", “darwin”, “win32”]
-      arch:
-        type: string
-        default: "x86"
-        description: The target CPU architecture for the heroku binary. Must be one of “x64”, “x86”, “arm”.
-        # enum ypes are not yet implemented
-        # type: enum
-        # enum: [“x64”, “x86”, “arm”]
-
     steps:
       - run:
           name: "Install Heroku CLI, if necessary"
-          # TODO: the assumption of wget, etc. below likely wouldn't work in all cases, especially windows.
           command: |
             if [[ $(command -v heroku) == "" ]]; then
-              wget https://cli-assets.heroku.com/heroku-cli/channels/stable/heroku-cli-{{parameters.os}}-{{parameters.arch}}.tar.gz -O heroku.tar.gz
-              mkdir $HOME/heroku
-              tar -xvzf heroku.tar.gz -C $HOME/heroku --strip-components 1
-              cd $HOME/heroku
-              ./install
+              curl https://cli-assets.heroku.com/install.sh | sh
             else
               echo "Heroku is already installed. No operation was performed."
             fi
+  deploy:
+    parameters:
+      app-name:
+        description:
+          "The name of your Heroku App.
+          For backwards compatibility the literal value
+          `$HEROKU_APP_NAME` is the default, so you can
+          easily use this command by setting an environment
+          variable called HEROKU_APP_NAME"
+        type: string
+        default: $HEROKU_APP_NAME
+      api-key:
+        description:
+          "The API key to use. defaulting to the literal value $HEROKU_API_KEY, so you can
+          populate the environment variable HEROKU_API_KEY and not need to declare a value in code."
+        type: string
+        default: $HEROKU_API_KEY
+      branch:
+        type: string
+        description:
+          Deploy the given branch. The default value is your current branch.
+        default: "$CIRCLE_BRANCH"
+      only-branch:
+        type: string
+        description:
+          "If you specify an only-branch, the deploy will not occur for any other branch. The default value,
+          an empty string, will result in the command running for all branches.
+          This is here mostly because for people moving from CircleCI 1.0 setting up a workflow
+          with branch filters may be more than they want to do, and this is a convenient way to filter
+          out deploys for all but one branch (a typical use would be to pass `master` as the value."
+        default: ""
+    steps:
+      - run:
+          name: Deploy branch to Heroku via git push
+          command: |
+            if [ "<< paramaters.only-branch >>" == "" || "${CIRCLE_BRANCH}" == "<< paramaters.only-branch >>" ]; then
+              git push https://heroku:<< parameters.api-key >>@git.heroku.com/<< parameters.app-name >>.git << parameters.branch >>
+            fi
+jobs:
+  deploy:
+    parameters:
+      app-name:
+        description:
+          "The name of your Heroku App.
+          For backwards compatibility the literal value
+          `$HEROKU_APP_NAME` is the default, so you can
+          easily use this command by setting an environment
+          variable called HEROKU_APP_NAME"
+        type: string
+        default: $HEROKU_APP_NAME
+      maintenance-mode:
+        description:
+          "Use this to automatically enable mantainance mode before pre-deploy steps
+           and have it disabled after post-deploy steps have been run."
+        type: boolean
+        default: false
+      pre-deploy:
+        description:
+          "A list of pre-deploy steps that are run before deployment. This would
+           be an ideal place to scale any processes down."
+        type: steps
+        default: []
+      post-deploy:
+        description:
+          "A list of post-deploy steps that are run after deployment. This would
+           be an ideal place to scale any processes back up."
+        type: steps
+        default: []
+    executor: default
+    steps:
+      - install
+      - run: |
+          <<# parameters.maintenance-mode >>
+            heroku maintenance:on --app << parameters.app-name >>
+          <</ parameters.maintenance-mode >>
+      - << parameters.pre-deploy >>
+      - deploy:
+        app-name: << parameters.app-name >>
+      - << parameters.post-deploy >>
+      - run: |
+          <<# parameters.maintenance-mode >>
+            heroku maintenance:off --app << parameters.app-name >>
+          <</ parameters.maintenance-mode >>
