@@ -99,10 +99,10 @@ jobs:
           condition: << parameters.maintenance-mode >>
           steps:
             - run: heroku maintenance:on --app << parameters.app-name >>
-      - << parameters.pre-deploy >>
+      - steps: << parameters.pre-deploy >>
       - deploy:
         app-name: << parameters.app-name >>
-      - << parameters.post-deploy >>
+      - steps: << parameters.post-deploy >>
       - when:
           condition: << parameters.maintenance-mode >>
           steps:
