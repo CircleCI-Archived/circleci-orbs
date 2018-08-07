@@ -1,0 +1,16 @@
+version: 2
+orbs:
+  build-info: circleci/build-info@volatile
+
+workflows:
+  info:
+    jobs:
+      - build-info/dump
+
+jobs:
+  my-local-job:
+    executor: build-info/simple
+    steps:
+      - build-info/show_build_info
+
+
