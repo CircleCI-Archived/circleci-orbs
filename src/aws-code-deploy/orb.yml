@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 description: "AWS CodeDeploy"
 
 # orbs:
@@ -201,7 +201,3 @@ jobs:
           bundle-bucket: << parameters.bundle-bucket >>
           bundle-key: << parameters.bundle-key >>
           bundle-type: << parameters.bundle-type >>
-
-## TODO:
-# - custom deployment configs
-# - better defaults
