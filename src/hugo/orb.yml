@@ -1,3 +1,4 @@
+version: 2.1
 description: "A simple encapsulation of common tasks in Hugo"
 
 executors:
