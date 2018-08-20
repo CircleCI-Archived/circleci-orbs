@@ -1,8 +1,8 @@
 version: 2.1
 description: "AWS CodeDeploy"
 
-# orbs:
-#   aws-cli: circleci/aws-cli@volatile
+orbs:
+  aws-cli: circleci/aws-cli@dev:0.0.1
 
 commands:
   create-application:
@@ -174,15 +174,13 @@ jobs:
           "The file type used for an application revision bundle. Currently defaults to 'zip'"
         type: string
         default: "zip"
-#    executor: aws-cli/default
-    executor:
-      machine: true # TODO: remove this and replace with aws-cli/default
+    executor: aws-cli/default
     steps:
-      # - aws-cli/install
-      # - aws-cli/configure:
-      #     aws_access_key_id: $AWS_ACCESS_KEY_ID
-      #     aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
-      #     region: << parameters.region >>
+      - aws-cli/install
+      - aws-cli/configure:
+          aws_access_key_id: $AWS_ACCESS_KEY_ID
+          aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
+          region: << parameters.region >>
       - create-application:
           application-name: << parameters.application-name >>
       - create-deployment-group:

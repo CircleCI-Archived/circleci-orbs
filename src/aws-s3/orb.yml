@@ -2,7 +2,7 @@ version: 2.1
 description: A simple example of doing S3 deployment
 
 orbs:
-  aws-cli: circleci/aws-cli@volatile
+  aws-cli: circleci/aws-cli@dev:0.0.1
 
 commands:
   deploy:
