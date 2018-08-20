@@ -40,4 +40,3 @@ usage:
             from: "somepath/thing"
             to: "S3_bucket_URI_goes_here"
             overwrite: "false"
-

@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 description: "Installs a ready to go awscli"
 executor:
   default:
@@ -47,8 +47,8 @@ commands:
       - configure_credentials:
           name: Configure cli credentials
           command: |
-            aws configure set aws_access_key_id << parameters.aws_access_key_id >> --profile << parameters.profile_name >>
-            aws configure set aws_secret_access_key << parameters.aws_secret_access_key >> --profile << parameters.profile_name >>
+            "aws configure set aws_access_key_id << parameters.aws_access_key_id >> --profile << parameters.profile_name >>"
+            "aws configure set aws_secret_access_key << parameters.aws_secret_access_key >> --profile << parameters.profile_name >>"
       - configure_region:
           name: Configure default region
-          command: aws configure set region << parameters.region >> --profile << parameters.profile_name >>
+          command: "aws configure set region << parameters.region >> --profile << parameters.profile_name >>"
