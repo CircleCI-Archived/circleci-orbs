@@ -1,3 +1,5 @@
+version: 2.1
+
 executor:
   gradle:
     description: The docker container to use when running Gradle builds
@@ -30,7 +32,7 @@ commands:
           command: find . -name 'build.gradle' -exec cat {} + | shasum | awk '{print $1}' > /tmp/gradle_cache_seed
       - restore_cache:
           key: gradle-{{ checksum "/tmp/gradle_cache_seed" }}
-      - << parameters.steps >>
+      - steps: << parameters.steps >>
       - save_cache:
           paths:
             - ~/.gradle

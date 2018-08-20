@@ -1,9 +1,8 @@
-version: 2
+version: 2.1
 description: A simple example of doing S3 deployment
 
-# Not valid yet
-# orbs:
-#   aws-cli: circleci/aws-cli@volatile
+orbs:
+  aws-cli: circleci/aws-cli@volatile
 
 commands:
   deploy:
@@ -19,27 +18,26 @@ commands:
         default: "false"
         type: boolean
     steps:
-      # Not valid yet
-      # - aws-cli/install
-      # - aws-cli/configure:
-      #     aws_access_key_id: $AWS_ACCESS_KEY_ID
-      #     aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
-      #     region: $AWS_REGION
+      - aws-cli/install
+      - aws-cli/configure:
+          aws_access_key_id: $AWS_ACCESS_KEY_ID
+          aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
+          region: $AWS_REGION
       - deploy:
           name: Deploy to S3
-          command: aws s3 sync << parameters.from >> << parameters.to >><<# parameters.overwrite >> --delete<</ parameters.overwrite >>
+          command: "aws s3 sync << parameters.from >> << parameters.to >><<# parameters.overwrite >> --delete<</ parameters.overwrite >>"
 
-# usage:
-#   version: 2
-#   orbs:
-#     aws-cli: circleci/aws-cli@volatile
-#     s3: circleci/s3@volatile
-#   jobs:
-#     build:
-#       executor: aws-cli/default
-#       steps:
-#         - s3/deploy:
-#             from: "somepath/thing"
-#             to: "S3_bucket_URI_goes_here"
-#             overwrite: "false"
-#
+usage:
+  version: 2
+  orbs:
+    aws-cli: circleci/aws-cli@volatile
+    s3: circleci/s3@volatile
+  jobs:
+    build:
+      executor: aws-cli/default
+      steps:
+        - s3/deploy:
+            from: "somepath/thing"
+            to: "S3_bucket_URI_goes_here"
+            overwrite: "false"
+
