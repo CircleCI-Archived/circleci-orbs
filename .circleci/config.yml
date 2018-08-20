@@ -18,7 +18,7 @@ jobs:
 
   build:
     docker:
-      - image: circlecidx/circleci-cli:0.1.1418
+      - image: circleci/circleci-cli:0.1.1418
     steps:
       - checkout
       - run: "echo -e \"token: placeholder\nverbose: false > ~/.circleci/cli.yml\""
