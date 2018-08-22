@@ -1,24 +1,25 @@
 version: 2.1
 description: "Installs a ready to go awscli"
-executor:
+
+executors:
   default:
     description: The debian based docker container to use when running the AWS CLI
     parameters:
-      python_version:
+      python-version:
         type: string
         default: "2.7"
-      debian_release:
+      debian-release:
         type: string
         default: "stretch"
     docker:
-      - image: circleci/python:<< parameters.python_version >>-<< parameters.debian_release >>
+      - image: circleci/python:<< parameters.python-version >>-<< parameters.debian-release >>
 
 commands:
   install:
     description: |
       Install the AWS CLI using pip.
     steps:
-      - install:
+      - run:
           name: Install AWS CLI
           command: |
             if [[ $(command -v aws) == "" ]]; then
@@ -30,25 +31,25 @@ commands:
     description: |
       Apply configure to `~/.aws/credentials` and `~/.aws/config`
     parameters:
-      profile_name:
+      profile-name:
         description: Profile name to be configured.
         type: string
         default: "default"
-      aws_access_key_id:
+      aws-access-key-id:
         description: AWS access key id for IAM role, preferably passed in as an ENV var.
         type: string
-      aws_secret_access_key:
+      aws-secret-access-key:
         description: AWS secret key for IAM role, preferably passed in as an ENV var.
         type: string
       region:
         description: Default region
         type: string
     steps:
-      - configure_credentials:
+      - run:
           name: Configure cli credentials
           command: |
-            "aws configure set aws_access_key_id << parameters.aws_access_key_id >> --profile << parameters.profile_name >>"
-            "aws configure set aws_secret_access_key << parameters.aws_secret_access_key >> --profile << parameters.profile_name >>"
-      - configure_region:
+            "aws configure set aws_access_key_id << parameters.aws-access-key-id >> --profile << parameters.profile-name >>"
+            "aws configure set aws_secret_access_key << parameters.aws-secret-access-key >> --profile << parameters.profile-name >>"
+      - run:
           name: Configure default region
-          command: "aws configure set region << parameters.region >> --profile << parameters.profile_name >>"
+          command: "aws configure set region << parameters.region >> --profile << parameters.profile-name >>"
