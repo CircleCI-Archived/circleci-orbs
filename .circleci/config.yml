@@ -6,6 +6,11 @@ workflows:
     jobs:
       - lint
       - build
+      - dev-release:
+          filters:
+            branches:
+              only:
+                - master
 
 jobs:
   lint:
@@ -24,12 +29,18 @@ jobs:
       - run: "echo -e \"token: placeholder\nverbose: false > ~/.circleci/cli.yml\""
       - run: "sh scripts/validate-orbs.sh"
 
-  release:
-    machine: true
+  dev-release:
+    docker:
+      - image: circleci/circleci-cli:0.1.1418
     steps:
       - checkout
-      ## install the cirlceci cli (or get it into a Docker image we use in the executor)
+      - run: "sh scripts/dev-release.sh"
 
+  release:
+    docker:
+      - image: circleci/circleci-cli:0.1.1418
+    steps:
+      - checkout
       ## walk the tree in orb-releases.yml (the path to which could be fed as a parameter to the command)
           ## For each, attempt to build the orb with the CLI, then if that's successful, register it.
           ## would look something like: `circleci orb build $PATH-TO-SRC $ORB-NAMESPACE $ORB-NAME $PATH-TO-BUILT-ORB; circleci orb register $PATH-TO-BUILT-ORB $REVISION`
