@@ -1,6 +1,6 @@
 version: 2.1
 
-executor:
+executors:
   gradle:
     description: The docker container to use when running Gradle builds
     docker:
