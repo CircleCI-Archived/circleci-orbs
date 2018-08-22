@@ -1,6 +1,6 @@
 version: 2.1
 
-executor:
+executors:
   maven:
     description: The docker container to use when running Maven builds
     docker:
