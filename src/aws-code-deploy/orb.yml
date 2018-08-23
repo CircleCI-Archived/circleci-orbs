@@ -72,8 +72,9 @@ commands:
         type: string
       bundle-source:
         description:
-          "The directory in your project to package up into an application revision."
+          "The directory relative to your project to package up into an application revision."
         type: string
+        default: "."
       bundle-bucket:
         description:
           "The s3 bucket where an application revision will be stored"
@@ -93,7 +94,7 @@ commands:
           command: |
             aws deploy push \
               --application-name << parameters.application-name >> \
-              --source << parameters.bundle-source >> \
+              --source ./project/<< parameters.bundle-source >> \
               --s3-location s3://<< parameters.bundle-bucket >>/<< parameters.bundle-key >>.<< parameters.bundle-type >>
 
   deploy-bundle:
@@ -186,8 +187,9 @@ jobs:
         type: string
       bundle-source:
         description:
-          "The directory in your project to package up into an application revision."
+          "The directory relative to your project to package up into an application revision."
         type: string
+        default: "."
       bundle-bucket:
         description:
           "The s3 bucket where an application revision will be stored"
