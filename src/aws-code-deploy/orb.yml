@@ -40,6 +40,10 @@ commands:
           "Predefined deployment configuration name."
         type: string
         default: "CodeDeployDefault.OneAtATime"
+      service-role-arn:
+        description:
+          "The service role for a deployment group."
+        type: string
     steps:
       - run:
           name: ensure-deployment-created
@@ -54,7 +58,8 @@ commands:
               aws deploy create-deployment-group \
                 --application-name << parameters.application-name >> \
                 --deployment-group-name << parameters.deployment-group >> \
-                --deployment-config-name << parameters.deployment-config >>
+                --deployment-config-name << parameters.deployment-config >> \
+                --service-role-arn << parameters.service-role-arn >>
             else
               set -e
               echo "Deployment group named << parameters.deployment-group >> already exists. Skipping creation."
@@ -175,6 +180,10 @@ jobs:
           "Predefined deployment configuration name."
         type: string
         default: "CodeDeployDefault.OneAtATime"
+      service-role-arn:
+        description:
+          "The service role for a deployment group."
+        type: string
       bundle-source:
         description:
           "The directory in your project to package up into an application revision."
@@ -205,6 +214,7 @@ jobs:
           application-name: << parameters.application-name >>
           deployment-group: << parameters.deployment-group >>
           deployment-config: << parameters.deployment-config >>
+          service-role-arn: << parameters.service-role-arn >>
       - push-bundle:
           application-name: << parameters.application-name >>
           bundle-source: << parameters.bundle-source >>
