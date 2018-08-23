@@ -13,7 +13,7 @@ commands:
         type: string
     steps:
       - run:
-          name: ensure-created
+          name: ensure-application-created
           command: |
             aws deploy get-application --application-name << parameters.application-name >>
             if [ $? -ne 0 ]; then
@@ -39,7 +39,7 @@ commands:
         default: "CodeDeployDefault.OneAtATime"
     steps:
       - run:
-          name: ensure-created
+          name: ensure-deployment-created
           command: |
             aws deploy get-deployment-group \
               --application-name << parameters.application-name >> \
@@ -77,11 +77,13 @@ commands:
         type: string
         default: "zip"
     steps:
-      - deploy: |
-          aws deploy push \
-            --application-name << parameters.application-name >> \
-            --source << parameters.bundle-source >> \
-            --s3-location s3://<< parameters.bundle-bucket >>/key=<< parameters.bundle-key >>.<< parameters.bundle-type >>
+      - run:
+          name: push-bundle
+          command: |
+            aws deploy push \
+              --application-name << parameters.application-name >> \
+              --source << parameters.bundle-source >> \
+              --s3-location s3://<< parameters.bundle-bucket >>/<< parameters.bundle-key >>.<< parameters.bundle-type >>
 
   deploy-bundle:
     parameters:
@@ -112,33 +114,35 @@ commands:
         type: string
         default: "zip"
     steps:
-      - deploy: |
-          ID=$(aws deploy create-deployment \
-                 --application-name << parameters.application-name >> \
-                 --deployment-group-name << parameters.deployment-group >> \
-                 --deployment-config-name << parameters.deployment-config >> \
-                 --s3-location bucket=<< parameters.bundle-bucket >>,\
-                               bundleType=<< parameters.bundle-type >>,\
-                               key=<< parameters.bundle-key >>) \
-                 --output text \
-                 --query '[deploymentId]'
-          if [ -z "$ID" ]; then
-            echo "Something went wrong with the deployment."
-          else
-            STATUS=$(aws get-deployment \
-                      --deployment-id $ID
-                      --output text \
-                      --query '[deploymentInfo.status]')
-            while [[ "$STATUS" == "InProgress" || "$STATUS" == "Pending"]]; do
+      - run:
+          name: deploy-bundle
+          command: |
+            ID=$(aws deploy create-deployment \
+                   --application-name << parameters.application-name >> \
+                   --deployment-group-name << parameters.deployment-group >> \
+                   --deployment-config-name << parameters.deployment-config >> \
+                   --s3-location bucket=<< parameters.bundle-bucket >>,\
+                                 bundleType=<< parameters.bundle-type >>,\
+                                 key=<< parameters.bundle-key >>) \
+                   --output text \
+                   --query '[deploymentId]'
+            if [ -z "$ID" ]; then
+              echo "Something went wrong with the deployment."
+            else
               STATUS=$(aws get-deployment \
                         --deployment-id $ID
                         --output text \
                         --query '[deploymentInfo.status]')
-              sleep 5
-            done
-              echo "Deployment created."
-              aws get-deployment -deployment-id $ID
-          fi
+              while [[ "$STATUS" == "InProgress" || "$STATUS" == "Pending"]]; do
+                STATUS=$(aws get-deployment \
+                          --deployment-id $ID
+                          --output text \
+                          --query '[deploymentInfo.status]')
+                sleep 5
+              done
+                echo "Deployment created."
+                aws get-deployment -deployment-id $ID
+            fi
 
 jobs:
   deploy:
