@@ -1,0 +1,43 @@
+version: 2.1
+
+description: Commands for calling the Rollbar API
+
+commands:
+  notify_deploy:
+    description: |
+      A step to notify Rollbar the project has been deployed.
+      A Rollbar access token is required to be set in the
+      environment with the name `ROLLBAR_ACCESS_TOKEN`.
+      Add this as the last step of your the job that you
+      use to deploy.
+    parameters:
+      environment:
+        type: string
+        default: production
+        description: The Rollbar environment. Defaults to production.
+    steps:
+      - run:
+          name: Notify Rollbar
+          command: |
+            curl https://api.rollbar.com/api/1/deploy/ \
+              --form access_token=$ROLLBAR_ACCESS_TOKEN \
+              --form environment=<< paramters.environment >> \
+              --form revision=$CIRCLE_SHA1 \
+              --form local_username=$CIRCLE_USERNAME
+
+jobs:
+  notify_deploy:
+    description: |
+      A job to notify Rollbar the project has been deployed.
+      A Rollbar access token is required to be set in the
+      environment with the name `ROLLBAR_ACCESS_TOKEN`.
+    parameters:
+      environment:
+        type: string
+        default: production
+        description: The Rollbar environment. Defaults to production.
+    docker:
+      - image: circleci/buildpack-deps:18.04-scm
+    steps:
+      - notify_deploy:
+          environment: << parameters.environment >>
