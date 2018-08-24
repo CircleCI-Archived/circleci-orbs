@@ -94,7 +94,7 @@ commands:
           command: |
             aws deploy push \
               --application-name << parameters.application-name >> \
-              --source ./project/<< parameters.bundle-source >> \
+              --source << parameters.bundle-source >> \
               --s3-location s3://<< parameters.bundle-bucket >>/<< parameters.bundle-key >>.<< parameters.bundle-type >>
 
   deploy-bundle:
