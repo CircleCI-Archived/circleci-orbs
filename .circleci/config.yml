@@ -39,8 +39,7 @@ jobs:
       - run: "sh scripts/dev-release.sh"
 
   trigger-downstream:
-    docker:
-      - image: circleci/circleci-cli:0.1.1418
+    machine: true
     steps:
       - run: |
           # We probably want to have a mapping of orbs that have changed to
