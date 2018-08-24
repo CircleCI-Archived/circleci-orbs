@@ -133,7 +133,7 @@ commands:
                    --application-name << parameters.application-name >> \
                    --deployment-group-name << parameters.deployment-group >> \
                    --deployment-config-name << parameters.deployment-config >> \
-                   --s3-location bucket=<< parameters.bundle-bucket >>,bundleType=<< parameters.bundle-type >>,key=<< parameters.bundle-key >> \
+                   --s3-location bucket=<< parameters.bundle-bucket >>,bundleType=<< parameters.bundle-type >>,key=<< parameters.bundle-key >>.<< parameters.bundle-type >> \
                    --output text \
                    --query '[deploymentId]')
 
@@ -150,8 +150,14 @@ commands:
               sleep 5
             done
 
-            echo "Deployment created."
-            aws deploy get-deployment --deployment-id $ID
+            if [[ "$STATUS" == "Failed" ]]; then
+              echo "Deployment failed!"
+              aws deploy get-deployment --deployment-id $ID
+              exit
+            else
+              echo "Deployment finished."
+              aws deploy get-deployment --deployment-id $ID
+            fi
 
 jobs:
   deploy:
