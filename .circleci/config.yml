@@ -25,7 +25,7 @@ jobs:
 
   build:
     docker:
-      - image: circleci/circleci-cli:0.1.1418
+      - image: circleci/circleci-cli:latest
     steps:
       - checkout
       - run: "echo -e \"token: placeholder\nverbose: false > ~/.circleci/cli.yml\""
@@ -33,7 +33,7 @@ jobs:
 
   dev-release:
     docker:
-      - image: circleci/circleci-cli:0.1.1418
+      - image: circleci/circleci-cli:latest
     steps:
       - checkout
       - run: "sh scripts/dev-release.sh"
@@ -51,7 +51,7 @@ jobs:
 
   release:
     docker:
-      - image: circleci/circleci-cli:0.1.1418
+      - image: circleci/circleci-cli:latest
     steps:
       - checkout
       ## walk the tree in orb-releases.yml (the path to which could be fed as a parameter to the command)
