@@ -7,6 +7,9 @@ workflows:
       - lint
       - build
       - dev-release
+      - trigger-downstream:
+          requires:
+            - dev-release
 
 jobs:
   lint:
@@ -31,6 +34,18 @@ jobs:
     steps:
       - checkout
       - run: "sh scripts/dev-release.sh"
+
+  trigger-downstream:
+    docker:
+      - image: circleci/circleci-cli:0.1.1418
+    steps:
+      - run: |
+          # We probably want to have a mapping of orbs that have changed to
+          # test projects triggered instead of just triggering everything all
+          # the time.
+          BASE="https://circleci.com/api/v1.1/project/github"
+          PROJECT="circleci/aws-code-deploy-orb-test/build"
+          curl -X POST $BASE/$PROJECT?circle-token=$CIRCLECI_API_TOKEN
 
   release:
     docker:
