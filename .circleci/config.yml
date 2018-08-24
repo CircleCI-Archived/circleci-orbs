@@ -6,7 +6,10 @@ workflows:
     jobs:
       - lint
       - build
-      - dev-release
+      - dev-release:
+          requires:
+            - build
+            - lint
       - trigger-downstream:
           requires:
             - dev-release
