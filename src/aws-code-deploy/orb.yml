@@ -205,6 +205,7 @@ jobs:
         default: "zip"
     executor: aws-cli/default
     steps:
+      - checkout
       - aws-cli/install
       - aws-cli/configure:
           aws-access-key-id: $AWS_ACCESS_KEY_ID
