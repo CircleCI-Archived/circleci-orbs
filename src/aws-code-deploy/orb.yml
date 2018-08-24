@@ -133,28 +133,25 @@ commands:
                    --application-name << parameters.application-name >> \
                    --deployment-group-name << parameters.deployment-group >> \
                    --deployment-config-name << parameters.deployment-config >> \
-                   --s3-location bucket=<< parameters.bundle-bucket >>,\
-                                 bundleType=<< parameters.bundle-type >>,\
-                                 key=<< parameters.bundle-key >>) \
+                   --s3-location bucket=<< parameters.bundle-bucket >>,bundleType=<< parameters.bundle-type >>,key=<< parameters.bundle-key >> \
                    --output text \
-                   --query '[deploymentId]'
-            if [ -z "$ID" ]; then
-              echo "Something went wrong with the deployment."
-            else
-              STATUS=$(aws get-deployment \
-                        --deployment-id $ID
+                   --query '[deploymentId]')
+
+            STATUS=$(aws deploy get-deployment \
+                      --deployment-id $ID \
+                      --output text \
+                      --query '[deploymentInfo.status]')
+
+            while [[ "$STATUS" == "InProgress" || "$STATUS" == "Pending" ]]; do
+              STATUS=$(aws deploy get-deployment \
+                        --deployment-id $ID \
                         --output text \
                         --query '[deploymentInfo.status]')
-              while [[ "$STATUS" == "InProgress" || "$STATUS" == "Pending"]]; do
-                STATUS=$(aws get-deployment \
-                          --deployment-id $ID
-                          --output text \
-                          --query '[deploymentInfo.status]')
-                sleep 5
-              done
-                echo "Deployment created."
-                aws get-deployment -deployment-id $ID
-            fi
+              sleep 5
+            done
+
+            echo "Deployment created."
+            aws deploy get-deployment --deployment-id $ID
 
 jobs:
   deploy:
