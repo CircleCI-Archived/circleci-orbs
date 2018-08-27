@@ -38,12 +38,15 @@ commands:
       aws-access-key-id:
         description: AWS access key id for IAM role, preferably passed in as an ENV var.
         type: string
+        default: $AWS_ACCESS_KEY_ID
       aws-secret-access-key:
         description: AWS secret key for IAM role, preferably passed in as an ENV var.
         type: string
+        default: $AWS_SECRET_ACCESS_KEY
       region:
         description: Default region
         type: string
+        default: $AWS_REGION
     steps:
       - run:
           name: Configure cli credentials

@@ -167,11 +167,6 @@ jobs:
        bundle and upload an application revision to S3. Once uploaded this
        job will finally create a deployment based on that revision."
     parameters:
-      region:
-        description:
-          "The AWS Region to deploy into"
-        type: string
-        default: $AWS_REGION
       application-name:
         description:
           "The name of an AWS CodeDeploy application associated with the applicable IAM user or AWS account."
@@ -211,10 +206,7 @@ jobs:
     steps:
       - checkout
       - aws-cli/install
-      - aws-cli/configure:
-          aws-access-key-id: $AWS_ACCESS_KEY_ID
-          aws-secret-access-key: $AWS_SECRET_ACCESS_KEY
-          region: << parameters.region >>
+      - aws-cli/configure
       - create-application:
           application-name: << parameters.application-name >>
       - create-deployment-group:
