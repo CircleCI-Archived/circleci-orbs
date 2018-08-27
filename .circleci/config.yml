@@ -6,6 +6,13 @@ workflows:
     jobs:
       - lint
       - build
+      - dev-release:
+          requires:
+            - build
+            - lint
+      - trigger-downstream:
+          requires:
+            - dev-release
 
 jobs:
   lint:
@@ -18,18 +25,35 @@ jobs:
 
   build:
     docker:
-      - image: circlecidx/circleci-cli:0.1.228
+      - image: circleci/circleci-cli:0.1.1568
     steps:
       - checkout
       - run: "echo -e \"token: placeholder\nverbose: false > ~/.circleci/cli.yml\""
-      - run: "for ORB in src/*; do circleci orb validate --path $ORB/orb.yml; done"
+      - run: "sh scripts/validate-orbs.sh"
 
-  release:
-    machine: true
+  dev-release:
+    docker:
+      - image: circleci/circleci-cli:0.1.1568
     steps:
       - checkout
-      ## install the cirlceci cli (or get it into a Docker image we use in the executor)
+      - run: "sh scripts/dev-release.sh"
 
+  trigger-downstream:
+    machine: true
+    steps:
+      - run: |
+          # We probably want to have a mapping of orbs that have changed to
+          # test projects triggered instead of just triggering everything all
+          # the time.
+          BASE="https://circleci.com/api/v1.1/project/github"
+          PROJECT="circleci/aws-code-deploy-orb-test/build"
+          curl -X POST $BASE/$PROJECT?circle-token=$CIRCLECI_API_TOKEN
+
+  release:
+    docker:
+      - image: circleci/circleci-cli:0.1.1568
+    steps:
+      - checkout
       ## walk the tree in orb-releases.yml (the path to which could be fed as a parameter to the command)
           ## For each, attempt to build the orb with the CLI, then if that's successful, register it.
           ## would look something like: `circleci orb build $PATH-TO-SRC $ORB-NAMESPACE $ORB-NAME $PATH-TO-BUILT-ORB; circleci orb register $PATH-TO-BUILT-ORB $REVISION`
