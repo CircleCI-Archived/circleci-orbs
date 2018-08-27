@@ -154,7 +154,7 @@ commands:
             if [[ $STATUS == "Failed" ]]; then
               echo "Deployment failed!"
               aws deploy get-deployment --deployment-id $ID
-              exit
+              exit 1
             else
               echo "Deployment finished."
               aws deploy get-deployment --deployment-id $ID
