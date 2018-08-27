@@ -10,3 +10,13 @@ commands:
             circleci version
             echo "Run circleci help"
             circleci help
+executors:
+  default:
+    description:
+      Uses the circleci-cli image, which includes the `circleci` command.
+    parameters:
+      tag:
+        type: string
+        default: "latest"
+    docker:
+      - image: circleci/circleci-cli:<< parameters.tag >>
