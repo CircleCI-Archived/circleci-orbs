@@ -1,0 +1,22 @@
+version: 2.1
+commands:
+  install:
+    steps:
+      - run:
+          name: "Install `circleci` CLI"
+          command: |
+            sudo bash -c "$(curl -fSl https://raw.githubusercontent.com/CircleCI-Public/circleci-cli/master/install.sh)"
+            echo "Print the circleci version"
+            circleci version
+            echo "Run circleci help"
+            circleci help
+executors:
+  default:
+    description:
+      Uses the circleci-cli image, which includes the `circleci` command.
+    parameters:
+      tag:
+        type: string
+        default: "latest"
+    docker:
+      - image: circleci/circleci-cli:<< parameters.tag >>
