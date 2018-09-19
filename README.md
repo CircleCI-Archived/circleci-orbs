@@ -1,6 +1,12 @@
 # circleci-orbs
 The source code for orbs published by CircleCI.
 
+## What are orbs?
+
+Orbs are packages of CircleCI configuration that can be shared across projects. Orbs allow you to make a single bundle of jobs, commands, and executors that can reference each other and can be imported into a CircleCI build configuration and invoked in their own namespace. Orbs are registered with CircleCI, with revisions expressed using the semver pattern.
+
+You can find additional documentation detailing orbs, including how to use and create them, in [this repo](https://github.com/CircleCI-Public/config-preview-sdk/tree/master/docs).
+
 ## PRE-RELEASE CONCEPTS HEREIN
 _Caveat Emptor:_ As of May 2018 this repository is a work in progress and subject to extreme change or abandonment. Do not assume techniques or even syntax for orbs contained in this repository will continue to work as orbs move towards release.
 
