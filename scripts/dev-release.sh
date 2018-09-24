@@ -9,6 +9,7 @@
 
 # for ORB in $UPDATED_ORBS; do
 for ORB in src/*; do
+  echo "Attempting to publish ${ORB} as circleci/${ORB}@dev:${CIRCLE_BRANCH}"
   if [[ -z "$CIRCLECI_API_TOKEN" ]]; then
     circleci orb publish dev src/$ORB/orb.yml circleci $ORB dev:${CIRCLE_BRANCH}
   else
