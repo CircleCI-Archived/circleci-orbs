@@ -1,0 +1,133 @@
+orbs:
+  cli: circleci/circleci-cli@volatile
+jobs:
+  pack-and-validate-orb:
+    description: >
+      Pack the contents of an orb for publishing
+      and validate the orb is well-formed.
+    parameters:
+      path:
+        description: >
+          The root of where the code for the orb lives 
+          relative to the root of the repo.
+        type: string
+      workspace-path:
+        description: >
+          When provided, save the contents of the orb into
+          the workspace at the given path. The value should
+          include a trailing slash.
+          Empty string (also the default value) is a no-op.
+        type: string
+        default: ""
+      artifact-path:
+        description: >
+          When provided, save the contents of the orb as an
+          artifact in the directory specified. The value should
+          include a trailing slash.
+          Empty string (also the default value) is a no-op."
+        type: string
+        default: ""
+      destination-file-name:
+        description: >
+          The name of the file where the packed string will be stored.
+          In most cases you can leave the default value of `orb.yml`.
+        type: string
+        default: "orb.yml"
+
+    executor: cli/default
+    steps:
+      - run:
+          name: "Starting the job: pack-and-validate-orb on the directory << parameters.path >>"
+          command: |
+            echo "parameters.workspace-path passed as: '<< parameters.workspace-path >>' (if the string is empty no workspace save will be attempted)"
+            echo "parameters.artifact-path passed as: '<< parameters.artifact-path >>' (if the string is empty no artifact save will be attempted)"
+            echo "parameters.destination-file-name passed as: '~/pack-and-validate-orb/<< parameters.destination-file-name >>'"
+      - checkout
+      - run:
+          name: "Pack << parameters.path >>"
+           # TODO: this is more fragile than is ideal
+           # TODO: using this fixed path feels like a hack or a missing feature to have a small dose of shared state across the job that can be mutated at runtime
+          command: |
+            mkdir -pv ~/pack-and-validate-orb/ && touch ~/pack-and-validate-orb/<< parameters.destination-file-name >>
+            circleci config pack << parameters.path >> >> ~/pack-and-validate-orb/<< parameters.destination-file-name >>
+      - run: 
+          name: "Validate whether this is a well-formed orb."
+          command: circleci orb validate ~/pack-and-validate-orb/<< parameters.destination-file-name >>
+      - when:
+          condition: << parameters.workspace-path >>
+          steps:
+            - run:
+                name: Save the packed orb to `<< parameters.workspace-path >>`
+                command: |
+                  mkdir -p << parameters.workspace-path >>
+                  cp ~/pack-and-validate-orb/<< parameters.destination-file-name >> << parameters.workspace-path >>
+            - persist_to_workspace:
+                name: "putting the packed orb into `<< parameters.workspace-path >>` because that value was passed as `parameters.workspace-path`."
+                root: .
+                paths:
+                  - << parameters.workspace-path >>
+      - when:
+          condition: << parameters.artifact-path >>
+          steps:
+            - store_artifacts:
+                name: "Storing the artifact to << parameters.artifact-path >><< parameters.destination-file-name >>"
+                path: ~/pack-and-validate-orb/<< parameters.destination-file-name >>
+                destination: << parameters.artifact-path >><< parameters.destination-file-name >>
+  publish-dev-orb:
+    executor: cli/default
+    parameters:
+      namespace:
+        description: "The namespace where this should be published."
+        type: string
+      orb:
+        description: "The orb name where this should be published."
+        type: string  
+      label:
+        description: "The label to use when publishing the dev orb (eg: if you pass `foo` you will publish to `dev:foo`)"
+        type: string
+      workspace-path:
+        description: "The directory relative to the workspace root where the orb file will be found. Should end in a trailing /"
+        type: string
+        default: ""
+      token-variable:
+        description: "The env var containing your token. Pass this as a literal string such as `$ORB_DEV_PUBLISHING_TOKEN`. Do not paste the actual token into your configuration."
+        type: string
+      file-name:
+        description: "The name of the file where the packed string is stored. In most cases you can leave the default value."
+        type: string
+        default: "orb.yml"
+      do-validation:
+        description: "Boolean for whether to do validation. Default is true."
+        type: boolean
+        default: true
+    steps:
+      - when:
+          condition: << parameters.workspace-path >>
+          steps:
+            - attach_workspace:
+                at: .
+      - unless:
+          condition: << parameters.workspace-path >>
+          steps:
+            - run:
+                name: "No workspace was passed."
+                command: |
+                  echo "No workspace was passed."
+                  exit 1
+      - when:
+          condition: << parameters.do-validation >>
+          steps:
+            - run: 
+                name: "Validate whether this is a well-formed orb. Looking in << parameters.workspace-path >><< parameters.file-name >> for the file."
+                command: circleci orb validate << parameters.workspace-path >><< parameters.file-name >>
+      - run:
+          name: >
+            Publish a dev orb at << parameters.namespace >>/<< parameters.orb >>@dev:<< parameters.label >>.
+            NOTE: this currently assumes you are publishing to the registry at circleci.com
+          command: >
+            circleci orb publish dev
+            << parameters.workspace-path >><< parameters.file-name >>
+            << parameters.namespace >>
+            << parameters.orb >>
+            << parameters.label >>
+            --token << parameters.token-variable >>
