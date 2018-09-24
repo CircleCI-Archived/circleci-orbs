@@ -10,8 +10,8 @@
 # for ORB in $UPDATED_ORBS; do
 for ORB in src/*; do
   if [[ -z "$CIRCLECI_API_TOKEN" ]]; then
-    circleci circleci orb publish dev src/$ORB/orb.yml circleci $ORB dev:${CIRCLE_BRANCH}
+    circleci orb publish dev src/$ORB/orb.yml circleci $ORB dev:${CIRCLE_BRANCH}
   else
-    circleci circleci orb publish dev src/$ORB/orb.yml circleci $ORB dev:${CIRCLE_BRANCH} --token $CIRCLECI_API_TOKEN
+    circleci orb publish dev src/$ORB/orb.yml circleci $ORB dev:${CIRCLE_BRANCH} --token $CIRCLECI_API_TOKEN
   fi
 done
