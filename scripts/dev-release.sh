@@ -8,11 +8,11 @@
 #                grep -vE '^[A-Z!?]{1,2}\s+')
 
 # for ORB in $UPDATED_ORBS; do
-for ORB in src/*; do
+for ORB in src/*/; do
   echo "Attempting to publish ${ORB} as circleci/${ORB}@dev:${CIRCLE_BRANCH}"
   if [[ -z "$CIRCLECI_API_TOKEN" ]]; then
-    circleci orb publish dev src/$ORB/orb.yml circleci $ORB dev:${CIRCLE_BRANCH}
+    circleci orb publish dev $ORB/orb.yml circleci $(basename $ORB) dev:${CIRCLE_BRANCH}
   else
-    circleci orb publish dev src/$ORB/orb.yml circleci $ORB dev:${CIRCLE_BRANCH} --token $CIRCLECI_API_TOKEN
+    circleci orb publish dev $ORB/orb.yml circleci $(basename $ORB) dev:${CIRCLE_BRANCH} --token $CIRCLECI_API_TOKEN
   fi
 done
