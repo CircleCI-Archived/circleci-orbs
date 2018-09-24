@@ -4,7 +4,11 @@ parameters:
     default: "."
     type: string
   publishdir:
-    description: "Hugo sets the name of your publish Dir inside the site config, not as a CLI argument. Most people leave this to the default value of `public`, so that's what we do here. In most case you don't need to change this value."
+    description: >
+      Hugo sets the name of your publish Dir inside the site config,
+      not as a CLI argument. Most people leave this to the default value of
+      `public`, so that's what we do here.
+      In most case you don't need to change this value."
     default: "public"
     type: string
   html-proofer:

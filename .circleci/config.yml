@@ -1,4 +1,9 @@
-version: 2
+version: 2.1
+
+executors:
+  cli:
+    docker:
+      - image: circleci/circleci-cli:0.1.2463
 
 workflows:
   version: 2
@@ -24,16 +29,14 @@ jobs:
           'yamllint .'
 
   build:
-    docker:
-      - image: circleci/circleci-cli:0.1.1568
+    executor: cli
     steps:
       - checkout
       - run: "echo -e \"token: placeholder\nverbose: false > ~/.circleci/cli.yml\""
       - run: "sh scripts/validate-orbs.sh"
 
   dev-release:
-    docker:
-      - image: circleci/circleci-cli:0.1.1568
+    executor: cli
     steps:
       - checkout
       - run: "sh scripts/dev-release.sh"
@@ -50,8 +53,7 @@ jobs:
           curl -X POST $BASE/$PROJECT?circle-token=$CIRCLECI_API_TOKEN
 
   release:
-    docker:
-      - image: circleci/circleci-cli:0.1.1568
+    executor: cli
     steps:
       - checkout
       ## walk the tree in orb-releases.yml (the path to which could be fed as a parameter to the command)

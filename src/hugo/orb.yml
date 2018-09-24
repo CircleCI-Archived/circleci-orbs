@@ -8,4 +8,4 @@ executors:
         description: "The tag to use on the image"
         type: string
     docker:
-      - image: cibuilds/hugo:<< parameters.image >>
+      - image: cibuilds/hugo:<< parameters.tag >>
