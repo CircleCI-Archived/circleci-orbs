@@ -24,16 +24,16 @@ commands:
           name: Deploy to S3
           command: "aws s3 sync << parameters.from >> << parameters.to >><<# parameters.overwrite >> --delete<</ parameters.overwrite >>"
 
-usage:
-  version: 2
-  orbs:
-    aws-cli: circleci/aws-cli@volatile
-    s3: circleci/s3@volatile
-  jobs:
-    build:
-      executor: aws-cli/default
-      steps:
-        - s3/deploy:
-            from: "somepath/thing"
-            to: "S3_bucket_URI_goes_here"
-            overwrite: "false"
+# usage:
+#   version: 2
+#   orbs:
+#     aws-cli: circleci/aws-cli@volatile
+#     s3: circleci/s3@volatile
+#   jobs:
+#     build:
+#       executor: aws-cli/default
+#       steps:
+#         - s3/deploy:
+#             from: "somepath/thing"
+#             to: "S3_bucket_URI_goes_here"
+#             overwrite: "false"
