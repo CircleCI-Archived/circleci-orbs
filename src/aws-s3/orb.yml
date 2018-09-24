@@ -15,7 +15,7 @@ commands:
         type: string
         description: A URI to an S3 bucket
       overwrite:
-        default: "false"
+        default: false
         type: boolean
     steps:
       - aws-cli/install
