@@ -1,4 +1,46 @@
 version: 2.1
+description: "The Maven orb encapsulates common maven tasks."
+
+# Usage Examples
+#
+# If you have a standard maven project, you can use this orb to run through
+# a common maven worklow. Without any additional configuration you can
+# build, test, and automatically have your test results uploaded to CircleCI
+# with the following configuration:
+#
+# version 2.1
+# orbs:
+#   maven: circleci/maven@volatile
+#
+# workflows:
+#   test:
+#     jobs:
+#       - maven/test
+#
+# You could run mvn with debug mode with a configuration like this:
+#
+# version 2.1
+# orbs:
+#   maven: circleci/maven@volatile
+#
+# workflows:
+#   test:
+#     jobs:
+#       - maven/test:
+#           command: -X verify
+#
+# If your tests results are not in the default (target/surefire-reports) directory then
+# you could add a custom directory with a configuration like this:
+#
+# version 2.1
+# orbs:
+#   maven: circleci/maven@volatile
+#
+# workflows:
+#   test:
+#     jobs:
+#       - maven/test:
+#           test_results_path: /path/to/test/results
 
 executors:
   maven:
@@ -29,25 +71,50 @@ commands:
           command: find . -name 'pom.xml' -exec cat {} + | shasum | awk '{print $1}' > /tmp/maven_cache_seed
       - restore_cache:
           key: maven-{{ checksum "/tmp/maven_cache_seed" }}
+      - run:
+          name: Install Dependencies
+          command: mvn dependency:go-offline
       - steps: << parameters.steps >>
       - save_cache:
           paths:
             - ~/.m2
           key: maven-{{ checksum "/tmp/maven_cache_seed" }}
+  process_test_results:
+    description: |
+      Upload test results.
+
+      This will populate the Test Summary tab in the CircleCI UI. By default it will
+      look in `target/surefire-reports` (the default location for maven test results).
+      You can override where to find the test results with the path parameter.
+    parameters:
+      test_results_path:
+        type: string
+    steps:
+      - store_test_results:
+          path: << parameters.test_results_path >>
 
 jobs:
   test:
     description: |
-      Checkout, build and test a Maven project.
+      Checkout, build, test, and upload test results for a Maven project.
+
+      Parameters
+        command - the maven command to run
+        test_results_path - path to test results
     executor: maven
     parameters:
       command:
         type: string
         default: verify
+      test_results_path:
+        type: string
+        default: target/surefire-reports
     steps:
       - checkout
       - with_cache:
           steps:
             - run:
                 name: Run Tests
-                command: mvn {{ parameters.command }}
+                command: mvn << parameters.command >>
+      - process_test_results:
+          test_results_path: << parameters.test_results_path >>
