@@ -14,12 +14,11 @@
 for ORB in src/*/; do
   orbname=$(basename $ORB)
   echo "Attempting to publish ${ORB}orb.yml as circleci/${orbname}@dev:${CIRCLE_BRANCH}"
+  ls -al ${ORB}
   if [[ -z "$CIRCLECI_API_TOKEN" ]]; then
     circleci orb publish ${ORB}orb.yml circleci/${orbname}@dev:${CIRCLE_BRANCH}
-    echo !!
   else
     circleci orb publish ${ORB}orb.yml circleci/${orbname}@dev:${CIRCLE_BRANCH} --token $CIRCLECI_API_TOKEN
-    echo !!
   fi
   echo "---------------------------"
 done
