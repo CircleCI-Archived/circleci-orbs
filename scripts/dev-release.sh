@@ -13,13 +13,12 @@
 # TODO - this probably shouldn't silently fail to publish some of the orbs
 for ORB in src/*/; do
   orbname=$(basename $ORB)
-  echo "Attempting to publish ${ORB}orb.yml as circleci/${orbname}@dev:${CIRCLE_BRANCH}"
-  echo [ -e ${ORB}orb.yml ]
-  (ls ${ORB}orb.yml && echo yes) || echo no
+  (ls ${ORB}orb.yml && echo "orb.yml found, attempting to publish...") || echo "No orb.yml file was found - the next line is expected to fail."
   if [[ -z "$CIRCLECI_API_TOKEN" ]]; then
     circleci orb publish ${ORB}orb.yml circleci/${orbname}@dev:${CIRCLE_BRANCH}
   else
     circleci orb publish ${ORB}orb.yml circleci/${orbname}@dev:${CIRCLE_BRANCH} --token $CIRCLECI_API_TOKEN
   fi
+  echo $?
   echo "---------------------------"
 done
