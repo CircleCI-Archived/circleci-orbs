@@ -12,12 +12,12 @@
 # TODO - it may be overkill to always publish all on the branch
 # TODO - this probably shouldn't silently fail to publish some of the orbs
 for ORB in src/*/; do
-  ORBNAME = $ORB
-  echo "Attempting to publish ${ORB}orb.yml as circleci/${ORBNAME}@dev:${CIRCLE_BRANCH}"
+  orbname=$(basename $ORB)
+  echo "Attempting to publish ${ORB}orb.yml as circleci/${orbname}@dev:${CIRCLE_BRANCH}"
   if [[ -z "$CIRCLECI_API_TOKEN" ]]; then
-    circleci orb publish ${ORB}orb.yml circleci/${ORBNAME}@dev:${CIRCLE_BRANCH}
+    circleci orb publish ${ORB}orb.yml circleci/${orbname}@dev:${CIRCLE_BRANCH}
   else
-    circleci orb publish ${ORB}orb.yml circleci/${ORBNAME}#dev:${CIRCLE_BRANCH} --token $CIRCLECI_API_TOKEN
+    circleci orb publish ${ORB}orb.yml circleci/${orbname}#dev:${CIRCLE_BRANCH} --token $CIRCLECI_API_TOKEN
   fi
   echo "---------------------------"
 done
