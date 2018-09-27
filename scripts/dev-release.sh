@@ -1,4 +1,4 @@
-#!/bin/bash -eo pipefail
+#!/bin/bash -exo pipefail
 
 # COMMIT_RANGE=$(echo $CIRCLE_COMPARE_URL | sed 's:^.*/compare/::g')
 # echo "Commit range: " $COMMIT_RANGE
