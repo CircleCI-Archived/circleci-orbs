@@ -18,6 +18,9 @@ workflows:
       - trigger-downstream:
           requires:
             - dev-release
+          filters:
+            branches:
+              only: master
 
 jobs:
   lint:
