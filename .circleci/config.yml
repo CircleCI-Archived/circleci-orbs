@@ -3,7 +3,7 @@ version: 2.1
 executors:
   cli:
     docker:
-      - image: circleci/circleci-cli:0.1.2463
+      - image: circleci/circleci-cli:0.1.2709
 
 workflows:
   version: 2
@@ -18,6 +18,9 @@ workflows:
       - trigger-downstream:
           requires:
             - dev-release
+          filters:
+            branches:
+              only: master
 
 jobs:
   lint:
