@@ -1,4 +1,4 @@
-#!/bin/bash -exo pipefail
+#!/bin/bash -eo pipefail
 
 # COMMIT_RANGE=$(echo $CIRCLE_COMPARE_URL | sed 's:^.*/compare/::g')
 # echo "Commit range: " $COMMIT_RANGE
@@ -14,7 +14,7 @@
 for ORB in src/*/; do
   orbname=$(basename $ORB)
   (ls ${ORB}orb.yml && echo "orb.yml found, attempting to publish...") || echo "No orb.yml file was found - the next line is expected to fail."
-  if [[ -z "$CIRCLECI_API_TOKEN" ]]; then
+  if [ -z "$CIRCLECI_API_TOKEN" ]; then
     circleci orb publish ${ORB}orb.yml circleci/${orbname}@dev:${CIRCLE_BRANCH}
   else
     circleci orb publish ${ORB}orb.yml circleci/${orbname}@dev:${CIRCLE_BRANCH} --token $CIRCLECI_API_TOKEN
