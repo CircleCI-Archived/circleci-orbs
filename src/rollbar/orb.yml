@@ -21,7 +21,7 @@ commands:
           command: |
             curl https://api.rollbar.com/api/1/deploy/ \
               --form access_token=$ROLLBAR_ACCESS_TOKEN \
-              --form environment=<< paramters.environment >> \
+              --form environment=<< parameters.environment >> \
               --form revision=$CIRCLE_SHA1 \
               --form local_username=$CIRCLE_USERNAME
 
