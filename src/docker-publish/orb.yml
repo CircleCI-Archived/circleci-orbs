@@ -1,12 +1,12 @@
 version: 2.1
-description: "The docker-publish orb encapsulates common tasks for publishing a docker image to dockerhub."
+description: "The docker-publish orb encapsulates common tasks for building and publishing a docker image to a registry."
 
 # Usage Examples
 # --
 #
 # If you have a standard docker workflow, where you are building an image with a Dockerfile in the root
 # of your repository, naming the image to be the same name as your repository, and then pushing to
-# the default docker registry (at hub.docker.com). Then you can perform these tasks without any additional
+# the default docker registry (at docker.io). Then you can perform these tasks without any additional
 # configuration with the following circle.yml config:
 #
 # version: 2.1
@@ -61,7 +61,7 @@ commands:
         * run docker login to ensure that you can push the built image
 
       Parameters -
-        registry (optional); Name of alternate registry to use. Defaults to hub.docker.com.
+        registry (optional); Name of alternate registry to use. Defaults to docker.io.
     parameters:
       registry:
         type: string
@@ -89,7 +89,7 @@ commands:
         dockerfile (optional); Name of alternate dockerfile to use. Defaults to Dockerfile in working directly.
         image (optional); Name of image to create. Defaults to a combination of $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME.
         tag (optional); Name of alternate tag to use. Defaults to $CIRCLE_SHA1
-        registry (optional); Name of alternate registry to use. Defaults to hub.docker.com.
+        registry (optional); Name of alternate registry to use. Defaults to docker.io.
     parameters:
       dockerfile:
         type: string
@@ -108,7 +108,7 @@ commands:
       Deploy Docker image to registry.
 
       Parameters -
-        registry (optional); Name of alternate registry to use. Defaults to hub.docker.com.
+        registry (optional); Name of alternate registry to use. Defaults to docker.io.
         image (optional); Name of image to create. Defaults to a combination of $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME.
     parameters:
       registry:
