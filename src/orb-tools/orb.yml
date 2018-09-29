@@ -132,3 +132,23 @@ jobs:
             << parameters.orb >>
             << parameters.label >>
             --token << parameters.token-variable >>
+  illuminate-this-build:
+    docker:
+      - image: circleci/ruby:2.5.1-stretch
+    parameters:
+      checkout:
+        type: boolean
+        default: false
+        description: >
+          Boolean for whether to run a `checkout` first
+           - default is false for the command, assuming you
+           may have already done checkout in your job.
+    shell: /usr/bin/env ruby
+    steps:
+      - run:
+          name: Parse through .circleci/config.yml
+          command: |
+            puts "I am in ruby"
+
+
+
