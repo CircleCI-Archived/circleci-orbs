@@ -10,7 +10,7 @@ You can find additional documentation detailing orbs, including how to use and c
 ## Publishing Orbs
 Orbs are added to the registry through the CircleCI API. The build in this repository (`.circleci/config.yml`) uses that API via the [CircleCI CLI](https://github.com/CircleCI-Public/circleci-cli) to take the source of orbs located in the `src` folder and register them as orbs.
 
-To register an orb via the CLI you can point at a local file containing the YAML of the orb or pass the YAML of your orb to STDIN as a string.
+To register an orb via [our CLI](https://github.com/CircleCI-Public/circleci-cli) you can point at a local file containing the YAML of the orb or pass the YAML of your orb to STDIN as a string.
 
 `circleci orb publish $PATH_TO_FILE_WITH_ORB_YAML mynamespace/myorb@dev:mytag`
 
