@@ -1,0 +1,152 @@
+version: 2.1
+description: "The docker-publish orb encapsulates common tasks for publishing a docker image to dockerhub."
+
+# Usage Examples
+# --
+#
+# If you have a standard docker workflow, where you are building an image with a Dockerfile in the root
+# of your repository, naming the image to be the same name as your repository, and then pushing to
+# the default docker registry (at hub.docker.com). Then you can perform these tasks without any additional
+# configuration with the following circle.yml config:
+#
+# version: 2.1
+# orbs:
+#   docker: circleci/docker@dev:volatile
+#
+# workflows:
+#   publish:
+#     jobs:
+#       - docker/publish
+#
+# --
+# You could use a different naming and tagging convention with a configuration like this:
+#
+# version: 2.1
+# orbs:
+#   docker: circleci/docker@dev:volatile
+#
+# workflows:
+#   publish:
+#     jobs:
+#       - docker/publish:
+#           image: my/image
+#           tag: mytag
+#
+# --
+# You could use a different Dockerfile and push to a different regsitry with a configuration like this:
+#
+# version: 2.1
+# orbs:
+#   docker: circleci/docker@dev:volatile
+#
+# workflows:
+#   publish:
+#     jobs:
+#       - docker/publish:
+#           registry: my.docker.registry
+#           dockerfile: path/to/MyDockerFile
+
+executors:
+  docker:
+    description: The docker container to use when running docker-publish builds
+    docker:
+      - image: circleci/python:3.6
+
+commands:
+  check:
+    description: |
+      Sanity check to make sure you can build a docker image.
+
+        * check that $DOCKER_LOGIN and $DOCKER_PASSWORD environment variables are set
+        * run docker login to ensure that you can push the built image
+
+      Parameters -
+        registry (optional); Name of alternate registry to use. Defaults to hub.docker.com.
+    parameters:
+      registry:
+        type: string
+    steps:
+      - run:
+          name: Check Environment Variables
+          command: |
+            if [[ -z "${DOCKER_LOGIN}" ]]; then
+              echo "DOCKER_LOGIN is not set, will not be able to push image."
+              exit 1
+            fi
+
+            if [[ -z "${DOCKER_PASSWORD}" ]]; then
+              echo "DOCKER_PASSWORD is not set, will not be able to push image."
+              exit 1
+            fi
+      - run:
+          name: Docker Login
+          command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD << parameters.registry >>
+  build:
+    description: |
+      Builds a docker image.
+
+      Parameters -
+        dockerfile (optional); Name of alternate dockerfile to use. Defaults to Dockerfile in working directly.
+        image (optional); Name of image to create. Defaults to a combination of $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME.
+        tag (optional); Name of alternate tag to use. Defaults to $CIRCLE_SHA1
+        registry (optional); Name of alternate registry to use. Defaults to hub.docker.com.
+    parameters:
+      dockerfile:
+        type: string
+      image:
+        type: string
+      tag:
+        type: string
+      registry:
+        type: string
+    steps:
+      - run:
+          name: Build Docker Image
+          command: docker build -f << parameters.dockerfile >> -t << parameters.registry >>/<< parameters.image >>:<< parameters.tag >> .
+  deploy:
+    description: |
+      Deploy Docker image to registry.
+
+      Parameters -
+        registry (optional); Name of alternate registry to use. Defaults to hub.docker.com.
+        image (optional); Name of image to create. Defaults to a combination of $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME.
+    parameters:
+      registry:
+        type: string
+      image:
+        type: string
+    steps:
+      - run:
+          name: Push Docker Image
+          command: docker push << parameters.registry >>/<< parameters.image >>
+
+jobs:
+  publish:
+    description: Check, Build, and Deploy a Docker Image.
+    executor: docker
+    parameters:
+      dockerfile:
+        type: string
+        default: Dockerfile
+      image:
+        type: string
+        default: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
+      tag:
+        type: string
+        default: $CIRCLE_SHA1
+      registry:
+        type: string
+        default: docker.io
+    steps:
+      - checkout
+      - setup_remote_docker
+      - check:
+          registry: << parameters.registry >>
+      - build:
+          dockerfile: << parameters.dockerfile >>
+          image: << parameters.image >>
+          tag: << parameters.tag >>
+          registry: << parameters.registry >>
+      - deploy:
+          registry: << parameters.registry >>
+          image: << parameters.image >>
