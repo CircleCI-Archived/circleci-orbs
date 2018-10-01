@@ -1,5 +1,5 @@
 version: 2.1
-description: "Installs a ready to go awscli"
+description: "Installs the AWS Command Line Interface (awscli)"
 
 executors:
   default:
@@ -22,10 +22,20 @@ commands:
       - run:
           name: Install AWS CLI
           command: |
-            if [[ $(command -v aws) == "" ]]; then
-              sudo pip install awscli
-            else
-              echo "AWS CLI is already installed."
+            if [[ $(command -v pip) == "" ]]; then
+              echo "PIP is required to install AWS CLI and is not available."
+              exit 1
+            else 
+              if [[ $(command -v sudo) == "" ]]; then
+                echo "SUDO is required to install AWS CLI and is not available."
+                exit 1
+              else
+                if [[ $(command -v aws) == "" ]]; then
+                  sudo pip install awscli
+                else
+                  echo "AWS CLI is already installed."
+                fi
+              fi
             fi
   configure:
     description: |
