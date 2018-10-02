@@ -3,10 +3,10 @@ version: 2.1
 description: |
   An orb for working with Amazon Elastic Container Registry (ECR)
 
-  The executors within this Orb provide run-time environments that contain the 
-  necessary dependencies for executing the jobs and commands in this orb, 
-  except for the following required dependencies that must be configured in 
-  CircleCI in order to use this orb - Docker, environment variables for AWS 
+  The executors within this Orb provide run-time environments that contain the
+  necessary dependencies for executing the jobs and commands in this orb,
+  except for the following required dependencies that must be configured in
+  CircleCI in order to use this orb - Docker, environment variables for AWS
   login ($AWS_ACCESS_KEY_ID, $AWS_SECRET_ACCESS_KEY)
 
   The source for this Orb can be found here:
@@ -27,7 +27,7 @@ examples:
             - aws-ecr/build_and_push_image:
                 context: myContext # your context containing AWS login variables
                 region: myAwsRegion
-                account-url: myAwsAccountId.dkr.ecr.myAwsRegion.amazonaws.com 
+                account-url: myAwsAccountId.dkr.ecr.myAwsRegion.amazonaws.com
                 repo: myRepo # your Amazon ECR repository
                 tag: latest
 
@@ -42,8 +42,8 @@ executors:
 commands:
   ecr-login:
     description: "Authenticate into the Amazon ECR service"
-    parameters: 
-      region: 
+    parameters:
+      region:
         type: string
         default: "us-east-1"
     steps:
@@ -86,12 +86,12 @@ commands:
 jobs:
   build_and_push_image:
     description: Install AWS CLI, if needed, and configure. Log into Amazon ECR
-                 and push image to repository. Requires environment variables 
+                 and push image to repository. Requires environment variables
                  for AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY. We recommend
-                 these be saved in a Project (https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-project) or in 
+                 these be saved in a Project (https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-project) or in
                  Contexts (https://circleci.com/docs/2.0/contexts/).
     executor: default
-    parameters: 
+    parameters:
       profile-name:
         description: AWS profile name to be configured.
         type: string
@@ -108,7 +108,7 @@ jobs:
                      value, i.e. $AWS_SECRET_ACCESS_KEY.
         type: string
         default: $AWS_SECRET_ACCESS_KEY
-      region: 
+      region:
         type: string
         description: AWS region to use with the commands (default = us-east-1)
         default: "us-east-1"
@@ -124,7 +124,7 @@ jobs:
         default: "latest"
     steps:
       - aws-cli/install
-      - aws-cli/configure: 
+      - aws-cli/configure:
           profile-name: << parameters.profile-name >>
           aws-access-key-id: << parameters.aws-access-key-id >>
           aws-secret-access-key: << parameters.aws-secret-access-key >>
@@ -136,8 +136,8 @@ jobs:
       - build-image:
           account-url: << parameters.account-url >>
           repo: << parameters.repo >>
-          tag: << parameters.tag >> 
+          tag: << parameters.tag >>
       - push-image:
           account-url: << parameters.account-url >>
           repo: << parameters.repo >>
-          tag: << parameters.tag >> 
+          tag: << parameters.tag >>

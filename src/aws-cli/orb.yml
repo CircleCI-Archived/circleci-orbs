@@ -25,7 +25,7 @@ commands:
             if [[ $(command -v pip) == "" ]]; then
               echo "PIP is required to install AWS CLI and is not available."
               exit 1
-            else 
+            else
               if [[ $(command -v sudo) == "" ]]; then
                 echo "SUDO is required to install AWS CLI and is not available."
                 exit 1
