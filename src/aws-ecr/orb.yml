@@ -32,7 +32,7 @@ examples:
                 tag: latest
 
 orbs:
-  aws-cli: circleci/aws-cli@volatile
+  aws-cli: circleci/aws-cli@0.0.1
 
 executors:
   default:
