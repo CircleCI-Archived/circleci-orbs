@@ -229,9 +229,8 @@ jobs:
       - when:
           condition: << parameters.do-validation >>
           steps:
-            - run:
-                name: "Validate whether this is a well-formed orb. Looking in << parameters.workspace-path >><< parameters.file-name >> for the file."
-                command: circleci orb validate << parameters.workspace-path >><< parameters.file-name >>
+            - validate:
+                orb-path: << parameters.workspace-path >><< parameters.file-name >>
       - publish:
           orb-path: << parameters.workspace-path >><< parameters.file-name >>
           orb-ref: << parameters.orb-ref >>
