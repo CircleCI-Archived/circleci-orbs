@@ -1,6 +1,75 @@
 version: 2.1
+
 orbs:
   cli: circleci/circleci-cli@volatile
+
+commands:
+  validate:
+    description: >
+      Users the CLI to validate a given orb yml
+    parameters:
+      orb-path:
+        description: "Path to the orb to be validated."
+        type: string
+    steps:
+      - run:
+          name: "Validate whether this is a well-formed orb."
+          command: circleci orb validate << parameters.orb-path >>
+
+  pack:
+    description: >
+      *Experimental*
+      Uses the CLI to pack an orb file structure
+      into a single orb yml.
+    parameters:
+      source:
+        description: "Path to the root folder of an unpacked orb."
+        type: string
+      destination:
+        description: "Path including the filename to output the packed orb."
+        type: string
+    steps:
+      - run:
+          name: "Pack << parameters.source>>"
+          command: |
+            circleci config pack << parameters.source >> > << parameters.destination >>
+
+# store-as-artifact:
+#   description: >
+#     Stores an orb as a circleci artifact.
+#   parameters:
+#     a:
+#       description:
+#       type:
+#   steps:
+#     - run:
+#         name: ""
+#         command: echo 1
+
+# persist-to-workspace:
+#   description: >
+#     Persists an orb yml between jobs in a workflow.
+#   parameters:
+#     a:
+#       description:
+#       type:
+#   steps:
+#     - run:
+#         name: ""
+#         command: echo 1
+
+# publish:
+#   description: >
+#     Uses the CLI to publish an orb to the registry.
+#   parameters:
+#     a:
+#       description:
+#       type:
+#   steps:
+#     - run:
+#         name: ""
+#         command: echo 1
+
 jobs:
   pack-and-validate-orb:
     description: >
@@ -45,15 +114,16 @@ jobs:
             echo "parameters.destination-file-name passed as: '~/pack-and-validate-orb/<< parameters.destination-file-name >>'"
       - checkout
       - run:
-          name: "Pack << parameters.path >>"
+          name: "Ensure /pack-and-validate-orb"
            # TODO: this is more fragile than is ideal
            # TODO: using this fixed path feels like a hack or a missing feature to have a small dose of shared state across the job that can be mutated at runtime
           command: |
-            mkdir -pv ~/pack-and-validate-orb/ && touch ~/pack-and-validate-orb/<< parameters.destination-file-name >>
-            circleci config pack << parameters.path >> >> ~/pack-and-validate-orb/<< parameters.destination-file-name >>
-      - run:
-          name: "Validate whether this is a well-formed orb."
-          command: circleci orb validate ~/pack-and-validate-orb/<< parameters.destination-file-name >>
+            mkdir -pv ~/pack-and-validate-orb
+      - pack:
+          source: << parameters.path >>
+          destination: ~/pack-and-validate-orb/<< parameters.destination-file-name >>
+      - validate:
+          orb-path: ~/pack-and-validate-orb/<< parameters.destination-file-name >>
       - when:
           condition: << parameters.workspace-path >>
           steps:
