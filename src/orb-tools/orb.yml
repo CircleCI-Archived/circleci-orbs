@@ -58,6 +58,39 @@ commands:
 #         name: ""
 #         command: echo 1
 
+  increment:
+    description: >
+      Uses the CLI to increment the version of an orb in the registry.
+      If the orb does not have a version yet it starts at 0.0.0
+    parameters:
+      orb-path:
+        description: "Path to an orb."
+        type: string
+      namespace:
+        description: "Namespace the orb lives under."
+        type: string
+      orb-name:
+        description: "Name of the orb to increment.;"
+        type: string
+      segment:
+        description: "The semver segment to increment 'major' or 'minor' or 'patch'"
+        type: enum
+        enum: ["major", "minor", "patch"]
+      token-variable:
+        description: "The env var containing your token. Pass this as a literal string such as `$ORB_PUBLISHING_TOKEN`. Do not paste the actual token into your configuration."
+        type: string
+    steps:
+      - run:
+          name: >
+            Increment << parameters.segment >> segment of orb at << parameters.orb-path >>
+            NOTE: this currently assumes you are publishing to the registry at circleci.com
+          command: |
+            circleci orb publish increment \
+            << parameters.orb-path >> \
+            << parameters.namespace >>/<< parameters.orb-name >> \
+            << parameters.segment >> \
+            --token << parameters.token-variable >>
+
   publish:
     description: >
       Uses the CLI to publish an orb to the registry.
