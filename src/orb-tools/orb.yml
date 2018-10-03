@@ -115,6 +115,32 @@ commands:
             circleci orb publish << parameters.orb-path >> << parameters.orb-ref >> --token << parameters.token-variable >>
 
 jobs:
+  validate-orb:
+    description: Uses the CLI to validate a given orb.
+    parameters:
+      orb-path:
+        description: "Path to the orb to be validated."
+        type: string
+      workspace-path:
+        description: >
+          When provided, save the contents of the orb into
+          the workspace at the given path. The value should
+          include a trailing slash.
+          Empty string (also the default value) is a no-op.
+        type: string
+        default: ""
+    executor: cli/default
+    steps:
+      - checkout
+      - validate:
+          orb-path: << parameters.orb-path >>
+      - when:
+          condition: << parameters.workspace-path >>
+          steps:
+            - persist-orb-to-workspace:
+                orb-path: << parameters.orb-path >>
+                workspace-path: << parameters.workspace-path >>
+
   pack-and-validate-orb:
     description: >
       Pack the contents of an orb for publishing
