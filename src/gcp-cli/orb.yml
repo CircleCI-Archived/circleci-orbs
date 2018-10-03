@@ -1,0 +1,167 @@
+version: 2.1
+description: |
+  Installs the Google Cloud Command Line Interface (gcloud)
+
+  The executors within this Orb provide run-time environments that contain the
+  necessary dependencies for executing the jobs and commands in this orb,
+  except for the following required dependencies that must be configured in
+  CircleCI in order to use this orb - environment variables for gcloud
+  initialization ($GCLOUD_SERVICE_KEY).
+
+  The source for this Orb can be found here:
+  https://github.com/CircleCI-Public/circleci-orbs/tree/master/src/gcp-cli
+
+examples:
+  simple_install_and_configure:
+    description: Install the gcloud CLI, if not available
+    usage:
+      version: 2.1
+
+      orbs:
+        gcp-cli: circleci/gcp-cli@1.0.0
+
+      workflows:
+        install_and_configure_cli:
+          jobs:
+            - gcp-cli/install_and_configure_cli:
+                context: myContext # your context containing gcloud service key
+                google-project-id: myGoogleProjectId
+                google-compute-zone: myGoogleComputeZone
+
+executors:
+  default:
+    description: A debian based docker container to use when running the
+                 gcloud CLI
+    parameters:
+      python-version:
+        type: string
+        default: "2.7"
+      debian-release:
+        type: string
+        default: "stretch"
+    docker:
+      - image: circleci/python:<< parameters.python-version >>-<< parameters.debian-release >>
+  google:
+    description: The official Google docker container with gcloud SDK
+                 pre-installed
+    docker:
+      - image: google/cloud-sdk
+
+commands:
+  install:
+    description: |
+      Install the gcloud CLI, if not available
+    steps:
+      - when:
+          name: Install gcloud CLI, if not available
+          condition: $(command -v gcloud) == ""
+          steps:
+            - run:
+                name: Install gcloud CLI
+                command: |
+                  # Set sudo to work whether logged in as root user or non-root user
+                  if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+                  # Create an environment variable for the correct distribution
+                  if [[ $(command -v lsb_release) == "" ]]; then
+                    $SUDO apt-get update && $SUDO apt-get -y install lsb-release
+                    export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
+                  else
+                    export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
+                  fi
+
+                  # Add the Google Cloud SDK distribution URI as a package source
+                  echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | $SUDO tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+                  # Import the Google Cloud public key
+                  if [[ $(command -v curl) == "" ]]; then
+                    $SUDO apt-get update && $SUDO apt-get -y install curl
+                    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | $SUDO apt-key add -
+                  else
+                    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | $SUDO apt-key add -
+                  fi
+
+                  # Update and install the Cloud SDK
+                  if [[ $(command -v gcloud) == "" ]]; then
+                    $SUDO apt-get update && $SUDO apt-get -y install google-cloud-sdk
+                    echo "gcloud CLI is now installed."
+                  else
+                    echo "gcloud CLI is already installed."
+                  fi
+ 
+  initialize:
+    description: Initilize the gcloud CLI
+    parameters:
+      gcloud-service-key:
+        description: The gcloud service key
+        type: string
+        default: $GCLOUD_SERVICE_KEY
+      google-project-id:
+        description: The Google project ID to connect with via the gcloud CLI
+        type: string
+        default: $GOOGLE_PROJECT_ID
+      google-compute-zone:
+        description: The Google compute zone to connect with via the gcloud CLI
+        type: string
+        default: $GOOGLE_COMPUTE_ZONE
+    steps:
+      - run:
+          name: Initialize gcloud CLI to connect to Google Cloud
+          command: |
+            # Set sudo to work whether logged in as root user or non-root user
+            if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+            # Store service account
+            echo <<parameters.gcloud-service-key>> > ${HOME}/gcloud-service-key.json
+
+            # Initialize gcloud CLI
+            $SUDO gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+            $SUDO gcloud --quiet config set project <<parameters.google-project-id>>
+            $SUDO gcloud --quiet config set compute/zone <<parameters.google-compute-zone>>
+
+jobs:
+  install_and_initialize_cli:
+    description: Install gcloud CLI, if needed, and initialize to connect to
+                 Google Cloud.
+    executor: default
+    parameters:
+      gcloud-service-key:
+        description: The gcloud service key
+        type: string
+        default: $GCLOUD_SERVICE_KEY
+      google-project-id:
+        description: The Google project ID to connect with via the gcloud CLI
+        type: string
+        default: $GOOGLE_PROJECT_ID
+      google-compute-zone:
+        description: The Google compute zone to connect with via the gcloud CLI
+        type: string
+        default: $GOOGLE_COMPUTE_ZONE
+    steps:
+      - install
+      - initialize:
+          gcloud-service-key: <<parameters.gcloud-service-key>>
+          google-project-id: <<parameters.google-project-id>>
+          google-compute-zone: <<parameters.google-compute-zone>>
+  use_google_image_and_initialize_cli:
+    description: Use Google docker image with cloud-sdk pre-installed and
+                 initialize to connect to Google Cloud.
+    executor: google
+    parameters:
+      gcloud-service-key:
+        description: The gcloud service key
+        type: string
+        default: $GCLOUD_SERVICE_KEY
+      google-project-id:
+        description: The Google project ID to connect with via the gcloud CLI
+        type: string
+        default: $GOOGLE_PROJECT_ID
+      google-compute-zone:
+        description: The Google compute zone to connect with via the gcloud CLI
+        type: string
+        default: $GOOGLE_COMPUTE_ZONE
+    steps:
+      - initialize:
+          gcloud-service-key: <<parameters.gcloud-service-key>>
+          google-project-id: <<parameters.google-project-id>>
+          google-compute-zone: <<parameters.google-compute-zone>>
+
