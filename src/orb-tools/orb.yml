@@ -143,6 +143,7 @@ jobs:
 
   pack-and-validate-orb:
     description: >
+      *Experimental*
       Pack the contents of an orb for publishing
       and validate the orb is well-formed.
     parameters:
