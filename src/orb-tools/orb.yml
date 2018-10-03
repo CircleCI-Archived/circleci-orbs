@@ -58,18 +58,28 @@ commands:
 #         name: ""
 #         command: echo 1
 
-# publish:
-#   description: >
-#     Uses the CLI to publish an orb to the registry.
-#   parameters:
-#     a:
-#       description:
-#       type:
-#   steps:
-#     - run:
-#         name: ""
-#         command: echo 1
-
+  publish:
+    description: >
+      Uses the CLI to publish an orb to the registry.
+    parameters:
+      orb-path:
+        description: "Path to an orb."
+        type: string
+      orb-ref:
+        description: >
+          A fully-qualified reference to an orb. This takes the form namespace/orb@version.
+          NOTE: To publish a dev version prefix the version with 'dev:' like so namespace/orb@dev:label
+        type: string
+      token-variable:
+        description: "The env var containing your token. Pass this as a literal string such as `$ORB_PUBLISHING_TOKEN`. Do not paste the actual token into your configuration."
+        type: string
+    steps:
+      - run:
+          name: >
+            Publish orb at << parameters.orb-path >> to << parameters.orb-ref >>
+            NOTE: this currently assumes you are publishing to the registry at circleci.com
+          command: |
+            circleci orb publish << parameters.orb-path >> << parameters.orb-ref >> --token << parameters.token-variable >>
 jobs:
   pack-and-validate-orb:
     description: >
@@ -144,6 +154,7 @@ jobs:
                 name: "Storing the artifact to << parameters.artifact-path >><< parameters.destination-file-name >>"
                 path: ~/pack-and-validate-orb/<< parameters.destination-file-name >>
                 destination: << parameters.artifact-path >><< parameters.destination-file-name >>
+
   publish-dev-orb:
     executor: cli/default
     parameters:
@@ -191,14 +202,8 @@ jobs:
             - run:
                 name: "Validate whether this is a well-formed orb. Looking in << parameters.workspace-path >><< parameters.file-name >> for the file."
                 command: circleci orb validate << parameters.workspace-path >><< parameters.file-name >>
-      - run:
-          name: >
-            Publish a dev orb at << parameters.namespace >>/<< parameters.orb >>@dev:<< parameters.label >>.
-            NOTE: this currently assumes you are publishing to the registry at circleci.com
-          command: >
-            circleci orb publish dev
-            << parameters.workspace-path >><< parameters.file-name >>
-            << parameters.namespace >>
-            << parameters.orb >>
-            << parameters.label >>
-            --token << parameters.token-variable >>
+      - publish:
+          orb-path: << parameters.workspace-path >><< parameters.file-name >>
+          # TODO: Just pass the orb-ref in as a parameter instead of building it here.
+          orb-ref: << parameters.namespace >>/<< parameters.orb >>@dev:<< parameters.label >>
+          token-variable: << parameters.token-variable >>
