@@ -25,7 +25,7 @@ jobs:
           When provided, save the contents of the orb as an
           artifact in the directory specified. The value should
           include a trailing slash.
-          Empty string (also the default value) is a no-op."
+          Empty string (also the default value) is a no-op.
         type: string
         default: ""
       destination-file-name:
