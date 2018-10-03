@@ -34,29 +34,29 @@ commands:
           command: |
             circleci config pack << parameters.source >> > << parameters.destination >>
 
-# store-as-artifact:
-#   description: >
-#     Stores an orb as a circleci artifact.
-#   parameters:
-#     a:
-#       description:
-#       type:
-#   steps:
-#     - run:
-#         name: ""
-#         command: echo 1
-
-# persist-to-workspace:
-#   description: >
-#     Persists an orb yml between jobs in a workflow.
-#   parameters:
-#     a:
-#       description:
-#       type:
-#   steps:
-#     - run:
-#         name: ""
-#         command: echo 1
+  persist-orb-to-workspace:
+    description: >
+      Persists an orb yml between jobs in a workflow.
+    parameters:
+      orb-path:
+        description: "Path to the orb to be persisted."
+        type: string
+      workspace-path:
+        description: >
+          Save the contents of the orb into the workspace at the
+          given path. The value should include a trailing slash.
+        type: string
+    steps:
+      - run:
+          name: Save and orb to `<< parameters.workspace-path >>`
+          command: |
+            mkdir -p << parameters.workspace-path >>
+            cp << parameters.orb-path >> << parameters.workspace-path >>
+      - persist_to_workspace:
+          name: "Persist orb to `<< parameters.workspace-path >>` because that value was passed as `parameters.workspace-path`."
+          root: .
+          paths:
+            - << parameters.workspace-path >>
 
   increment:
     description: >
@@ -171,16 +171,9 @@ jobs:
       - when:
           condition: << parameters.workspace-path >>
           steps:
-            - run:
-                name: Save the packed orb to `<< parameters.workspace-path >>`
-                command: |
-                  mkdir -p << parameters.workspace-path >>
-                  cp ~/pack-and-validate-orb/<< parameters.destination-file-name >> << parameters.workspace-path >>
-            - persist_to_workspace:
-                name: "putting the packed orb into `<< parameters.workspace-path >>` because that value was passed as `parameters.workspace-path`."
-                root: .
-                paths:
-                  - << parameters.workspace-path >>
+            - persist-orb-to-workspace:
+                orb-path: ~/pack-and-validate-orb/<< parameters.destination-file-name >>
+                workspace-path: << parameters.workspace-path >>
       - when:
           condition: << parameters.artifact-path >>
           steps:
