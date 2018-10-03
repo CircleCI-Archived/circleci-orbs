@@ -208,6 +208,52 @@ jobs:
                 path: ~/pack-and-validate-orb/<< parameters.destination-file-name >>
                 destination: << parameters.artifact-path >><< parameters.destination-file-name >>
 
+  increment-orb:
+    executor: cli/default
+    parameters:
+      orb-path:
+        description: "Path to an orb."
+        type: string
+      namespace:
+        description: "Namespace the orb lives under."
+        type: string
+      orb-name:
+        description: "Name of the orb to increment.;"
+        type: string
+      segment:
+        description: "The semver segment to increment 'major' or 'minor' or 'patch'"
+        type: enum
+        enum: ["major", "minor", "patch"]
+      workspace-path:
+        description: "The directory relative to the workspace root where the orb file will be found. Should end in a trailing /"
+        type: string
+        default: ""
+      token-variable:
+        description: "The env var containing your token. Pass this as a literal string such as `$ORB_PUBLISHING_TOKEN`. Do not paste the actual token into your configuration."
+        type: string
+    steps:
+      - when:
+          condition: << parameters.workspace-path >>
+          steps:
+            - attach_workspace:
+                at: .
+            - increment:
+                orb-path: << parameters.workspace-path >>$(basename << parameters.orb-path >>)
+                namespace: << parameters.namespace >>
+                orb-name: << parameters.orb-name >>
+                segment: << parameters.segment >>
+                token-variable: << parameters.token-variable >>
+      - unless:
+          condition: << parameters.workspace-path >>
+          steps:
+            - checkout
+            - increment:
+                orb-path: << parameters.orb-path >>
+                namespace: << parameters.namespace >>
+                orb-name: << parameters.orb-name >>
+                segment: << parameters.segment >>
+                token-variable: << parameters.token-variable >>
+
   publish-orb:
     executor: cli/default
     parameters:
