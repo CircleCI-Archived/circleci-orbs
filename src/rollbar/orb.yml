@@ -32,7 +32,7 @@ jobs:
       A Rollbar access token is required to be set in the
       environment with the name `ROLLBAR_ACCESS_TOKEN`.
     parameters:
-      environment:
+      project_environment:
         type: string
         default: production
         description: The Rollbar environment. Defaults to production.
@@ -40,4 +40,4 @@ jobs:
       - image: circleci/buildpack-deps:18.04-scm
     steps:
       - notify_deploy:
-          environment: << parameters.environment >>
+          environment: << parameters.project_environment >>
