@@ -1,9 +1,160 @@
 version: 2.1
+
 orbs:
   cli: circleci/circleci-cli@volatile
+
+commands:
+  validate:
+    description: >
+      Users the CLI to validate a given orb yml
+    parameters:
+      orb-path:
+        description: "Path to the orb to be validated."
+        type: string
+    steps:
+      - run:
+          name: "Validate whether this is a well-formed orb."
+          command: circleci orb validate << parameters.orb-path >>
+
+  pack:
+    description: >
+      *Experimental*
+      Uses the CLI to pack an orb file structure
+      into a single orb yml.
+    parameters:
+      source:
+        description: "Path to the root folder of an unpacked orb."
+        type: string
+      destination:
+        description: "Path including the filename to output the packed orb."
+        type: string
+    steps:
+      - run:
+          name: "Pack << parameters.source>>"
+          command: |
+            circleci config pack << parameters.source >> > << parameters.destination >>
+
+  persist-orb-to-workspace:
+    description: >
+      Persists an orb yml between jobs in a workflow.
+    parameters:
+      orb-path:
+        description: "Path to the orb to be persisted."
+        type: string
+      workspace-path:
+        description: >
+          Save the contents of the orb into the workspace at the
+          given path. The value should include a trailing slash.
+        type: string
+    steps:
+      - run:
+          name: Save and orb to `<< parameters.workspace-path >>`
+          command: |
+            mkdir -p << parameters.workspace-path >>
+            cp << parameters.orb-path >> << parameters.workspace-path >>
+      - persist_to_workspace:
+          name: "Persist orb to `<< parameters.workspace-path >>` because that value was passed as `parameters.workspace-path`."
+          root: .
+          paths:
+            - << parameters.workspace-path >>
+
+  increment:
+    description: >
+      Uses the CLI to increment the version of an orb in the registry.
+      If the orb does not have a version yet it starts at 0.0.0
+    parameters:
+      orb-path:
+        description: "Path to an orb."
+        type: string
+      namespace:
+        description: "Namespace the orb lives under."
+        type: string
+      orb-name:
+        description: "Name of the orb to increment.;"
+        type: string
+      segment:
+        description: "The semver segment to increment 'major' or 'minor' or 'patch'"
+        type: enum
+        enum: ["major", "minor", "patch"]
+      token-variable:
+        description: >
+          The env var containing your token. Pass this as a literal string such
+          as `$ORB_PUBLISHING_TOKEN`. Do not paste the actual token into your
+          configuration. If omitted it's assumed the CLI has already been setup
+          with a valid token.
+        type: string
+        default: ""
+    steps:
+      - run:
+          name: >
+            Increment << parameters.segment >> segment of orb at << parameters.orb-path >>
+            NOTE: this currently assumes you are publishing to the registry at circleci.com
+          command: >
+            circleci orb publish increment
+            << parameters.orb-path >>
+            << parameters.namespace >>/<< parameters.orb-name >>
+            << parameters.segment >>
+            <<# parameters.token-variable >>--token << parameters.token-variable >> <</ parameters.token-variable >>
+
+  publish:
+    description: >
+      Uses the CLI to publish an orb to the registry.
+    parameters:
+      orb-path:
+        description: "Path to an orb."
+        type: string
+      orb-ref:
+        description: >
+          A fully-qualified reference to an orb. This takes the form namespace/orb@version.
+          NOTE: To publish a dev version prefix the version with 'dev:' like so namespace/orb@dev:label
+        type: string
+      token-variable:
+        description: >
+          The env var containing your token. Pass this as a literal string such
+          as `$ORB_PUBLISHING_TOKEN`. Do not paste the actual token into your
+          configuration. If omitted it's assumed the CLI has already been setup
+          with a valid token.
+        type: string
+        default: ""
+    steps:
+      - run:
+          name: >
+            Publish orb at << parameters.orb-path >> to << parameters.orb-ref >>
+            NOTE: this currently assumes you are publishing to the registry at circleci.com
+          command: >
+            circleci orb publish << parameters.orb-path >> << parameters.orb-ref >>
+            <<# parameters.token-variable >>--token << parameters.token-variable >> <</ parameters.token-variable >>
+
 jobs:
+  validate-orb:
+    description: Uses the CLI to validate a given orb.
+    parameters:
+      orb-path:
+        description: "Path to the orb to be validated."
+        type: string
+      workspace-path:
+        description: >
+          When provided, save the contents of the orb into
+          the workspace at the given path. The value should
+          include a trailing slash.
+          Empty string (also the default value) is a no-op.
+        type: string
+        default: ""
+    executor: cli/default
+    steps:
+      - checkout
+      - validate:
+          orb-path: << parameters.orb-path >>
+      - when:
+          condition: << parameters.workspace-path >>
+          steps:
+            - persist-orb-to-workspace:
+                orb-path: << parameters.orb-path >>
+                workspace-path: << parameters.workspace-path >>
+
   pack-and-validate-orb:
     description: >
+      *Experimental*
       Pack the contents of an orb for publishing
       and validate the orb is well-formed.
     parameters:
@@ -25,7 +176,7 @@ jobs:
           When provided, save the contents of the orb as an
           artifact in the directory specified. The value should
           include a trailing slash.
-          Empty string (also the default value) is a no-op."
+          Empty string (also the default value) is a no-op.
         type: string
         default: ""
       destination-file-name:
@@ -45,28 +196,22 @@ jobs:
             echo "parameters.destination-file-name passed as: '~/pack-and-validate-orb/<< parameters.destination-file-name >>'"
       - checkout
       - run:
-          name: "Pack << parameters.path >>"
+          name: "Ensure /pack-and-validate-orb"
            # TODO: this is more fragile than is ideal
            # TODO: using this fixed path feels like a hack or a missing feature to have a small dose of shared state across the job that can be mutated at runtime
           command: |
-            mkdir -pv ~/pack-and-validate-orb/ && touch ~/pack-and-validate-orb/<< parameters.destination-file-name >>
-            circleci config pack << parameters.path >> >> ~/pack-and-validate-orb/<< parameters.destination-file-name >>
-      - run:
-          name: "Validate whether this is a well-formed orb."
-          command: circleci orb validate ~/pack-and-validate-orb/<< parameters.destination-file-name >>
+            mkdir -pv ~/pack-and-validate-orb
+      - pack:
+          source: << parameters.path >>
+          destination: ~/pack-and-validate-orb/<< parameters.destination-file-name >>
+      - validate:
+          orb-path: ~/pack-and-validate-orb/<< parameters.destination-file-name >>
       - when:
           condition: << parameters.workspace-path >>
           steps:
-            - run:
-                name: Save the packed orb to `<< parameters.workspace-path >>`
-                command: |
-                  mkdir -p << parameters.workspace-path >>
-                  cp ~/pack-and-validate-orb/<< parameters.destination-file-name >> << parameters.workspace-path >>
-            - persist_to_workspace:
-                name: "putting the packed orb into `<< parameters.workspace-path >>` because that value was passed as `parameters.workspace-path`."
-                root: .
-                paths:
-                  - << parameters.workspace-path >>
+            - persist-orb-to-workspace:
+                orb-path: ~/pack-and-validate-orb/<< parameters.destination-file-name >>
+                workspace-path: << parameters.workspace-path >>
       - when:
           condition: << parameters.artifact-path >>
           steps:
@@ -74,25 +219,85 @@ jobs:
                 name: "Storing the artifact to << parameters.artifact-path >><< parameters.destination-file-name >>"
                 path: ~/pack-and-validate-orb/<< parameters.destination-file-name >>
                 destination: << parameters.artifact-path >><< parameters.destination-file-name >>
+
+  increment-orb:
+    description: >
+      Uses the CLI to increment the version of an orb in the registry.
+      If the orb does not have a version yet it starts at 0.0.0
+    executor: cli/default
+    parameters:
+      orb-path:
+        description: "Path to an orb."
+        type: string
+      namespace:
+        description: "Namespace the orb lives under."
+        type: string
+      orb-name:
+        description: "Name of the orb to increment.;"
+        type: string
+      segment:
+        description: "The semver segment to increment 'major' or 'minor' or 'patch'"
+        type: enum
+        enum: ["major", "minor", "patch"]
+      workspace-path:
+        description: "The directory relative to the workspace root where the orb file will be found. Should end in a trailing /"
+        type: string
+        default: ""
+      release-token-variable:
+        description: >
+          The env var containing your token. Pass this as a literal string such
+          as `$ORB_PUBLISHING_TOKEN`. Do not paste the actual token into your
+          configuration. If omitted it's assumed the CLI has already been setup
+          with a valid token.
+        type: string
+        default: ""
+    steps:
+      - when:
+          condition: << parameters.workspace-path >>
+          steps:
+            - attach_workspace:
+                at: .
+            - increment:
+                orb-path: << parameters.workspace-path >>$(basename << parameters.orb-path >>)
+                namespace: << parameters.namespace >>
+                orb-name: << parameters.orb-name >>
+                segment: << parameters.segment >>
+                token-variable: << parameters.release-token-variable >>
+      - unless:
+          condition: << parameters.workspace-path >>
+          steps:
+            - checkout
+            - increment:
+                orb-path: << parameters.orb-path >>
+                namespace: << parameters.namespace >>
+                orb-name: << parameters.orb-name >>
+                segment: << parameters.segment >>
+                token-variable: << parameters.release-token-variable >>
+
   publish-dev-orb:
     executor: cli/default
     parameters:
       namespace:
         description: "The namespace where this should be published."
         type: string
-      orb:
+      orb-name:
         description: "The orb name where this should be published."
         type: string
       label:
         description: "The label to use when publishing the dev orb (eg: if you pass `foo` you will publish to `dev:foo`)"
         type: string
+      dev-token-variable:
+        description: >
+          The env var containing your dev token. Pass this as a literal string such
+          as `$ORB_DEV_PUBLISHING_TOKEN`. Do not paste the actual token into your
+          configuration. If omitted it's assumed the CLI has already been setup
+          with a valid token.
+        type: string
+        default: ""
       workspace-path:
         description: "The directory relative to the workspace root where the orb file will be found. Should end in a trailing /"
         type: string
         default: ""
-      token-variable:
-        description: "The env var containing your token. Pass this as a literal string such as `$ORB_DEV_PUBLISHING_TOKEN`. Do not paste the actual token into your configuration."
-        type: string
       file-name:
         description: "The name of the file where the packed string is stored. In most cases you can leave the default value."
         type: string
@@ -118,17 +323,65 @@ jobs:
       - when:
           condition: << parameters.do-validation >>
           steps:
+            - validate:
+                orb-path: << parameters.workspace-path >><< parameters.file-name >>
+      - publish:
+          orb-path: << parameters.workspace-path >><< parameters.file-name >>
+          orb-ref: << parameters.namespace >>/<< parameters.orb-name >>@dev:<< parameters.label >>
+          token-variable: << parameters.dev-token-variable >>
+
+  publish-release-orb:
+    executor: cli/default
+    parameters:
+      namespace:
+        description: "The namespace where this should be published."
+        type: string
+      orb-name:
+        description: "The orb name where this should be published."
+        type: string
+      version:
+        description: "The semver to use when publishing the orb (eg: if you pass `1.2.3`)"
+        type: string
+      release-token-variable:
+        description: >
+          The env var containing your release token. Pass this as a literal string such
+          as `$ORB_PUBLISHING_TOKEN`. Do not paste the actual token into your
+          configuration. If omitted it's assumed the CLI has already been setup
+          with a valid token.
+        type: string
+        default: ""
+      workspace-path:
+        description: "The directory relative to the workspace root where the orb file will be found. Should end in a trailing /"
+        type: string
+        default: ""
+      file-name:
+        description: "The name of the file where the packed string is stored. In most cases you can leave the default value."
+        type: string
+        default: "orb.yml"
+      do-validation:
+        description: "Boolean for whether to do validation. Default is true."
+        type: boolean
+        default: true
+    steps:
+      - when:
+          condition: << parameters.workspace-path >>
+          steps:
+            - attach_workspace:
+                at: .
+      - unless:
+          condition: << parameters.workspace-path >>
+          steps:
             - run:
-                name: "Validate whether this is a well-formed orb. Looking in << parameters.workspace-path >><< parameters.file-name >> for the file."
-                command: circleci orb validate << parameters.workspace-path >><< parameters.file-name >>
-      - run:
-          name: >
-            Publish a dev orb at << parameters.namespace >>/<< parameters.orb >>@dev:<< parameters.label >>.
-            NOTE: this currently assumes you are publishing to the registry at circleci.com
-          command: >
-            circleci orb publish dev
-            << parameters.workspace-path >><< parameters.file-name >>
-            << parameters.namespace >>
-            << parameters.orb >>
-            << parameters.label >>
-            --token << parameters.token-variable >>
+                name: "No workspace was passed."
+                command: |
+                  echo "No workspace was passed."
+                  exit 1
+      - when:
+          condition: << parameters.do-validation >>
+          steps:
+            - validate:
+                orb-path: << parameters.workspace-path >><< parameters.file-name >>
+      - publish:
+          orb-path: << parameters.workspace-path >><< parameters.file-name >>
+          orb-ref: << parameters.namespace >>/<< parameters.orb-name >>@<< parameters.version >>
+          token-variable: << parameters.release-token-variable >>
