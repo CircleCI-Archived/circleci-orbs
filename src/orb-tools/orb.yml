@@ -77,19 +77,24 @@ commands:
         type: enum
         enum: ["major", "minor", "patch"]
       token-variable:
-        description: "The env var containing your token. Pass this as a literal string such as `$ORB_PUBLISHING_TOKEN`. Do not paste the actual token into your configuration."
+        description: >
+          The env var containing your token. Pass this as a literal string such
+          as `$ORB_PUBLISHING_TOKEN`. Do not paste the actual token into your
+          configuration. If omitted it's assumed the CLI has already been setup
+          with a valid token.
         type: string
+        default: ""
     steps:
       - run:
           name: >
             Increment << parameters.segment >> segment of orb at << parameters.orb-path >>
             NOTE: this currently assumes you are publishing to the registry at circleci.com
-          command: |
-            circleci orb publish increment \
-            << parameters.orb-path >> \
-            << parameters.namespace >>/<< parameters.orb-name >> \
-            << parameters.segment >> \
-            --token << parameters.token-variable >>
+          command: >
+            circleci orb publish increment
+            << parameters.orb-path >>
+            << parameters.namespace >>/<< parameters.orb-name >>
+            << parameters.segment >>
+            <<# parameters.token-variable >>--token << parameters.token-variable >> <</ parameters.token-variable >>
 
   publish:
     description: >
@@ -104,15 +109,21 @@ commands:
           NOTE: To publish a dev version prefix the version with 'dev:' like so namespace/orb@dev:label
         type: string
       token-variable:
-        description: "The env var containing your token. Pass this as a literal string such as `$ORB_PUBLISHING_TOKEN`. Do not paste the actual token into your configuration."
+        description: >
+          The env var containing your token. Pass this as a literal string such
+          as `$ORB_PUBLISHING_TOKEN`. Do not paste the actual token into your
+          configuration. If omitted it's assumed the CLI has already been setup
+          with a valid token.
         type: string
+        default: ""
     steps:
       - run:
           name: >
             Publish orb at << parameters.orb-path >> to << parameters.orb-ref >>
             NOTE: this currently assumes you are publishing to the registry at circleci.com
-          command: |
-            circleci orb publish << parameters.orb-path >> << parameters.orb-ref >> --token << parameters.token-variable >>
+          command: >
+            circleci orb publish << parameters.orb-path >> << parameters.orb-ref >>
+            <<# parameters.token-variable >>--token << parameters.token-variable >> <</ parameters.token-variable >>
 
 jobs:
   validate-orb:
