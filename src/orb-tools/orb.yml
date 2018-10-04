@@ -243,9 +243,14 @@ jobs:
         description: "The directory relative to the workspace root where the orb file will be found. Should end in a trailing /"
         type: string
         default: ""
-      token-variable:
-        description: "The env var containing your token. Pass this as a literal string such as `$ORB_PUBLISHING_TOKEN`. Do not paste the actual token into your configuration."
+      release-token-variable:
+        description: >
+          The env var containing your token. Pass this as a literal string such
+          as `$ORB_PUBLISHING_TOKEN`. Do not paste the actual token into your
+          configuration. If omitted it's assumed the CLI has already been setup
+          with a valid token.
         type: string
+        default: ""
     steps:
       - when:
           condition: << parameters.workspace-path >>
@@ -257,7 +262,7 @@ jobs:
                 namespace: << parameters.namespace >>
                 orb-name: << parameters.orb-name >>
                 segment: << parameters.segment >>
-                token-variable: << parameters.token-variable >>
+                token-variable: << parameters.release-token-variable >>
       - unless:
           condition: << parameters.workspace-path >>
           steps:
@@ -267,23 +272,32 @@ jobs:
                 namespace: << parameters.namespace >>
                 orb-name: << parameters.orb-name >>
                 segment: << parameters.segment >>
-                token-variable: << parameters.token-variable >>
+                token-variable: << parameters.release-token-variable >>
 
-  publish-orb:
+  publish-dev-orb:
     executor: cli/default
     parameters:
-      orb-ref:
-        description: >
-          A fully-qualified reference to an orb. This takes the form namespace/orb@version.
-          NOTE: To publish a dev version prefix the version with 'dev:' like so namespace/orb@dev:label
+      namespace:
+        description: "The namespace where this should be published."
         type: string
+      orb-name:
+        description: "The orb name where this should be published."
+        type: string
+      label:
+        description: "The label to use when publishing the dev orb (eg: if you pass `foo` you will publish to `dev:foo`)"
+        type: string
+      dev-token-variable:
+        description: >
+          The env var containing your dev token. Pass this as a literal string such
+          as `$ORB_DEV_PUBLISHING_TOKEN`. Do not paste the actual token into your
+          configuration. If omitted it's assumed the CLI has already been setup
+          with a valid token.
+        type: string
+        default: ""
       workspace-path:
         description: "The directory relative to the workspace root where the orb file will be found. Should end in a trailing /"
         type: string
         default: ""
-      token-variable:
-        description: "The env var containing your token. Pass this as a literal string such as `$ORB_PUBLISHING_TOKEN`. Do not paste the actual token into your configuration."
-        type: string
       file-name:
         description: "The name of the file where the packed string is stored. In most cases you can leave the default value."
         type: string
@@ -313,5 +327,61 @@ jobs:
                 orb-path: << parameters.workspace-path >><< parameters.file-name >>
       - publish:
           orb-path: << parameters.workspace-path >><< parameters.file-name >>
-          orb-ref: << parameters.orb-ref >>
-          token-variable: << parameters.token-variable >>
+          orb-ref: << parameters.namespace >>/<< parameters.orb-name >>@dev:<< parameters.label >>
+          token-variable: << parameters.dev-token-variable >>
+
+  publish-release-orb:
+    executor: cli/default
+    parameters:
+      namespace:
+        description: "The namespace where this should be published."
+        type: string
+      orb-name:
+        description: "The orb name where this should be published."
+        type: string
+      version:
+        description: "The semver to use when publishing the orb (eg: if you pass `1.2.3`)"
+        type: string
+      release-token-variable:
+        description: >
+          The env var containing your release token. Pass this as a literal string such
+          as `$ORB_PUBLISHING_TOKEN`. Do not paste the actual token into your
+          configuration. If omitted it's assumed the CLI has already been setup
+          with a valid token.
+        type: string
+        default: ""
+      workspace-path:
+        description: "The directory relative to the workspace root where the orb file will be found. Should end in a trailing /"
+        type: string
+        default: ""
+      file-name:
+        description: "The name of the file where the packed string is stored. In most cases you can leave the default value."
+        type: string
+        default: "orb.yml"
+      do-validation:
+        description: "Boolean for whether to do validation. Default is true."
+        type: boolean
+        default: true
+    steps:
+      - when:
+          condition: << parameters.workspace-path >>
+          steps:
+            - attach_workspace:
+                at: .
+      - unless:
+          condition: << parameters.workspace-path >>
+          steps:
+            - run:
+                name: "No workspace was passed."
+                command: |
+                  echo "No workspace was passed."
+                  exit 1
+      - when:
+          condition: << parameters.do-validation >>
+          steps:
+            - validate:
+                orb-path: << parameters.workspace-path >><< parameters.file-name >>
+      - publish:
+          orb-path: << parameters.workspace-path >><< parameters.file-name >>
+          orb-ref: << parameters.namespace >>/<< parameters.orb-name >>@<< parameters.version >>
+          token-variable: << parameters.release-token-variable >>
