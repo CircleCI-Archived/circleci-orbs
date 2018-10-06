@@ -103,7 +103,7 @@ jobs:
             - run: heroku maintenance:on --app << parameters.app-name >>
       - steps: << parameters.pre-deploy >>
       - deploy-via-git:
-        app-name: << parameters.app-name >>
+          app-name: << parameters.app-name >>
       - steps: << parameters.post-deploy >>
       - when:
           condition: << parameters.maintenance-mode >>
