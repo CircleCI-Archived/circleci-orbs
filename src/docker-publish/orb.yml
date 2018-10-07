@@ -53,6 +53,34 @@ examples:
                   registry: my.docker.registry
                   dockerfile: path/to/MyDockerFile
 
+  life_cycle_hooks:
+    description: |
+      Build and deploy a docker image with custom lifecycle hooks; before
+      checking out the code from the VCS repository, before building the 
+      docker image, and after building the docker image. 
+    usage:
+      version: 2.1
+
+      orbs:
+        docker-publish: circleci/docker-publish@1.0.0
+
+      workflows:
+        docker_with_lifecycle:
+          jobs:
+            - docker-publish/publish:
+                after_checkout:
+                  - run:
+                      name: Do this after checkout.
+                      command: echo "Did this after checkout"
+                before_build:
+                  - run:
+                      name: Do this before the build.
+                      command: echo "Did this before the build"
+                after_build:
+                  - run:
+                      name: Do this after the build.
+                      command: echo "Did this after the build"
+
 executors:
   docker:
     description: The docker container to use when running docker-publish builds
@@ -147,16 +175,40 @@ jobs:
         description: Name of registry to use. Defaults to docker.io.
         type: string
         default: docker.io
+      after_checkout:
+        description: Optional steps to run after checking out the code. 
+        type: steps
+        default: []
+      before_build:
+        description: Optional steps to run before building the docker image.
+        type: steps
+        default: []
+      after_build:
+        description: Optional steps to run after building the docker image.
+        type: steps
+        default: []
     steps:
       - checkout
+      - when:
+          name: Run after_checkout lifecycle hook steps.
+          condition: << parameters.after_checkout >>
+          steps: << parameters.after_checkout >>
       - setup_remote_docker
       - check:
           registry: << parameters.registry >>
+      - when:
+          name: Run before_build lifecycle hook steps.
+          condition: << parameters.before_build >>
+          steps: << parameters.before_build >>
       - build:
           dockerfile: << parameters.dockerfile >>
           image: << parameters.image >>
           tag: << parameters.tag >>
           registry: << parameters.registry >>
+      - when:
+          name: Run after_build lifecycle hook steps.
+          condition: << parameters.after_build >>
+          steps: << parameters.after_build >>
       - deploy:
           registry: << parameters.registry >>
           image: << parameters.image >>
