@@ -1,46 +1,56 @@
 version: 2.1
 description: "The Maven orb encapsulates common maven tasks."
 
-# Usage Examples
-#
-# If you have a standard maven project, you can use this orb to run through
-# a common maven worklow. Without any additional configuration you can
-# build, test, and automatically have your test results uploaded to CircleCI
-# with the following configuration:
-#
-# version 2.1
-# orbs:
-#   maven: circleci/maven@volatile
-#
-# workflows:
-#   test:
-#     jobs:
-#       - maven/test
-#
-# You could run mvn with debug mode with a configuration like this:
-#
-# version 2.1
-# orbs:
-#   maven: circleci/maven@volatile
-#
-# workflows:
-#   test:
-#     jobs:
-#       - maven/test:
-#           command: -X verify
-#
-# If your tests results are not in the default (target/surefire-reports) directory then
-# you could add a custom directory with a configuration like this:
-#
-# version 2.1
-# orbs:
-#   maven: circleci/maven@volatile
-#
-# workflows:
-#   test:
-#     jobs:
-#       - maven/test:
-#           test_results_path: /path/to/test/results
+examples:
+  standard_maven_project:
+    description: |
+      If you have a standard maven project, you can use this orb to run through
+      a common maven worklow. Without any additional configuration you can
+      build, test, and automatically have your test results uploaded to CircleCI.
+    usage:
+      version: 2.1
+
+      orbs:
+        maven: circleci/maven@1.0.0
+
+      workflows:
+        maven_test:
+          jobs:
+            - maven/test
+  
+  custom_command:
+    description: |
+      You could run any custom maven command that you wish. In the example 
+      below we are running maven verify with debug mode enabled. 
+    
+    usage:
+      version: 2.1
+
+      orbs:
+        maven: circleci/maven@1.0.0
+      
+      workflows:
+        maven_test:
+          jobs:
+            - maven/test:
+                command: -X verify
+
+  custom_test_results_path:
+    description: |
+      If your tests results are not in the default (target/surefire-reports) 
+      directory then you could add a custom directory.
+    
+    usage:
+      version: 2.1
+
+      orbs:
+        maven: circleci/maven@1.0.0
+      
+      workflows:
+        maven_test:
+          jobs:
+            - maven/test:
+                test_results_path: /path/to/test/results
 
 executors:
   maven:
