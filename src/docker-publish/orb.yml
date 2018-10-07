@@ -16,10 +16,10 @@ examples:
       orbs:
         docker-publish: circleci/docker-publish@1.0.0
 
-        workflows:
-          build_and_publish_docker_image:
-            jobs:
-              - docker-publish/publish
+      workflows:
+        build_and_publish_docker_image:
+          jobs:
+            - docker-publish/publish
   
   custom_name_and_tag:
     description: Build and Deploy docker image with a custom name and tag.
@@ -29,12 +29,12 @@ examples:
       orbs:
         docker-publish: circleci/docker-publish@1.0.0
 
-        workflows:
-          build_and_publish_docker_image:
-            jobs:
-              - docker-publish/publish:
-                  image: my/image
-                  tag: my_tag
+      workflows:
+        build_and_publish_docker_image:
+          jobs:
+            - docker-publish/publish:
+                image: my/image
+                tag: my_tag
 
   custom_name_and_tag:
     description: | 
@@ -46,12 +46,12 @@ examples:
       orbs:
         docker-publish: circleci/docker-publish@1.0.0
 
-        workflows:
-          build_and_publish_docker_image:
-            jobs:
-              - docker-publish/publish:
-                  registry: my.docker.registry
-                  dockerfile: path/to/MyDockerFile
+      workflows:
+        build_and_publish_docker_image:
+          jobs:
+            - docker-publish/publish:
+                registry: my.docker.registry
+                dockerfile: path/to/MyDockerFile
 
   life_cycle_hooks:
     description: |
