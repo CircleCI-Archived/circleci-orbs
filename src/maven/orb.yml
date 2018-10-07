@@ -107,16 +107,14 @@ jobs:
   test:
     description: |
       Checkout, build, test, and upload test results for a Maven project.
-
-      Parameters
-        command - the maven command to run
-        test_results_path - path to test results
     executor: maven
     parameters:
       command:
+        description: The maven command to run.
         type: string
         default: verify
       test_results_path:
+        description: The path to the test results.
         type: string
         default: target/surefire-reports
     steps:
