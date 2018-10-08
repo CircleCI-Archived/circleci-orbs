@@ -36,7 +36,7 @@ examples:
                 image: my/image
                 tag: my_tag
 
-  custom_name_and_tag:
+  custom_registry_and_dockerfile:
     description: |
       Build and Deploy docker image with a non standard Dockerfile and to a
       custom registry.
