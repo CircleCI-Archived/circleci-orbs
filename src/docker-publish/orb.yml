@@ -1,0 +1,214 @@
+version: 2.1
+description: |
+  The docker-publish orb encapsulates common tasks for building and publishing
+  a docker image to a registry.
+
+examples:
+  standard_build_and_push:
+    description: |
+      A standard docker workflow, where you are building an image with a
+      Dockerfile in the root of your repository, naming the image to be the
+      same name as your repository, and then pushing to the default docker
+      registry (at docker.io).
+    usage:
+      version: 2.1
+
+      orbs:
+        docker-publish: circleci/docker-publish@1.0.0
+
+      workflows:
+        build_and_publish_docker_image:
+          jobs:
+            - docker-publish/publish
+
+  custom_name_and_tag:
+    description: Build and Deploy docker image with a custom name and tag.
+    usage:
+      version: 2.1
+
+      orbs:
+        docker-publish: circleci/docker-publish@1.0.0
+
+      workflows:
+        build_and_publish_docker_image:
+          jobs:
+            - docker-publish/publish:
+                image: my/image
+                tag: my_tag
+
+  custom_name_and_tag:
+    description: |
+      Build and Deploy docker image with a non standard Dockerfile and to a
+      custom registry.
+    usage:
+      version: 2.1
+
+      orbs:
+        docker-publish: circleci/docker-publish@1.0.0
+
+      workflows:
+        build_and_publish_docker_image:
+          jobs:
+            - docker-publish/publish:
+                registry: my.docker.registry
+                dockerfile: path/to/MyDockerFile
+
+  life_cycle_hooks:
+    description: |
+      Build and deploy a docker image with custom lifecycle hooks; before
+      checking out the code from the VCS repository, before building the
+      docker image, and after building the docker image.
+    usage:
+      version: 2.1
+
+      orbs:
+        docker-publish: circleci/docker-publish@1.0.0
+
+      workflows:
+        docker_with_lifecycle:
+          jobs:
+            - docker-publish/publish:
+                after_checkout:
+                  - run:
+                      name: Do this after checkout.
+                      command: echo "Did this after checkout"
+                before_build:
+                  - run:
+                      name: Do this before the build.
+                      command: echo "Did this before the build"
+                after_build:
+                  - run:
+                      name: Do this after the build.
+                      command: echo "Did this after the build"
+
+executors:
+  docker:
+    description: The docker container to use when running docker-publish builds
+    docker:
+      - image: circleci/python:3.6
+
+commands:
+  check:
+    description: |
+      Sanity check to make sure you can build a docker image.
+
+        * check that $DOCKER_LOGIN and $DOCKER_PASSWORD environment variables are set
+        * run docker login to ensure that you can push the built image
+    parameters:
+      registry:
+        description: Name of registry to use. Defaults to docker.io.
+        type: string
+        default: docker.io
+    steps:
+      - run:
+          name: Check Environment Variables
+          command: |
+            if [[ -z "${DOCKER_LOGIN}" ]]; then
+              echo "DOCKER_LOGIN is not set, will not be able to push image."
+              exit 1
+            fi
+
+            if [[ -z "${DOCKER_PASSWORD}" ]]; then
+              echo "DOCKER_PASSWORD is not set, will not be able to push image."
+              exit 1
+            fi
+      - run:
+          name: Docker Login
+          command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD << parameters.registry >>
+  build:
+    description: Builds and Tags a Docker Image.
+    parameters:
+      dockerfile:
+        description: Name of dockerfile to use. Defaults to Dockerfile in working directory.
+        type: string
+        default: Dockerfile
+      image:
+        description: Name of image to create. Defaults to a combination of $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME.
+        type: string
+        default: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
+      tag:
+        description: Value for tag to use. Defaults to $CIRCLE_SHA1.
+        type: string
+        default: $CIRCLE_SHA1
+      registry:
+        description: Name of registry to use. Defaults to docker.io.
+        type: string
+        default: docker.io
+    steps:
+      - run:
+          name: Build Docker Image
+          command: docker build -f << parameters.dockerfile >> -t << parameters.registry >>/<< parameters.image >>:<< parameters.tag >> .
+  deploy:
+    description: Deploy docker image to a registry.
+    parameters:
+      registry:
+        description: Name of registry to use. Defaults to docker.io.
+        type: string
+        default: docker.io
+      image:
+        description: Name of image to create. Defaults to a combination of $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME.
+        type: string
+        default: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
+    steps:
+      - run:
+          name: Push Docker Image
+          command: docker push << parameters.registry >>/<< parameters.image >>
+
+jobs:
+  publish:
+    description: Check, Build, and Deploy a Docker Image.
+    executor: docker
+    parameters:
+      dockerfile:
+        description: Name of dockerfile to use. Defaults to Dockerfile in working directory.
+        type: string
+        default: Dockerfile
+      image:
+        description: Name of image to create. Defaults to a combination of $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME.
+        type: string
+        default: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
+      tag:
+        description: Value for tag to use. Defaults to $CIRCLE_SHA1.
+        type: string
+        default: $CIRCLE_SHA1
+      registry:
+        description: Name of registry to use. Defaults to docker.io.
+        type: string
+        default: docker.io
+      after_checkout:
+        description: Optional steps to run after checking out the code.
+        type: steps
+        default: []
+      before_build:
+        description: Optional steps to run before building the docker image.
+        type: steps
+        default: []
+      after_build:
+        description: Optional steps to run after building the docker image.
+        type: steps
+        default: []
+    steps:
+      - checkout
+      - when:
+          name: Run after_checkout lifecycle hook steps.
+          condition: << parameters.after_checkout >>
+          steps: << parameters.after_checkout >>
+      - setup_remote_docker
+      - check:
+          registry: << parameters.registry >>
+      - when:
+          name: Run before_build lifecycle hook steps.
+          condition: << parameters.before_build >>
+          steps: << parameters.before_build >>
+      - build:
+          dockerfile: << parameters.dockerfile >>
+          image: << parameters.image >>
+          tag: << parameters.tag >>
+          registry: << parameters.registry >>
+      - when:
+          name: Run after_build lifecycle hook steps.
+          condition: << parameters.after_build >>
+          steps: << parameters.after_build >>
+      - deploy:
+          registry: << parameters.registry >>
+          image: << parameters.image >>
