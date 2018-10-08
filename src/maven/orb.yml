@@ -17,18 +17,18 @@ examples:
         maven_test:
           jobs:
             - maven/test
-  
+
   custom_command:
     description: |
-      You could run any custom maven command that you wish. In the example 
-      below we are running maven verify with debug mode enabled. 
-    
+      You could run any custom maven command that you wish. In the example
+      below we are running maven verify with debug mode enabled.
+
     usage:
       version: 2.1
 
       orbs:
         maven: circleci/maven@1.0.0
-      
+
       workflows:
         maven_test:
           jobs:
@@ -37,15 +37,15 @@ examples:
 
   custom_test_results_path:
     description: |
-      If your tests results are not in the default (target/surefire-reports) 
+      If your tests results are not in the default (target/surefire-reports)
       directory then you could add a custom directory.
-    
+
     usage:
       version: 2.1
 
       orbs:
         maven: circleci/maven@1.0.0
-      
+
       workflows:
         maven_test:
           jobs:
