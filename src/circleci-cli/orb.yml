@@ -1,6 +1,10 @@
 version: 2.1
 commands:
   install:
+    parameters:
+      token-env-var:
+        type: string
+        default: ""
     steps:
       - run:
           name: "Install `circleci` CLI"
@@ -10,6 +14,7 @@ commands:
             circleci version
             echo "Run circleci help"
             circleci help
+            echo -e "token: $<< parameters.token-env-var >>\nverbose: false" > ~/.circleci/cli.yml
 executors:
   default:
     description:
