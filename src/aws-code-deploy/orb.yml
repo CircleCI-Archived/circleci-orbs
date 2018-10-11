@@ -2,7 +2,7 @@ version: 2.1
 description: "AWS CodeDeploy"
 
 orbs:
-  aws-cli: circleci/aws-cli@dev:snapshot
+  aws-cli: circleci/aws-cli@0.0.1
 
 commands:
   create-application:
