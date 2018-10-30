@@ -54,41 +54,37 @@ commands:
     description: |
       Install the gcloud CLI, if not available
     steps:
-      - when:
+      - run:
           name: Install gcloud CLI, if not available
-          condition: $(command -v gcloud) == ""
-          steps:
-            - run:
-                name: Install gcloud CLI
-                command: |
-                  # Set sudo to work whether logged in as root user or non-root user
-                  if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+          command: |
+            # Set sudo to work whether logged in as root user or non-root user
+            if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
-                  # Create an environment variable for the correct distribution
-                  if [[ $(command -v lsb_release) == "" ]]; then
-                    $SUDO apt-get update && $SUDO apt-get -y install lsb-release
-                    export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
-                  else
-                    export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
-                  fi
+            # Create an environment variable for the correct distribution
+            if [[ $(command -v lsb_release) == "" ]]; then
+              $SUDO apt-get update && $SUDO apt-get -y install lsb-release
+              export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
+            else
+              export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
+            fi
 
-                  # Add the Google Cloud SDK distribution URI as a package source
-                  echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | $SUDO tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-                  # Import the Google Cloud public key
-                  if [[ $(command -v curl) == "" ]]; then
-                    $SUDO apt-get update && $SUDO apt-get -y install curl
-                    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | $SUDO apt-key add -
-                  else
-                    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | $SUDO apt-key add -
-                  fi
+            # Add the Google Cloud SDK distribution URI as a package source
+            echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | $SUDO tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+            # Import the Google Cloud public key
+            if [[ $(command -v curl) == "" ]]; then
+              $SUDO apt-get update && $SUDO apt-get -y install curl
+              curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | $SUDO apt-key add -
+            else
+              curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | $SUDO apt-key add -
+            fi
 
-                  # Update and install the Cloud SDK
-                  if [[ $(command -v gcloud) == "" ]]; then
-                    $SUDO apt-get update && $SUDO apt-get -y install google-cloud-sdk
-                    echo "gcloud CLI is now installed."
-                  else
-                    echo "gcloud CLI is already installed."
-                  fi
+            # Update and install the Cloud SDK
+            if [[ $(command -v gcloud) == "" ]]; then
+              $SUDO apt-get update && $SUDO apt-get -y install google-cloud-sdk
+              echo "gcloud CLI is now installed."
+            else
+              echo "gcloud CLI is already installed."
+            fi
  
   initialize:
     description: Initilize the gcloud CLI
