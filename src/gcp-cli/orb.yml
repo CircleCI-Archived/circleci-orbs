@@ -22,6 +22,8 @@ examples:
 
       workflows:
         install_and_configure_cli:
+          # optionally determine executor to use
+          executor: default
           jobs:
             - gcp-cli/install_and_configure_cli:
                 context: myContext # your context containing gcloud service key
@@ -142,6 +144,7 @@ jobs:
           gcloud-service-key: <<parameters.gcloud-service-key>>
           google-project-id: <<parameters.google-project-id>>
           google-compute-zone: <<parameters.google-compute-zone>>
+      - run: gcloud -v
   use_google_image_and_initialize_cli:
     description: Use Google docker image with cloud-sdk pre-installed and
                  initialize to connect to Google Cloud.
