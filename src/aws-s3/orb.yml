@@ -1,19 +1,19 @@
 version: 2.1
-description: A simple example of doing S3 deployment
+description: An orb for working with Amazon S3.
 
 orbs:
   aws-cli: circleci/aws-cli@0.0.1
 
 commands:
   sync:
-    description: "A simple encapsulation of doing an s3 sync"
+    description: "Syncs directories and S3 prefixes. https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html"
     parameters:
       from:
         type: string
-        description: A directory path local to the job to deploy to S3
+        description: A local *directory* path to sync with S3
       to:
         type: string
-        description: A URI to an S3 bucket
+        description: A URI to an S3 bucket, i.e. 's3://the-name-my-bucket'
       overwrite:
         default: false
         type: boolean
@@ -24,16 +24,47 @@ commands:
           name: Deploy to S3
           command: "aws s3 sync << parameters.from >> << parameters.to >><<# parameters.overwrite >> --delete<</ parameters.overwrite >>"
 
-# usage:
-#   version: 2
-#   orbs:
-#     aws-cli: circleci/aws-cli@volatile
-#     s3: circleci/s3@volatile
-#   jobs:
-#     build:
-#       executor: aws-cli/default
-#       steps:
-#         - s3/deploy:
-#             from: "somepath/thing"
-#             to: "S3_bucket_URI_goes_here"
-#             overwrite: "false"
+
+  copy:
+    description: "Copies a local file or S3 object to another location locally or in S3. https://docs.aws.amazon.com/cli/latest/reference/s3/cp.html"
+    parameters:
+      from:
+        type: string
+        description: A local file or source s3 object
+      to:
+        type: string
+        description: A local target or s3 destination
+      arguments:
+        description: If you wish to pass any additional arguments to the aws copy command (i.e. -sse)
+        default: ''
+        type: string
+    steps:
+      - aws-cli/install
+      - aws-cli/configure
+      - run:
+          name: S3 Copy << parameters.from >> -> << parameters.to >>
+          command: "aws s3 cp << parameters.from >> << parameters.to >><<# parameters.arguments >> << parameters.arguments >><</ parameters.arguments >>"
+
+
+examples:
+  basic_commands:
+    description: "Examples uses aws s3 commands"
+    usage:
+      version: 2.1
+      orbs:
+        aws-s3: circleci/aws-s3@volatile
+      jobs:
+        build:
+          docker:
+            - image: circleci/python:2.7
+          steps:
+            - checkout
+            - run: mkdir bucket && echo "lorum ipsum" > bucket/build_asset.txt
+            - aws-s3/sync:
+                from: bucket
+                to: "s3://my-s3-bucket-name/prefix"
+                overwrite: true
+            - aws-s3/copy:
+                from: bucket/build_asset.txt
+                to: "s3://my-s3-bucket-name"
+                arguments: --dryrun
