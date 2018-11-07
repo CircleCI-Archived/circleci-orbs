@@ -1,6 +1,7 @@
 version: 2.1
 
-description: provides a job for reporting code coverage of clojure projects to codecov
+description: |
+  Automate Codecov reporting for Clojure projects
 
 orbs:
   codecov: circleci/codecov@dev:marc
