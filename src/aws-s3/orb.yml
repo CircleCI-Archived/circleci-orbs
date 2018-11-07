@@ -1,8 +1,33 @@
 version: 2.1
-description: An orb for working with Amazon S3.
+
+description: |
+  A set of tools for working with Amazon S3
+
+examples:
+  basic_commands:
+    description: "Examples uses aws s3 commands"
+    usage:
+      version: 2.1
+      orbs:
+        aws-s3: circleci/aws-s3@volatile
+      jobs:
+        build:
+          docker:
+            - image: circleci/python:2.7
+          steps:
+            - checkout
+            - run: mkdir bucket && echo "lorum ipsum" > bucket/build_asset.txt
+            - aws-s3/sync:
+                from: bucket
+                to: "s3://my-s3-bucket-name/prefix"
+                overwrite: true
+            - aws-s3/copy:
+                from: bucket/build_asset.txt
+                to: "s3://my-s3-bucket-name"
+                arguments: --dryrun
 
 orbs:
-  aws-cli: circleci/aws-cli@0.0.1
+  aws-cli: circleci/aws-cli@volatile
 
 commands:
   sync:
@@ -44,27 +69,3 @@ commands:
       - run:
           name: S3 Copy << parameters.from >> -> << parameters.to >>
           command: "aws s3 cp << parameters.from >> << parameters.to >><<# parameters.arguments >> << parameters.arguments >><</ parameters.arguments >>"
-
-
-examples:
-  basic_commands:
-    description: "Examples uses aws s3 commands"
-    usage:
-      version: 2.1
-      orbs:
-        aws-s3: circleci/aws-s3@volatile
-      jobs:
-        build:
-          docker:
-            - image: circleci/python:2.7
-          steps:
-            - checkout
-            - run: mkdir bucket && echo "lorum ipsum" > bucket/build_asset.txt
-            - aws-s3/sync:
-                from: bucket
-                to: "s3://my-s3-bucket-name/prefix"
-                overwrite: true
-            - aws-s3/copy:
-                from: bucket/build_asset.txt
-                to: "s3://my-s3-bucket-name"
-                arguments: --dryrun

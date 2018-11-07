@@ -1,5 +1,7 @@
 version: 2.1
-description: "AWS CodeDeploy"
+
+description: |
+  Deploy applications to AWS CodeDeploy
 
 orbs:
   aws-cli: circleci/aws-cli@0.0.1

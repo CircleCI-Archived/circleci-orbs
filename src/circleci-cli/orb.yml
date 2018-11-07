@@ -1,10 +1,7 @@
 version: 2.1
+
 description: |
-  Installs and configures CircleCI's command-line interface
-
-  View the source for this orb on GitHub: https://github.com/CircleCI-Public/circleci-orbs/blob/master/src/circleci-cli/orb.yml
-
-  View this orb in CircleCI's orb registry: https://circleci.com/orbs/registry/orb/circleci/circleci-cli
+  Install and configure the CircleCI command-line interface
 
 commands:
   install:

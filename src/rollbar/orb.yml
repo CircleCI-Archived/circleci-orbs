@@ -1,6 +1,7 @@
 version: 2.1
 
-description: Commands for calling the Rollbar API
+description: |
+  A set of commands and jobs for working with the Rollbar API
 
 commands:
   notify_deploy:

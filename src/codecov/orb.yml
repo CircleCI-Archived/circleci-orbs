@@ -1,9 +1,7 @@
 version: 2.1
 
 description: |
-  Provides a command for reporting code coverage to Codecov.
-  The token will be read from $CODECOV_TOKEN by default, but this
-  can be overridden using the `token` parameter.
+  Upload code coverage results to Codecov
 
 commands:
   upload:

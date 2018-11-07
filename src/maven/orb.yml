@@ -1,5 +1,7 @@
 version: 2.1
-description: "The Maven orb encapsulates common maven tasks."
+
+description: |
+  Simplify common tasks for building and testing Maven projects
 
 examples:
   standard_maven_project:
