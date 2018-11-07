@@ -62,7 +62,7 @@ commands:
       - when:
           condition: << parameters.npm >>
           steps:
-            - run: 
+            - run:
                 name: Install specific version of npm
                 command: sudo npm i npm@"<< parameters.npm_version >>"
             - run:
@@ -174,23 +174,28 @@ commands:
           steps:
             - run:
                 name: Split files by test file, assign to $TESTFILES
-                command: |
-                  echo 'export TESTFILES=$(circleci tests split << parameters.test-file >> | circleci tests split --split-by="<< parameters.split-by >>" --timings-type="<< parameters.timings-type >>")' >> $BASH_ENV
-                  source $BASH_ENV
+                command: >
+                  echo 'export TESTFILES=$(circleci tests split << parameters.test-file >>
+                  | circleci tests split
+                  --split-by="<< parameters.split-by >>"
+                  --timings-type="<< parameters.timings-type >>")'
+                  >> $BASH_ENV
       - when:
           condition: << parameters.test-path >>
           steps:
             - run:
                 name: Split files by directory, assign to $TESTFILES
-                command: |
-                  echo 'export TESTFILES=$(circleci tests split < << parameters.test-path >> | circleci tests split --split-by="<< parameters.split-by >>" --timings-type="<< parameters.timings-type >>")' >> $BASH_ENV
-                  source $BASH_ENV
+                command: >
+                  echo 'export TESTFILES=$(circleci tests split < << parameters.test-path >>
+                  | circleci tests split --split-by="<< parameters.split-by >>"
+                  --timings-type="<< parameters.timings-type >>")' >> $BASH_ENV
       - when:
           condition: << parameters.glob-path >>
           steps:
             - run:
                 name: Split files by glob pattern, assign to $TESTFILES
-                command: |
-                  echo 'export TESTFILES=$(circleci tests glob "<< parameters.glob-path >>" | circleci tests split --split-by="<< parameters.split-by >>" --timings-type="<< parameters.timings-type >>")' >> $BASH_ENV
-                  source $BASH_ENV
+                command: >
+                  echo 'export TESTFILES=$(circleci tests glob "<< parameters.glob-path >>"
+                  | circleci tests split --split-by="<< parameters.split-by >>"
+                  --timings-type="<< parameters.timings-type >>")' >> $BASH_ENV
       - steps: << parameters.steps >>
