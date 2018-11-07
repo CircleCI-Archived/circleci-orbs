@@ -1,4 +1,6 @@
 version: 2.1
+description: |
+  Simplify building and testing Gradle projects on CircleCI
 
 executors:
   gradle:
