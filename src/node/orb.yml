@@ -1,0 +1,196 @@
+version: 2.1
+description: "The Node Orb encapsulates some common Node tasks."
+
+executors:
+  default:
+    parameters:
+      tag:
+        type: string
+        default: "latest"
+    docker:
+      - image: circleci/node:<< parameters.tag >>
+  node:
+    parameters:
+      tag:
+        type: string
+        default: "latest"
+    docker:
+      - image: circleci/node:<< parameters.tag >>
+  postgres:
+    parameters:
+      tag:
+        type: string
+        default: "latest"
+    docker:
+      - image: circleci/postgres:<< parameters.tag >>
+  mysql:
+    parameters:
+      tag:
+        type: string
+        default: "latest"
+    docker:
+      - image: circleci/mysql:<< parameters.tag >>
+
+jobs:
+  helloworld:
+    executor: node
+    steps:
+      - run: echo "hello world"
+
+commands:
+  install-package-manager:
+    description: |
+      Install yarn or npm package manager.
+
+      This command installs npm and/or yarn given the `npm` or `yarn` parameter set to `true`,
+      and defaults to `latest` and `stable`, respectively, unless passed specific `npm_version`
+      or `yarn_version` parameters.
+    parameters:
+      npm:
+        type: boolean
+        default: false
+      yarn:
+        type: boolean
+        default: false
+      npm_version:
+        type: string
+        default: "latest"
+      yarn_version:
+        type: string
+        default: ""
+    steps:
+      - when:
+          condition: << parameters.npm >>
+          steps:
+            - run: 
+                name: Install specific version of npm
+                command: sudo npm i npm@"<< parameters.npm_version >>"
+            - run:
+                name: Workaround to address issues with using npm to upgrade npm
+                command: |
+                    sudo rm -rf /usr/local/lib/node_modules
+                    sudo mv node_modules /usr/local/lib/
+      - when:
+          condition: << parameters.yarn >>
+          steps:
+            - run:
+                name: Set Yarn Version env var
+                command: |
+                  echo 'export YARN_VERSION=<< parameters.yarn_version >>' >> $BASH_ENV
+                  source $BASH_ENV
+            - run:
+                name: Install Yarn
+                command: |
+                  if [ -n "$YARN_VERSION" ];
+                    then
+                      echo $YARN_VERSION
+                      curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version $YARN_VERSION
+                    else
+                      curl -o- -L https://yarnpkg.com/install.sh | bash
+                  fi
+                  echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"' >> $BASH_ENV
+                  source $BASH_ENV
+  with-cache:
+    description: |
+      Run a set of steps with node dependencies cached.
+
+      This command will first restore a cache of node dependencies, if one was
+      saved by a previous build. The provided `steps` will then be executed, and
+      if successful, a fresh cache will be saved, if required.
+
+      The contents of the `~/node_modules` directory is cached, which will substantially
+      improve build times for projects with many dependencies. This directory can be changed
+      with the `dir` parameter.
+
+      The cache-key is generated from `package.json`. This file path can be changed with the
+      `cache-key` parameter.
+    parameters:
+      steps:
+        type: steps
+      dir:
+        type: string
+        default: "~/node_modules/"
+      cache-key:
+        type: string
+        default: "package.json"
+    steps:
+      - restore_cache:
+          keys:
+            - node-deps-{{ .Branch }}-{{ checksum "<< parameters.cache-key >>" }}
+            - node-deps-{{ .Branch }}-
+            - node-deps-
+      - steps: << parameters.steps >>
+      - save_cache:
+          key: node-deps-{{ .Branch }}-{{ checksum "<< parameters.cache-key >>" }}
+          paths:
+            - << parameters.dir >>
+  with-splitting:
+    description: |
+      Run a testing command (`test-command`) with CircleCI's built-in test splitting feature enabled. This requires
+      that the `parallelism` key be set to a value greater than 1.
+
+      `test-command` should be defined as the command used for initiating testing. The environment variable $TESTFILES
+      is defined prior to this command being called as the group of tests to be run in a given container after running
+      CircleCI's test-splitting logic.
+
+      This command requires one of `test-file`, `test-path`, or `glob-path` parameters that point
+      to a text file with test filenames, a path to test files, or one or more patterns for globbing of
+      test files, respectively.
+
+      CircleCI will then seek historical test timing data in the directory specified by the previously
+      used `store_test_results` step as a basis for splitting tests. If you do not use `store_test_results`,
+      there will be no timing data available for splitting your tests.
+
+      Tests are split by `timings` by default, and can be split based on filesize by setting the `split-by`
+      parameter to `filesize`.
+
+      The CLI expectes both filenames and classnames to be present in the timing data produced by the timing
+      suite. By default, splitting defaults to `filename`. You can specify `classnames` via the `timings-type`
+      parameter.
+
+      For more information on running tests in parallel, please visit
+      https://circleci.com/docs/2.0/parallelism-faster-jobs.
+    parameters:
+      steps:
+        type: steps
+      test-file:
+        type: string
+        default: ""
+      test-path:
+        type: string
+        default: ""
+      glob-path:
+        type: string
+        default: ""
+      split-by:
+        type: string
+        default: "timings"
+      timings-type:
+        type: string
+        default: "filename"
+    steps:
+      - when:
+          condition: << parameters.test-file >>
+          steps:
+            - run:
+                name: Split files by test file, assign to $TESTFILES
+                command: |
+                  echo 'export TESTFILES=$(circleci tests split << parameters.test-file >> | circleci tests split --split-by="<< parameters.split-by >>" --timings-type="<< parameters.timings-type >>")' >> $BASH_ENV
+                  source $BASH_ENV
+      - when:
+          condition: << parameters.test-path >>
+          steps:
+            - run:
+                name: Split files by directory, assign to $TESTFILES
+                command: |
+                  echo 'export TESTFILES=$(circleci tests split < << parameters.test-path >> | circleci tests split --split-by="<< parameters.split-by >>" --timings-type="<< parameters.timings-type >>")' >> $BASH_ENV
+                  source $BASH_ENV
+      - when:
+          condition: << parameters.glob-path >>
+          steps:
+            - run:
+                name: Split files by glob pattern, assign to $TESTFILES
+                command: |
+                  echo 'export TESTFILES=$(circleci tests glob "<< parameters.glob-path >>" | circleci tests split --split-by="<< parameters.split-by >>" --timings-type="<< parameters.timings-type >>")' >> $BASH_ENV
+                  source $BASH_ENV
+      - steps: << parameters.steps >>
