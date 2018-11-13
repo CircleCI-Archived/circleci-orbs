@@ -85,7 +85,7 @@ jobs:
           curl -X POST $BASE/$PROJECT?circle-token=$CIRCLECI_API_TOKEN
 
   slack-notify-hold:
-    excecutor: cli
+    machine: true
     steps:
       - slack/notify:
           message: "Orbs from commit ${CIRCLE_SHA1} are ready for review/approval: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
