@@ -24,7 +24,7 @@ workflows:
             branches:
               only: master
 
-      -  hold:
+      - hold:
           type: approval
           requires:
             - dev-release
