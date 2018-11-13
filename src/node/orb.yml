@@ -121,9 +121,9 @@ commands:
     steps:
       - restore_cache:
           keys:
-            - << parameters.cache-version >>-node-deps-{{ .Branch }}-{{ checksum "<< parameters.cache-key >>" }}
-            - << parameters.cache-version >>-node-deps-{{ .Branch }}-
-            - << parameters.cache-version >>-node-deps-
+            - node-deps-<< parameters.cache-version >>-{{ .Branch }}-{{ checksum "<< parameters.cache-key >>" }}
+            - node-deps-<< parameters.cache-version >>-{{ .Branch }}-
+            - node-deps-<< parameters.cache-version >>
       - steps: << parameters.steps >>
       - save_cache:
           key: << parameters.cache-version >>-node-deps-{{ .Branch }}-{{ checksum "<< parameters.cache-key >>" }}
