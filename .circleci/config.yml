@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  slack: circleci/slack@volatile
+
 executors:
   cli:
     docker:
@@ -24,11 +27,18 @@ workflows:
             branches:
               only: master
 
-      - hold:
-          type: approval
+      - slack-notify-hold:
           requires:
             - dev-release
             - trigger-downstream
+          filters:
+            branches:
+              only: master
+
+      - hold:
+          type: approval
+          requires:
+            - slack-notify-hold
           filters:
             branches:
               only: master
@@ -74,12 +84,25 @@ jobs:
           PROJECT="circleci/aws-code-deploy-orb-test/build"
           curl -X POST $BASE/$PROJECT?circle-token=$CIRCLECI_API_TOKEN
 
+  slack-notify-hold:
+    excecutor: cli
+    steps:
+      - slack/notify:
+          message: "Orbs from commit ${CIRCLE_SHA1} are ready for review/approval: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
+          mentions: rose,eddiewebb
+
   dev-promote-patch:
     executor: cli
     steps:
       - checkout
+
+      - slack/notify:
+          message: "Orb publishing was approved for any orbs modified in commit ${CIRCLE_SHA1}: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
+          mentions: rose,eddiewebb
+
+
       - run:
-          name:
+          name: Publish any modified orbs
           shell: /bin/bash -exo pipefail
           command: |
             COMMIT_RANGE=$(echo $CIRCLE_COMPARE_URL | sed 's:^.*/compare/::g')
