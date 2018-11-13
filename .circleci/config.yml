@@ -11,16 +11,29 @@ workflows:
     jobs:
       - lint
       - build
+
       - dev-release:
           requires:
             - build
             - lint
+
       - trigger-downstream:
           requires:
             - dev-release
           filters:
             branches:
               only: master
+
+      -  hold:
+          type: approval
+          requires:
+            - dev-release
+            - trigger-downstream
+
+      - dev-promote-patch:
+          requires:
+            - hold
+
 
 jobs:
   lint:
@@ -55,10 +68,32 @@ jobs:
           PROJECT="circleci/aws-code-deploy-orb-test/build"
           curl -X POST $BASE/$PROJECT?circle-token=$CIRCLECI_API_TOKEN
 
-  release:
+  dev-promote-patch:
     executor: cli
+    working-directory: ~/circleci-orbs/src
     steps:
       - checkout
+      - run:
+          name:
+          shell: /bin/bash -exo pipefail
+          command: |
+            COMMIT_RANGE=$(echo $CIRCLE_COMPARE_URL | sed 's:^.*/compare/::g')
+
+            echo "Commit range: $COMMIT_RANGE"
+
+            for ORB in /*/; do
+              orbname=$(basename $ORB)
+
+              if [[ $(git diff $COMMIT_RANGE --name-status | grep "$orbname") ]]; then
+
+                echo "promoting circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1} as patch release"
+
+                circleci orb publish promote circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1} patch
+              else
+                echo "${orbname} not modified; not promoting"
+              fi
+            done
+
       ## walk the tree in orb-releases.yml (the path to which could be fed as a parameter to the command)
           ## For each, attempt to build the orb with the CLI, then if that's successful, register it.
           ## would look something like: `circleci orb build $PATH-TO-SRC $ORB-NAMESPACE $ORB-NAME $PATH-TO-BUILT-ORB; circleci orb register $PATH-TO-BUILT-ORB $REVISION`
