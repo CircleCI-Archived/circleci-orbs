@@ -33,6 +33,9 @@ workflows:
       - dev-promote-patch:
           requires:
             - hold
+          filters:
+            branches:
+              only: master
 
 
 jobs:
