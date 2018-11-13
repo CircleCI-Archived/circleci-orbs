@@ -115,15 +115,18 @@ commands:
       cache-key:
         type: string
         default: "package.json"
+      cache-version:
+        type: string
+        default: "v1"
     steps:
       - restore_cache:
           keys:
-            - node-deps-{{ .Branch }}-{{ checksum "<< parameters.cache-key >>" }}
-            - node-deps-{{ .Branch }}-
-            - node-deps-
+            - << parameters.cache-version >>-node-deps-{{ .Branch }}-{{ checksum "<< parameters.cache-key >>" }}
+            - << parameters.cache-version >>-node-deps-{{ .Branch }}-
+            - << parameters.cache-version >>-node-deps-
       - steps: << parameters.steps >>
       - save_cache:
-          key: node-deps-{{ .Branch }}-{{ checksum "<< parameters.cache-key >>" }}
+          key: << parameters.cache-version >>-node-deps-{{ .Branch }}-{{ checksum "<< parameters.cache-key >>" }}
           paths:
             - << parameters.dir >>
   with-splitting:
