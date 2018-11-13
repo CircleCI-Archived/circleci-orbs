@@ -92,7 +92,7 @@ jobs:
 
                 circleci orb publish promote circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1} patch
               else
-                echo "${orbname} not modified; not promoting"
+                echo "${orbname} not modified; no need to promote"
               fi
             done
 
