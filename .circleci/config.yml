@@ -29,6 +29,9 @@ workflows:
           requires:
             - dev-release
             - trigger-downstream
+          filters:
+            branches:
+              only: master
 
       - dev-promote-patch:
           requires:
