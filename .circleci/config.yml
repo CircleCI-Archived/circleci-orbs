@@ -73,7 +73,6 @@ jobs:
 
   dev-promote-patch:
     executor: cli
-    working-directory: ~/circleci-orbs/src
     steps:
       - checkout
       - run:
@@ -84,7 +83,7 @@ jobs:
 
             echo "Commit range: $COMMIT_RANGE"
 
-            for ORB in /*/; do
+            for ORB in src/*/; do
               orbname=$(basename $ORB)
 
               if [[ $(git diff $COMMIT_RANGE --name-status | grep "$orbname") ]]; then
