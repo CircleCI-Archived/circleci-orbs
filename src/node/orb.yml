@@ -126,7 +126,7 @@ commands:
             - node-deps-<< parameters.cache-version >>
       - steps: << parameters.steps >>
       - save_cache:
-          key: << parameters.cache-version >>-node-deps-{{ .Branch }}-{{ checksum "<< parameters.cache-key >>" }}
+          key: node-deps-<< parameters.cache-version >>-{{ .Branch }}-{{ checksum "<< parameters.cache-key >>" }}
           paths:
             - << parameters.dir >>
   with-splitting:
