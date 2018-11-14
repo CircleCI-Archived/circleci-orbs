@@ -86,7 +86,7 @@ jobs:
           curl -X POST $BASE/$PROJECT?circle-token=$CIRCLECI_API_TOKEN
 
       - slack/notify:
-          message: "Orbs from commit ${CIRCLE_SHA1} are ready for review/approval: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
+          message: "Orbs from commit ${CIRCLE_SHA1} on the ${CIRCLE_BRANCH} branch are ready for review/approval: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
           mentions: "${ROSE_SLACK_UUID},${EDDIE_SLACK_UUID}"
 
   dev-promote-patch:
@@ -95,9 +95,8 @@ jobs:
       - checkout
 
       - slack/notify:
-          message: "Orb publishing was approved for any orbs modified in commit ${CIRCLE_SHA1}: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
+          message: "Orb publishing was approved for any orbs modified in commit ${CIRCLE_SHA1} on the ${CIRCLE_BRANCH} branch: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
           mentions: "${ROSE_SLACK_UUID},${EDDIE_SLACK_UUID}"
-
 
       - run:
           name: Publish any modified orbs
