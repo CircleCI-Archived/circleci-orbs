@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  slack: circleci/slack@volatile
+
 executors:
   cli:
     docker:
@@ -11,16 +14,36 @@ workflows:
     jobs:
       - lint
       - build
+
       - dev-release:
           requires:
             - build
             - lint
+
       - trigger-downstream:
           requires:
             - dev-release
           filters:
             branches:
               only: master
+          context: orb-publishing
+
+      - hold:
+          type: approval
+          requires:
+            - trigger-downstream
+          filters:
+            branches:
+              only: master
+
+      - dev-promote-patch:
+          requires:
+            - hold
+          filters:
+            branches:
+              only: master
+          context: orb-publishing
+
 
 jobs:
   lint:
@@ -42,7 +65,14 @@ jobs:
     executor: cli
     steps:
       - checkout
-      - run: "sh scripts/dev-release.sh"
+      - run:
+          name: Publish dev releases of any modified orbs
+          command: |
+            GIT_LOG=$(git log -1 --format="" --name-only)
+
+            echo "Files changed:" $GIT_LOG
+
+            bash scripts/dev-release.sh
 
   trigger-downstream:
     machine: true
@@ -55,10 +85,41 @@ jobs:
           PROJECT="circleci/aws-code-deploy-orb-test/build"
           curl -X POST $BASE/$PROJECT?circle-token=$CIRCLECI_API_TOKEN
 
-  release:
+      - slack/notify:
+          message: "Orbs from commit ${CIRCLE_SHA1} are ready for review/approval: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
+          mentions: "${ROSE_SLACK_UUID},{EDDIE_SLACK_UUID}$"
+
+  dev-promote-patch:
     executor: cli
     steps:
       - checkout
+
+      - slack/notify:
+          message: "Orb publishing was approved for any orbs modified in commit ${CIRCLE_SHA1}: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
+          mentions: "${ROSE_SLACK_UUID},{EDDIE_SLACK_UUID}$"
+
+
+      - run:
+          name: Publish any modified orbs
+          shell: /bin/bash -exo pipefail
+          command: |
+            GIT_LOG=$(git log -1 --format="" --name-only)
+
+            echo "Files changed:" $GIT_LOG
+
+            for ORB in src/*/; do
+              orbname=$(basename $ORB)
+
+              if [[ $(git log -1 --format="" --name-only | grep "$orbname") ]]; then
+
+                echo "promoting circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1} as patch release"
+
+                circleci orb publish promote circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1} patch
+              else
+                echo "${orbname} not modified; no need to promote"
+              fi
+            done
+
       ## walk the tree in orb-releases.yml (the path to which could be fed as a parameter to the command)
           ## For each, attempt to build the orb with the CLI, then if that's successful, register it.
           ## would look something like: `circleci orb build $PATH-TO-SRC $ORB-NAMESPACE $ORB-NAME $PATH-TO-BUILT-ORB; circleci orb register $PATH-TO-BUILT-ORB $REVISION`
