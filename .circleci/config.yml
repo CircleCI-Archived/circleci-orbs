@@ -72,7 +72,7 @@ jobs:
 
             echo "Commit range: $COMMIT_RANGE"
 
-            "sh scripts/dev-release.sh"
+            bash scripts/dev-release.sh
 
   trigger-downstream:
     machine: true
