@@ -26,19 +26,12 @@ workflows:
           filters:
             branches:
               only: master
-
-      - slack-notify-hold:
-          requires:
-            - dev-release
-            - trigger-downstream
-          filters:
-            branches:
-              only: master
+          context: orb-publishing
 
       - hold:
           type: approval
           requires:
-            - slack-notify-hold
+            - trigger-downstream
           filters:
             branches:
               only: master
@@ -49,6 +42,7 @@ workflows:
           filters:
             branches:
               only: master
+          context: orb-publishing
 
 
 jobs:
@@ -84,12 +78,9 @@ jobs:
           PROJECT="circleci/aws-code-deploy-orb-test/build"
           curl -X POST $BASE/$PROJECT?circle-token=$CIRCLECI_API_TOKEN
 
-  slack-notify-hold:
-    machine: true
-    steps:
       - slack/notify:
           message: "Orbs from commit ${CIRCLE_SHA1} are ready for review/approval: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
-          mentions: rose,eddiewebb
+          mentions: "${ROSE_SLACK_UUID},{EDDIE_SLACK_UUID}$"
 
   dev-promote-patch:
     executor: cli
@@ -98,7 +89,7 @@ jobs:
 
       - slack/notify:
           message: "Orb publishing was approved for any orbs modified in commit ${CIRCLE_SHA1}: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
-          mentions: rose,eddiewebb
+          mentions: "${ROSE_SLACK_UUID},{EDDIE_SLACK_UUID}$"
 
 
       - run:
