@@ -68,7 +68,9 @@ jobs:
       - run:
           name: Publish dev releases of any modified orbs
           command: |
-            echo "Files changed: $(git log -1 --format="" --name-only)"
+            GIT_LOG=$(git log -1 --format="" --name-only)
+
+            echo "Files changed:" $GIT_LOG
 
             bash scripts/dev-release.sh
 
@@ -101,7 +103,9 @@ jobs:
           name: Publish any modified orbs
           shell: /bin/bash -exo pipefail
           command: |
-            echo "Files changed: $(git log -1 --format="" --name-only)"
+            GIT_LOG=$(git log -1 --format="" --name-only)
+
+            echo "Files changed:" $GIT_LOG
 
             for ORB in src/*/; do
               orbname=$(basename $ORB)
