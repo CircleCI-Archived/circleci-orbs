@@ -68,9 +68,7 @@ jobs:
       - run:
           name: Publish dev releases of any modified orbs
           command: |
-            COMMIT_RANGE=$(echo $CIRCLE_COMPARE_URL | sed 's:^.*/compare/::g')
-
-            echo "Commit range: $COMMIT_RANGE"
+            echo "Files changes: $(git log -1 --format="" --name-only)""
 
             bash scripts/dev-release.sh
 
@@ -103,14 +101,12 @@ jobs:
           name: Publish any modified orbs
           shell: /bin/bash -exo pipefail
           command: |
-            COMMIT_RANGE=$(echo $CIRCLE_COMPARE_URL | sed 's:^.*/compare/::g')
-
-            echo "Commit range: $COMMIT_RANGE"
+            echo "Files changes: $(git log -1 --format="" --name-only)""
 
             for ORB in src/*/; do
               orbname=$(basename $ORB)
 
-              if [[ $(git diff $COMMIT_RANGE --name-status | grep "$orbname") ]]; then
+              if [[ $(git log -1 --format="" --name-only | grep "$orbname") ]]; then
 
                 echo "promoting circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1} as patch release"
 

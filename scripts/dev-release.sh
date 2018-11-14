@@ -12,13 +12,9 @@
 # TODO - it may be overkill to always publish all on the branch
 # TODO - this probably shouldn't silently fail to publish some of the orbs
 
-COMMIT_RANGE=$(echo $CIRCLE_COMPARE_URL | sed 's:^.*/compare/::g')
-
-echo "Commit range: $COMMIT_RANGE"
-
 for ORB in src/*/; do
   orbname=$(basename $ORB)
-  if [[ $(git diff $COMMIT_RANGE --name-status | grep "$orbname") ]]; then
+  if [[ $(git log -1 --format="" --name-only | grep "$orbname") ]]; then
     (ls ${ORB}orb.yml && echo "orb.yml found, attempting to publish...") || echo "No orb.yml file was found - the next line is expected to fail."
     if [ -z "$CIRCLECI_API_TOKEN" ]; then
       circleci orb publish ${ORB}orb.yml circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1}
