@@ -3,6 +3,25 @@ version: 2.1
 description: |
   Deploy applications to AWS CodeDeploy
 
+examples:
+  deploy_application:
+    description: Deploy an application to AWS CodeDeploy
+    usage:
+      version: 2.1
+
+      orbs:
+        aws-code-deploy: circleci/aws-code-deploy@volatile
+
+      workflows:
+        deploy_application:
+          jobs:
+            - aws-code-deploy/deploy:
+                application-name: myApplication
+                deployment-group: myDeploymentGroup
+                service-role-arn: myDeploymentGroupRoleARN
+                bundle-bucket: myApplicationS3Bucket
+                bundle-key: myS3BucketKey
+
 orbs:
   aws-cli: circleci/aws-cli@0.0.1
 
@@ -27,6 +46,7 @@ commands:
               set -e
               echo "Application named << parameters.application-name >> already exists. Skipping creation."
             fi
+
   create-deployment-group:
     parameters:
       application-name:
@@ -66,6 +86,7 @@ commands:
               set -e
               echo "Deployment group named << parameters.deployment-group >> already exists. Skipping creation."
             fi
+
   push-bundle:
     parameters:
       application-name:
