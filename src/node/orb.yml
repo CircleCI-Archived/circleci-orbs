@@ -123,21 +123,21 @@ commands:
         type: boolean
         default: false
     steps:
-      when:
-        condition: << parameters.use-strict-cache >>
-        steps:
-          - restore_cache:
-              keys:
-                - node-deps-<< parameters.cache-version >>-{{ .Branch }}-{{ checksum "<< parameters.cache-key >>" }}
+      - when:
+          condition: << parameters.use-strict-cache >>
+          steps:
+            - restore_cache:
+                keys:
+                  - node-deps-<< parameters.cache-version >>-{{ .Branch }}-{{ checksum "<< parameters.cache-key >>" }}
 
-      unless:
-        condition: << parameters.use-strict-cache >>
-        steps:
-          - restore_cache:
-              keys:
-                - node-deps-<< parameters.cache-version >>-{{ .Branch }}-{{ checksum "<< parameters.cache-key >>" }}
-                - node-deps-<< parameters.cache-version >>-{{ .Branch }}-
-                - node-deps-<< parameters.cache-version >>
+      - unless:
+          condition: << parameters.use-strict-cache >>
+          steps:
+            - restore_cache:
+                keys:
+                  - node-deps-<< parameters.cache-version >>-{{ .Branch }}-{{ checksum "<< parameters.cache-key >>" }}
+                  - node-deps-<< parameters.cache-version >>-{{ .Branch }}-
+                  - node-deps-<< parameters.cache-version >>
 
       - steps: << parameters.steps >>
       - save_cache:
