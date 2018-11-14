@@ -92,7 +92,7 @@ commands:
                   fi
                   echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"' >> $BASH_ENV
                   source $BASH_ENV
-                  
+
   with-cache:
     description: |
       Run a set of steps with node dependencies cached.
@@ -129,7 +129,7 @@ commands:
           - restore_cache:
               keys:
                 - node-deps-<< parameters.cache-version >>-{{ .Branch }}-{{ checksum "<< parameters.cache-key >>" }}
-                
+
       unless:
         condition: << parameters.use-strict-cache >>
         steps:
@@ -144,7 +144,7 @@ commands:
           key: node-deps-<< parameters.cache-version >>-{{ .Branch }}-{{ checksum "<< parameters.cache-key >>" }}
           paths:
             - << parameters.dir >>
-            
+
   with-splitting:
     description: |
       Run a testing command (`test-command`) with CircleCI's built-in test splitting feature enabled. This requires
