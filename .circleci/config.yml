@@ -65,7 +65,14 @@ jobs:
     executor: cli
     steps:
       - checkout
-      - run: "sh scripts/dev-release.sh"
+      - run:
+          name: Publish dev releases of any modified orbs
+          command: |
+            COMMIT_RANGE=$(echo $CIRCLE_COMPARE_URL | sed 's:^.*/compare/::g')
+
+            echo "Commit range: $COMMIT_RANGE"
+
+            "sh scripts/dev-release.sh"
 
   trigger-downstream:
     machine: true
