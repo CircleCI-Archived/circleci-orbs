@@ -20,4 +20,4 @@ For more info on use of the CLI see the help on orb publishing inside the CLI:
 
 `circleci orb publish --help`
 
-TODO: The above will default to use the main circleci.com service. If you are publishing orbs to a registry on your private CircleCI server installation you can pass your root domain in as an argument or by setting it in your ~/.circleci-config.yml file.
+TODO: The above will default to use the main circleci.com service. If you are publishing orbs to a registry on your private CircleCI server installation you can pass your root domain in as an argument or by setting it in your `.circleci/config.yml` file.
