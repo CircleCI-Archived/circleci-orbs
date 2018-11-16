@@ -14,7 +14,7 @@
 
 for ORB in src/*/; do
   orbname=$(basename $ORB)
-  if [[ $(git log -1 --format="" --name-only | grep "$orbname") ]]; then
+  if [[ $(git diff $COMMIT_RANGE --name-status | grep "$orbname") ]]; then
     (ls ${ORB}orb.yml && echo "orb.yml found, attempting to publish...") || echo "No orb.yml file was found - the next line is expected to fail."
     if [ -z "$CIRCLECI_API_TOKEN" ]; then
       circleci orb publish ${ORB}orb.yml circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1}

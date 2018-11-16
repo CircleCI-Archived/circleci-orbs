@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   slack: circleci/slack@volatile
+  circle-compare-url: iynere/compare-url@dev:alpha
 
 executors:
   cli:
@@ -97,22 +98,23 @@ jobs:
       - slack/notify:
           message: "Orb publishing was approved for any orbs modified in commit ${CIRCLE_SHA1} on the ${CIRCLE_BRANCH} branch: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
           mentions: "${ROSE_SLACK_UUID},${EDDIE_SLACK_UUID}"
+      - circle-compare-url/reconstruct
 
       - run:
           name: Publish any modified orbs
           shell: /bin/bash -exo pipefail
           command: |
-            GIT_LOG=$(git log -1 --format="" --name-only)
+            # save value stored in file to a local env var
+            CIRCLE_COMPARE_URL=$(cat CIRCLE_COMPARE_URL)
 
-            echo "Files changed:" $GIT_LOG
+            COMMIT_RANGE=$(echo $CIRCLE_COMPARE_URL | sed 's:^.*/compare/::g')
+
+            echo "Commit range: $COMMIT_RANGE"
 
             for ORB in src/*/; do
               orbname=$(basename $ORB)
-
-              if [[ $(git log -1 --format="" --name-only | grep "$orbname") ]]; then
-
+              if [[ $(git diff $COMMIT_RANGE --name-status | grep "$orbname") ]]; then
                 echo "promoting circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1} as patch release"
-
                 circleci orb publish promote circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1} patch
               else
                 echo "${orbname} not modified; no need to promote"
