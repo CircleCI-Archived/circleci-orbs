@@ -134,7 +134,7 @@ jobs:
 
                 echo "promoting circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1} as patch release"
 
-                circleci orb publish promote circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1} patch--token $CIRCLECI_API_TOKEN
+                circleci orb publish promote circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1} patch --token $CIRCLECI_API_TOKEN
               else
                 echo "${orbname} not modified; no need to promote"
               fi
