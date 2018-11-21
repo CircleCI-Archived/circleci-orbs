@@ -89,7 +89,7 @@ jobs:
               else
                 echo "${orbname} not modified; no need to promote"
               fi
-              echo "---------------------------"
+              echo "------------------------------------------------------"
             done
 
   trigger-downstream:
@@ -138,6 +138,7 @@ jobs:
               else
                 echo "${orbname} not modified; no need to promote"
               fi
+              echo "------------------------------------------------------"
             done
 
       ## walk the tree in orb-releases.yml (the path to which could be fed as a parameter to the command)
