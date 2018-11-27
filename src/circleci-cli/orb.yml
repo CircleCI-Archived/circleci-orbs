@@ -3,6 +3,34 @@ version: 2.1
 description: |
   Install and configure the CircleCI command-line interface
 
+examples:
+  executor-command-example:
+    description: Run a job inside the CircleCI CLI container, via this orb's executor. In another job, use the orb to install the CLI .
+    usage:
+      version: 2.1
+
+      orbs:
+        cli: circleci/circleci-cli@1.0.0
+
+      workflows:
+        cli-orb-example:
+          jobs:
+            - use-executor
+            - use-install-command
+
+      jobs:
+        use-executor:
+          executor: cli/default
+          steps:
+            - run: echo "this job is using the orb's default executor"
+
+        use-install-command:
+          docker:
+            - image: circleci/circleci-cli:latest
+          steps:
+            - cli/install
+            - run: echo "the CLI is now installed"
+
 commands:
   install:
     steps:

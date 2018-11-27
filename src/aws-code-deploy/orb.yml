@@ -10,7 +10,7 @@ examples:
       version: 2.1
 
       orbs:
-        aws-code-deploy: circleci/aws-code-deploy@volatile
+        aws-code-deploy: circleci/aws-code-deploy@1.0.0
 
       workflows:
         deploy_application:

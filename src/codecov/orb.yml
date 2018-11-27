@@ -3,6 +3,38 @@ version: 2.1
 description: |
   Upload code coverage results to Codecov
 
+examples:
+  upload_results:
+    description: Upload some coverage results to Codecov
+    usage:
+      version: 2.1
+
+      orbs:
+        codecov: circleci/codecov@1.0.0
+        node: circleci/node@1.0.0
+
+      workflows:
+        build-test:
+          jobs:
+            - build
+
+            - test:
+                requires:
+                  - build
+
+      jobs:
+        - build # etc
+
+        - test:
+            executor: node/default
+            steps:
+              - checkout
+
+              # do some testing
+
+              - codecov/upload:
+                  path: test-coverage-path
+
 commands:
   upload:
     parameters:

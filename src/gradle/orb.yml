@@ -3,6 +3,22 @@ version: 2.1
 description: |
   Simplify common tasks for building and testing Gradle projects
 
+examples:
+  gradle-workflow:
+    description: Checkout, build, and test a Gradle project
+
+    usage:
+      version: 2.1
+
+      orbs:
+        gradle: circleci/gradle@1.0.0
+
+      workflows:
+        checkout-build-test:
+          jobs:
+            - gradle/test:
+                test_command: test
+
 executors:
   gradle:
     description: The docker container to use when running Gradle builds

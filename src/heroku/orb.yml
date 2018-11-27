@@ -3,6 +3,43 @@ version: 2.1
 description: |
   Install the Heroku CLI and deploy applications to Heroku
 
+examples:
+  use_heroku_job:
+    description: Use this orb's deploy-via-git job to deploy to Heroku in one simple go
+    usage:
+      version: 2.1
+
+      orbs:
+        heroku: circleci/heroku@1.0.0
+
+      workflows:
+        heroku_deploy:
+          jobs:
+            - heroku/deploy-via-git
+
+  use_heroku_commands:
+    description: customize your Heroku flow using the commands from this orb
+    usage:
+      version: 2.1
+
+      orbs:
+        heroku: circleci/heroku@1.0.0
+
+      workflows:
+        heroku_deploy:
+          jobs:
+            - deploy
+
+      jobs:
+        deploy:
+          executor:
+            heroku/default
+          steps:
+            - checkout
+            - heroku/install
+            - heroku/deploy-via-git:
+                only-branch: master
+
 executors:
   default:
     description:
@@ -26,6 +63,7 @@ commands:
             else
               echo "Heroku is already installed. No operation was performed."
             fi
+
   deploy-via-git:
     parameters:
       app-name:
@@ -64,6 +102,7 @@ commands:
             if [[ "<< parameters.only-branch >>" == "" ]] || [[ "${CIRCLE_BRANCH}" == "<< parameters.only-branch >>" ]]; then
               git push https://heroku:<< parameters.api-key >>@git.heroku.com/<< parameters.app-name >>.git << parameters.branch >>
             fi
+
 jobs:
   deploy-via-git:
     parameters:
