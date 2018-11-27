@@ -3,6 +3,27 @@ version: 2.1
 description: |
   Simplify common tasks for building and testing Node projects
 
+examples:
+  standard_node_project:
+    description: A common Node workflow
+    usage:
+      version: 2.1
+
+      orbs:
+        node: circleci/node@1.0.0
+
+      workflows:
+        build-test:
+          jobs:
+            - build
+            - test:
+                requires:
+                  - build
+
+      jobs:
+        build:
+          executor: node/default
+
 executors:
   default:
     parameters:
