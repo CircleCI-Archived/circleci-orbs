@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  slack: circleci/slack@volatile
+  slack: circleci/slack@0.1.3
   circle-compare-url: iynere/compare-url@0.1.0
 
 executors:
@@ -45,7 +45,6 @@ workflows:
               only: master
           context: orb-publishing
 
-
 jobs:
   lint:
     docker:
@@ -60,7 +59,7 @@ jobs:
     steps:
       - checkout
       - run: "echo -e \"token: placeholder\nverbose: false > ~/.circleci/cli.yml\""
-      - run: "sh scripts/validate-orbs.sh"
+      - run: bash scripts/validate-orbs.sh
 
   dev-release:
     executor: cli

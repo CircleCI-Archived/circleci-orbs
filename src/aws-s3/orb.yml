@@ -9,7 +9,7 @@ examples:
     usage:
       version: 2.1
       orbs:
-        aws-s3: circleci/aws-s3@volatile
+        aws-s3: circleci/aws-s3@1.0.0
       jobs:
         build:
           docker:
@@ -27,7 +27,7 @@ examples:
                 arguments: --dryrun
 
 orbs:
-  aws-cli: circleci/aws-cli@volatile
+  aws-cli: circleci/aws-cli@0.1.4
 
 commands:
   sync:
