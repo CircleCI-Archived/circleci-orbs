@@ -3,7 +3,7 @@ The source code for orbs published by CircleCI.
 
 Some orbs have their own repos under the CircleCI-Public GitHub organization; [use the `circleci-orbs` topic tag](https://github.com/search?q=topic%3Acircleci-orbs+org%3ACircleCI-Public&type=Repositories) to see source repositories for all CircleCI-published orbs.
 
-## What are orbs?
+## What are Orbs?
 
 Orbs are packages of CircleCI configuration that can be shared across projects. Orbs allow you to make a single bundle of jobs, commands, and executors that can reference each other and can be imported into a CircleCI build configuration and invoked in their own namespace. Orbs are registered with CircleCI, with revisions expressed using the semver pattern.
 
@@ -19,5 +19,3 @@ To register an orb via the CLI you can point at a local file containing the YAML
 For more info on use of the CLI see the help on orb publishing inside the CLI:
 
 `circleci orb publish --help`
-
-TODO: The above will default to use the main circleci.com service. If you are publishing orbs to a registry on your private CircleCI server installation you can pass your root domain in as an argument or by setting it in your `.circleci/config.yml` file.

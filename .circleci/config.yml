@@ -119,7 +119,6 @@ jobs:
 
       - run:
           name: Publish any modified orbs
-          shell: /bin/bash -exo pipefail
           command: |
             # save value stored in file to a local env var
             CIRCLE_COMPARE_URL=$(cat CIRCLE_COMPARE_URL.txt)
