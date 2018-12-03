@@ -155,7 +155,7 @@ commands:
         type: string
         default: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
     steps:
-      - run:
+      - deploy:
           name: Push Docker Image
           command: docker push << parameters.registry >>/<< parameters.image >>
 
