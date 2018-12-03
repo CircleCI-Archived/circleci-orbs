@@ -155,9 +155,12 @@ commands:
         type: string
         default: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
     steps:
-      - deploy:
+      - run:
           name: Push Docker Image
-          command: docker push << parameters.registry >>/<< parameters.image >>
+          command: |
+            if [[ $CIRCLE_NODE_INDEX == 0 ]]; then
+              docker push << parameters.registry >>/<< parameters.image >>
+            fi
 
 jobs:
   publish:
