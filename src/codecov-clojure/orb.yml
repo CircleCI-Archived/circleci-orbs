@@ -24,7 +24,11 @@ examples:
                 cache-key: code-coverage-{{ checksum "project.clj" }}
 
       jobs:
-        - build # etc
+        build:
+          executor: codecov-clojure/default
+          steps:
+            - checkout
+            - run: echo "do some build stuff" # etc
 
 orbs:
   codecov: circleci/codecov@0.0.2

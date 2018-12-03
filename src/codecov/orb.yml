@@ -23,17 +23,22 @@ examples:
                   - build
 
       jobs:
-        - build # etc
+        build:
+          executor: node/default
+          steps:
+            - checkout
 
-        - test:
-            executor: node/default
-            steps:
-              - checkout
+            # do some building
 
-              # do some testing
+        test:
+          executor: node/default
+          steps:
+            - checkout
 
-              - codecov/upload:
-                  path: test-coverage-path
+            # do some testing
+
+            - codecov/upload:
+                path: test-coverage-path
 
 commands:
   upload:

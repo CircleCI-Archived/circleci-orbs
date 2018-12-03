@@ -45,7 +45,6 @@ workflows:
               only: master
           context: orb-publishing
 
-
 jobs:
   lint:
     docker:
@@ -60,7 +59,7 @@ jobs:
     steps:
       - checkout
       - run: "echo -e \"token: placeholder\nverbose: false > ~/.circleci/cli.yml\""
-      - run: "sh scripts/validate-orbs.sh"
+      - run: bash scripts/validate-orbs.sh
 
   dev-release:
     executor: cli
