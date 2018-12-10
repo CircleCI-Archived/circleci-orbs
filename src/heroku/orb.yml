@@ -100,7 +100,7 @@ commands:
           name: Deploy branch to Heroku via git push
           command: |
             if [[ "<< parameters.only-branch >>" == "" ]] || [[ "${CIRCLE_BRANCH}" == "<< parameters.only-branch >>" ]]; then
-              git push https://heroku:<< parameters.api-key >>@git.heroku.com/<< parameters.app-name >>.git << parameters.branch >>
+              git push https://heroku:<< parameters.api-key >>@git.heroku.com/<< parameters.app-name >>.git << parameters.branch >>:master
             fi
 
 jobs:
