@@ -122,7 +122,7 @@ commands:
       dir:
         type: string
         description: Filepath to your Node modules.
-        default: ${CIRCLE_WORKING_DIRECTORY}/node_modules
+        default: ~/node_modules
       cache-key:
         type: string
         description: File to use as a Node cache checksum.
