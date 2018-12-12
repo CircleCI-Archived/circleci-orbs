@@ -113,7 +113,7 @@ commands:
       improve build times for projects with many dependencies. This directory can be changed
       with the `dir` parameter.
 
-      The cache-key is generated from `package.json`. This file path can be changed with the
+      The cache-key is generated from `package-lock.json`. This file path can be changed with the
       `cache-key` parameter.
     parameters:
       steps:
@@ -126,7 +126,7 @@ commands:
       cache-key:
         type: string
         description: File to use as a Node cache checksum.
-        default: "package.json"
+        default: "package-lock.json"
       cache-version:
         type: string
         description: Cache version; increment this for a fresh cache.
