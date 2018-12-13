@@ -68,7 +68,6 @@ examples:
         my-executor:
           docker:
             - image: circleci/openjdk@9
-    
 
       workflows:
         maven_test:
