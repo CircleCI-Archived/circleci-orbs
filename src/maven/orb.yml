@@ -131,6 +131,7 @@ jobs:
     description: |
       Checkout, build, test, and upload test results for a Maven project.
     executor: <<parameters.executor>>
+    parallelism: <<parameters.parallelism>>
     parameters:
       executor:
         description: The name of custom executor to use
@@ -144,12 +145,33 @@ jobs:
         description: The path to the test results.
         type: string
         default: target/surefire-reports
+      parallelism:
+        description: If you wish to run tests in parallel, set a higher value.
+        type: integer
+        default: 1
+      parallel:
+        description: If you wish to run tests in parallel, must be true to split tests
+        type: boolean
+        default: false
+      parallel_test_pattern:
+        description: If you wish to run tests in parallel, what ant-glob style path matches the tests to be split? Defaults to all classes in src/test/java ending in 'Tests'
+        type: string
+        default: "src/test/java/**/*Tests.java"
     steps:
       - checkout
+      # we can only evalute truthiness of parameters, not value, so we need to use bash logic, or force 2 parameters.
+      - when:
+          condition: << parameters.parallel >>
+          steps:
+            - run:
+                name: Enable Test Splitting
+                command: |
+                  class_argument=$( echo -n $(circleci tests glob <<parameters.parallel_test_pattern>> |  sed -e 's#^src/test/java/\(.*\)\.java#\1#' | tr "/" "."  | circleci tests split --split-by=timings --timings-type=classname) | tr ' ' ',')
+                  echo "export SPLIT_TESTS=$class_argument" >> $BASH_ENV
       - with_cache:
           steps:
             - run:
                 name: Run Tests
-                command: mvn << parameters.command >>
+                command: mvn << parameters.command >> <<# parameters.parallel >> -Dtest=$SPLIT_TESTS <</ parameters.parallel >>
       - process_test_results:
           test_results_path: << parameters.test_results_path >>
