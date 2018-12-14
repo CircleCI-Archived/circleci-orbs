@@ -190,10 +190,6 @@ jobs:
         description: If following standard maven conventions this does not need to be changed.
         type: string
         default: "src/test/java"
-
-    environment:
-      TEST_PATTERN: <<parameters.parallel_test_pattern>>
-      IT_PATTERN: <<parameters.parallel_it_pattern>>
     steps:
       - checkout
       - run:
