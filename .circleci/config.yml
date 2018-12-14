@@ -104,7 +104,7 @@ jobs:
 
       - slack/notify:
           message: "Orbs from
-             *<https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}|commit ${CIRCLE_SHA1}>*
+             *<https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}|commit ${CIRCLE_SHA1:0:7}>*
              on the *<https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/tree/${CIRCLE_BRANCH}|${CIRCLE_BRANCH} branch>*
              are ready for review/approval (<https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}|workflow here>)"
           mentions: "${ORBS_USER_GROUP_UUID}"
@@ -116,7 +116,7 @@ jobs:
 
       - slack/notify:
           message: "Orb publishing was approved for any orbs modified in
-             *<https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}|commit ${CIRCLE_SHA1}>*
+             *<https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}|commit ${CIRCLE_SHA1:0:7}>*
              on the *<https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/tree/${CIRCLE_BRANCH}|${CIRCLE_BRANCH} branch>*
               (<https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}|workflow here>)"
           mentions: "${ORBS_USER_GROUP_UUID}"
