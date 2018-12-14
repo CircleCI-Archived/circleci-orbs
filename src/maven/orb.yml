@@ -126,7 +126,7 @@ commands:
       - store_test_results:
           path: << parameters.test_results_path >>
 
-jobs:     
+jobs:
   test:
     description: |
       Checkout, build, test, and upload test results for a Maven project.
@@ -146,7 +146,7 @@ jobs:
         default: target/surefire-reports
 
     steps:
-      - checkout      
+      - checkout
       - with_cache:
           steps:
             - run:
@@ -154,7 +154,6 @@ jobs:
                 command: mvn << parameters.command >>
       - process_test_results:
           test_results_path: << parameters.test_results_path >>
-
 
 
   parallel_test:
@@ -196,7 +195,7 @@ jobs:
       TEST_PATTERN: <<parameters.parallel_test_pattern>>
       IT_PATTERN: <<parameters.parallel_it_pattern>>
     steps:
-      - checkout       
+      - checkout
       - run:
           name: Enable Test Splitting
           command: |
@@ -210,12 +209,14 @@ jobs:
             mkdir -p .circleci/tests/
 
             # genrate excludes surefire tests using provided pattern
-            circleci tests glob <<parameters.test_directory>>/<<parameters.parallel_test_pattern>> | sed -e 's#^<<parameters.test_directory>>/\(.*\)\.java#\1#' | tr "/" "." > .circleci/tests/surefire_classnames
+            circleci tests glob <<parameters.test_directory>>/<<parameters.parallel_test_pattern>> |\
+              sed -e 's#^<<parameters.test_directory>>/\(.*\)\.java#\1#' | tr "/" "." > .circleci/tests/surefire_classnames
             cat .circleci/tests/surefire_classnames | circleci tests split --split-by=timings --timings-type=classname > /tmp/this_node_tests
             cat .circleci/tests/surefire_classnames | grep -xvf /tmp/this_node_tests > .circleci/tests/surefire_classnames_ignore_list
 
             #generate excluded failsafe tests using provided pattern
-            circleci tests glob <<parameters.test_directory>>/<<parameters.parallel_it_pattern>> | sed -e 's#^<<parameters.test_directory>>/\(.*\)\.java#\1#' | tr "/" "." > .circleci/tests/failsafe_classnames
+            circleci tests glob <<parameters.test_directory>>/<<parameters.parallel_it_pattern>> |\
+              sed -e 's#^<<parameters.test_directory>>/\(.*\)\.java#\1#' | tr "/" "." > .circleci/tests/failsafe_classnames
             cat .circleci/tests/failsafe_classnames | circleci tests split --split-by=timings --timings-type=classname > /tmp/this_node_it_tests
             cat .circleci/tests/failsafe_classnames |  grep -xvf /tmp/this_node_it_tests > .circleci/tests/failsafe_classnames_ignore_list
       - store_artifacts:
@@ -224,6 +225,6 @@ jobs:
           steps:
             - run:
                 name: Run Tests
-                command: mvn << parameters.command >> -Dsurefire.excludesFile=.circleci/tests/surefire_classnames_ignore_list -Dfailsafe.excludesFile=.circleci/tests/failsafe_classnames_ignore_list 
+                command: mvn << parameters.command >> -Dsurefire.excludesFile=.circleci/tests/surefire_classnames_ignore_list -Dfailsafe.excludesFile=.circleci/tests/failsafe_classnames_ignore_list
       - process_test_results:
           test_results_path: << parameters.test_results_path >>
