@@ -109,7 +109,7 @@ commands:
       saved by a previous build. The provided `steps` will then be executed, and
       if successful, a fresh cache will be saved, if required.
 
-      The contents of the `~/node_modules` directory is cached, which will substantially
+      The contents of the `~/project/node_modules` directory is cached, which will substantially
       improve build times for projects with many dependencies. This directory can be changed
       with the `dir` parameter.
 
@@ -122,7 +122,7 @@ commands:
       dir:
         type: string
         description: Filepath to your Node modules.
-        default: ${CIRCLE_WORKING_DIRECTORY}/node_modules
+        default: ~/project/node_modules
       cache-key:
         type: string
         description: File to use as a Node cache checksum.
