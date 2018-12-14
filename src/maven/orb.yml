@@ -126,10 +126,40 @@ commands:
       - store_test_results:
           path: << parameters.test_results_path >>
 
-jobs:
+jobs:     
   test:
     description: |
       Checkout, build, test, and upload test results for a Maven project.
+    executor: <<parameters.executor>>
+    parameters:
+      executor:
+        description: The name of custom executor to use
+        type: executor
+        default: maven
+      command:
+        description: The maven command to run.
+        type: string
+        default: verify
+      test_results_path:
+        description: The path to the test results.
+        type: string
+        default: target/surefire-reports
+
+    steps:
+      - checkout      
+      - with_cache:
+          steps:
+            - run:
+                name: Run Tests
+                command: mvn << parameters.command >>
+      - process_test_results:
+          test_results_path: << parameters.test_results_path >>
+
+
+
+  parallel_test:
+    description: |
+      Checkout, build, test, and upload test results for a Maven project spreading tests across multiple nodes
     executor: <<parameters.executor>>
     parallelism: <<parameters.parallelism>>
     parameters:
@@ -146,32 +176,54 @@ jobs:
         type: string
         default: target/surefire-reports
       parallelism:
-        description: If you wish to run tests in parallel, set a higher value.
+        description: How many nodes should testing be split across?
         type: integer
-        default: 1
-      parallel:
-        description: If you wish to run tests in parallel, must be true to split tests
-        type: boolean
-        default: false
+        default: 2
       parallel_test_pattern:
-        description: If you wish to run tests in parallel, what ant-glob style path matches the tests to be split? Defaults to all classes in src/test/java ending in 'Tests'
+        description: This is the standard Surefire pattern,but you can override if you use alternate <includes> patterns in your pom.xml
         type: string
-        default: "src/test/java/**/*Tests.java"
+        default: "**/*Test*.java"
+      parallel_it_pattern:
+        description: This is the standard Failsafe pattern,but you can override if you use alternate <includes> patterns in your pom.xml.
+        type: string
+        default: "**/*IT*.java"
+      test_directory:
+        description: If following standard maven conventions this does not need to be changed.
+        type: string
+        default: "src/test/java"
+
+    environment:
+      TEST_PATTERN: <<parameters.parallel_test_pattern>>
+      IT_PATTERN: <<parameters.parallel_it_pattern>>
     steps:
-      - checkout
-      # we can only evalute truthiness of parameters, not value, so we need to use bash logic, or force 2 parameters.
-      - when:
-          condition: << parameters.parallel >>
-          steps:
-            - run:
-                name: Enable Test Splitting
-                command: |
-                  class_argument=$( echo -n $(circleci tests glob <<parameters.parallel_test_pattern>> |  sed -e 's#^src/test/java/\(.*\)\.java#\1#' | tr "/" "."  | circleci tests split --split-by=timings --timings-type=classname) | tr ' ' ',')
-                  echo "export SPLIT_TESTS=$class_argument" >> $BASH_ENV
+      - checkout       
+      - run:
+          name: Enable Test Splitting
+          command: |
+            # READ THIS
+            # Caveat 1) CircleCI Test Splitting usese filename by default, but Java JUnit reports do not use filenames, they use classnames.
+            #           Forunately the tranlation is very standard since conflicting file/classnames won't compile.
+            # Caveat 2) Surefire and Failsafe both append <includes> (which can come from parent projects) to any -DincludeFIles argument (meaning it would still run all tests on every node)
+            #           The solution to this is to generate an exclusion list, that is tests being run on the other nodes, and pass that to sirefire/failsafe
+            # Debugging We place all decision files in .circleci/tests and export it as an artifact for inspection/debugging.
+
+            mkdir -p .circleci/tests/
+
+            # genrate excludes surefire tests using provided pattern
+            circleci tests glob <<parameters.test_directory>>/<<parameters.parallel_test_pattern>> | sed -e 's#^<<parameters.test_directory>>/\(.*\)\.java#\1#' | tr "/" "." > .circleci/tests/surefire_classnames
+            cat .circleci/tests/surefire_classnames | circleci tests split --split-by=timings --timings-type=classname > /tmp/this_node_tests
+            cat .circleci/tests/surefire_classnames | grep -xvf /tmp/this_node_tests > .circleci/tests/surefire_classnames_ignore_list
+
+            #generate excluded failsafe tests using provided pattern
+            circleci tests glob <<parameters.test_directory>>/<<parameters.parallel_it_pattern>> | sed -e 's#^<<parameters.test_directory>>/\(.*\)\.java#\1#' | tr "/" "." > .circleci/tests/failsafe_classnames
+            cat .circleci/tests/failsafe_classnames | circleci tests split --split-by=timings --timings-type=classname > /tmp/this_node_it_tests
+            cat .circleci/tests/failsafe_classnames |  grep -xvf /tmp/this_node_it_tests > .circleci/tests/failsafe_classnames_ignore_list
+      - store_artifacts:
+          path: .circleci/tests/
       - with_cache:
           steps:
             - run:
                 name: Run Tests
-                command: mvn << parameters.command >> <<# parameters.parallel >> -Dtest=$SPLIT_TESTS <</ parameters.parallel >>
+                command: mvn << parameters.command >> -Dsurefire.excludesFile=.circleci/tests/surefire_classnames_ignore_list -Dfailsafe.excludesFile=.circleci/tests/failsafe_classnames_ignore_list 
       - process_test_results:
           test_results_path: << parameters.test_results_path >>
