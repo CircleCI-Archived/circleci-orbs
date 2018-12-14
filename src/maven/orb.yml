@@ -54,6 +54,27 @@ examples:
             - maven/test:
                 test_results_path: /path/to/test/results
 
+  custom_executor:
+    description: |
+      If you want to override the executor used by default.
+
+    usage:
+      version: 2.1
+
+      orbs:
+        maven: circleci/maven@1.0.0
+
+      executors:
+        my-executor:
+          docker:
+            - image: circleci/openjdk:9
+
+      workflows:
+        maven_test:
+          jobs:
+            - maven/test:
+                executor: my-executor
+
 executors:
   maven:
     description: The docker container to use when running Maven builds
@@ -109,8 +130,12 @@ jobs:
   test:
     description: |
       Checkout, build, test, and upload test results for a Maven project.
-    executor: maven
+    executor: <<parameters.executor>>
     parameters:
+      executor:
+        description: The name of custom executor to use
+        type: executor
+        default: maven
       command:
         description: The maven command to run.
         type: string
