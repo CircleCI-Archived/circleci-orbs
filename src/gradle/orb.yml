@@ -19,6 +19,27 @@ examples:
             - gradle/test:
                 test_command: test
 
+  custom_executor:
+    description: |
+      If you want to override the executor used by default.
+
+    usage:
+      version: 2.1
+
+      orbs:
+        gradle: circleci/gradle@1.0.0
+
+      executors:
+        my-executor:
+          docker:
+            - image: circleci/openjdk:11
+
+      workflows:
+        gradle_test:
+          jobs:
+            - gradle/test:
+                executor: my-executor
+
 executors:
   gradle:
     description: The docker container to use when running Gradle builds
@@ -61,8 +82,12 @@ jobs:
   test:
     description: |
       Checkout, build and test a gradle project.
-    executor: gradle
+    executor: <<parameters.executor>>
     parameters:
+      executor:
+        description: The name of custom executor to use
+        type: executor
+        default: gradle
       test_command:
         type: string
         default: test
