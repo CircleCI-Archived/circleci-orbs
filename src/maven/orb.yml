@@ -195,13 +195,16 @@ jobs:
       - run:
           name: Enable Test Splitting
           command: |
-            # READ THIS
-            # Caveat 1) CircleCI Test Splitting usese filename by default, but Java JUnit reports do not use filenames, they use classnames.
-            #           Forunately the tranlation is very standard since conflicting file/classnames won't compile.
-            # Caveat 2) Surefire and Failsafe both append <includes> (which can come from parent projects) to any -DincludeFIles argument (meaning it would still run all tests on every node)
-            #           The solution to this is to generate an exclusion list, that is tests being run on the other nodes, and pass that to sirefire/failsafe
-            # Debugging We place all decision files in .circleci/tests and export it as an artifact for inspection/debugging.
+            echo -e "\033[31m\033[4mOrb Notes on Test Splitting\033[0m
+            \033[34mCaveat 1:\033[0m  CircleCI Test Splitting uses filename by default, but JUnit reports use class names.
+            Therefore this orb uses naive tranlation of file paths to dot separated package names and strips the .java suffix.
 
+            \033[34mCaveat 2:\033[0m  Surefire and Failsafe both allow <includes> in pom configuration (which can come from parent projects). 
+            These values are appended to any -DincludeFIles argument (meaning it would still run all tests on every node).
+            Therefore this orb will generate an exclusion list, that is tests being run on the other nodes, and pass that to surefire/failsafe instead.
+
+            \033[34mDebugging:\033[0m This orb will place all files used to decide tests in .circleci/tests and export it as an artifact for inspection/debugging.
+            "
             mkdir -p .circleci/tests/
 
             # genrate excludes surefire tests using provided pattern
