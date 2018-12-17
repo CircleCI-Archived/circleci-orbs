@@ -16,8 +16,7 @@ examples:
       workflows:
         checkout-build-test:
           jobs:
-            - gradle/test:
-                test_command: test
+            - gradle/test
 
   custom_executor:
     description: |
@@ -71,18 +70,39 @@ commands:
           name: Generate Cache Checksum
           command: find . -name 'build.gradle' -exec cat {} + | shasum | awk '{print $1}' > /tmp/gradle_cache_seed
       - restore_cache:
-          key: gradle-{{ checksum "/tmp/gradle_cache_seed" }}
+          key: gradle-{{ checksum "/tmp/gradle_cache_seed" }}-{{ checksum ".circleci/config.yml" }}
       - steps: << parameters.steps >>
       - save_cache:
           paths:
-            - ~/.gradle
-          key: gradle-{{ checksum "/tmp/gradle_cache_seed" }}
+            - ~/.gradle/caches
+            - ~/.gradle/wrapper
+          key: gradle-{{ checksum "/tmp/gradle_cache_seed" }}-{{ checksum ".circleci/config.yml" }}
+
+  collect_test_results:
+    description: |
+      Store test reports to build artifacts.
+      Locate any JUnit test reports and store them as build artifacts and test results.
+      Store the HTML build report to build artifacts.
+    steps:
+      - run:
+          name: Gather Test Results
+          command: |
+            mkdir -p /tmp/test_results/junit
+            find . -name '*TEST-*.xml' -exec cp -v {} /tmp/test_results/junit \;
+      - store_test_results:
+          path: /tmp/test_results
+      - store_artifacts:
+          path: /tmp/test_results
+          destination: Results
+      - store_artifacts:
+          path: build/reports/tests/test/
+          destination: Reports
 
 jobs:
   test:
     description: |
       Checkout, build and test a gradle project.
-    executor: <<parameters.executor>>
+    executor: << parameters.executor >>
     parameters:
       executor:
         description: The name of custom executor to use
@@ -98,3 +118,4 @@ jobs:
             - run:
                 name: Run Tests
                 command: ./gradlew << parameters.test_command >>
+      - collect_test_results
