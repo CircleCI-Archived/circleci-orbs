@@ -18,6 +18,23 @@ examples:
           jobs:
             - gradle/test
 
+  custom-reports:
+    description: Publish custom results and reports
+
+    usage:
+      version: 2.1
+
+      orbs:
+        gradle: circleci/gradle@1.0.0
+
+      workflows:
+        test-with-custom-reports:
+          jobs:
+            - gradle/test:
+                test_command: myTests
+                test_results_path: build/my-results/
+                store_artifacts: build/my-reports/
+
   custom_executor:
     description: |
       If you want to override the executor used by default.
@@ -83,20 +100,50 @@ commands:
       Store test reports to build artifacts.
       Locate any JUnit test reports and store them as build artifacts and test results.
       Store the HTML build report to build artifacts.
+    parameters:
+      test_results_path:
+        description: Results to be published
+        type: string
+      reports_path:
+        description: Artifacts to be published
+        type: string
     steps:
-      - run:
-          name: Gather Test Results
-          command: |
-            mkdir -p /tmp/test_results/junit
-            find . -name '*TEST-*.xml' -exec cp -v {} /tmp/test_results/junit \;
-      - store_test_results:
-          path: /tmp/test_results
-      - store_artifacts:
-          path: /tmp/test_results
-          destination: Results
-      - store_artifacts:
-          path: build/reports/tests/test/
-          destination: Reports
+      - when:
+          condition: <<parameters.test_results_path>>
+          steps:
+            - store_test_results:
+                path: <<parameters.test_results_path>>
+            - store_artifacts:
+                path: /tmp/test_results
+                destination: Results
+      - unless:
+          condition: <<parameters.test_results_path>>
+          steps:
+            - run:
+                name: Gather Test Results
+                command: |
+                mkdir -p /tmp/test_results/junit
+                find . -name '*TEST-*.xml' -exec cp -v {} /tmp/test_results/junit \;
+            - store_test_results:
+                path: /tmp/test_results
+            - store_artifacts:
+                path: /tmp/test_results
+                destination: Results
+            - store_artifacts:
+                path: build/reports/tests/test/
+                destination: Reports
+      - when:
+          condition: <<parameters.reports_path>>
+          steps:
+            - store_artifacts:
+                path: <<parameters.reports_path>>
+                destination: Reports
+      - unless:
+          condition: <<parameters.reports_path>>
+          steps:
+            - store_artifacts:
+                path: build/reports/tests/test/
+                destination: Reports
 
 jobs:
   test:
@@ -111,6 +158,12 @@ jobs:
       test_command:
         type: string
         default: test
+      test_results_path:
+        description: Results to be published
+        type: string
+      reports_path:
+        description: Artifacts to be published
+        type: string
     steps:
       - checkout
       - with_cache:
@@ -118,4 +171,6 @@ jobs:
             - run:
                 name: Run Tests
                 command: ./gradlew << parameters.test_command >>
-      - collect_test_results
+      - collect_test_results:
+          test_results_path: <<parameters.test_results_path>>
+          reports_path: <<parameters.reports_path>>
