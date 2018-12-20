@@ -139,6 +139,10 @@ commands:
         description: Name of registry to use. Defaults to docker.io.
         type: string
         default: docker.io
+      extra_build_args:
+        description: Name of environment file to pass to docker.
+        type: env_var_name
+        default: __EMPTY
     steps:
       - run:
           name: Build Docker Image
@@ -222,7 +226,7 @@ jobs:
           image: << parameters.image >>
           tag: << parameters.tag >>
           registry: << parameters.registry >>
-          envfile: << parameters.envfile >>
+          extra_build_args: << parameters.extra_build_args >>
       - when:
           name: Run after_build lifecycle hook steps.
           condition: << parameters.after_build >>
