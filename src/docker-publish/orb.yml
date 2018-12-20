@@ -139,10 +139,14 @@ commands:
         description: Name of registry to use. Defaults to docker.io.
         type: string
         default: docker.io
+      extra_build_args:
+        description: Name of environment file to pass to docker.
+        type: env_var_name
+        default: __EMPTY
     steps:
       - run:
           name: Build Docker Image
-          command: docker build -f << parameters.dockerfile >> -t << parameters.registry >>/<< parameters.image >>:<< parameters.tag >> << parameters.path >>
+          command: __EMPTY= docker build ${<< parameters.extra_build_args >>} -f << parameters.dockerfile >> -t << parameters.registry >>/<< parameters.image >>:<< parameters.tag >> << parameters.path >>
   deploy:
     description: Deploy docker image to a registry.
     parameters:
@@ -187,6 +191,10 @@ jobs:
         description: Name of registry to use. Defaults to docker.io.
         type: string
         default: docker.io
+      extra_build_args:
+        description: Name of environment file to pass to docker.
+        type: env_var_name
+        default: __EMPTY
       after_checkout:
         description: Optional steps to run after checking out the code.
         type: steps
@@ -218,6 +226,7 @@ jobs:
           image: << parameters.image >>
           tag: << parameters.tag >>
           registry: << parameters.registry >>
+          extra_build_args: << parameters.extra_build_args >>
       - when:
           name: Run after_build lifecycle hook steps.
           condition: << parameters.after_build >>
