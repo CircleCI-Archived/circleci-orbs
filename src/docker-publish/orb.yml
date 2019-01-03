@@ -122,6 +122,22 @@ examples:
           jobs:
             - check_and_build_only
 
+  with_extra_build_args:
+    description: >
+      Build/publish a docker image with extra build arguments
+
+    usage:
+      version: 2.1
+
+    orbs:
+      docker-publish: circleci/docker-publish@1.0.0
+
+    workflows:
+      extra_build_args:
+        jobs:
+          - docker-publish/publish:
+              extra_build_args: --build-arg FOO=bar --build-arg BAZ=qux
+
 executors:
   docker:
     description: The docker container to use when running docker-publish builds
@@ -180,13 +196,20 @@ commands:
         type: string
         default: docker.io
       extra_build_args:
-        description: Name of environment file to pass to docker.
-        type: env_var_name
-        default: __EMPTY
+        description: >
+          Extra arguments to pass to docker build. For examples, see
+          https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg
+        type: string
+        default: ""
     steps:
       - run:
           name: Build Docker Image
-          command: __EMPTY= docker build ${<< parameters.extra_build_args >>} -f << parameters.dockerfile >> -t << parameters.registry >>/<< parameters.image >>:<< parameters.tag >> << parameters.path >>
+          command: |
+            docker build \
+              <<#parameters.extra_build_args>><<parameters.extra_build_args>><</parameters.extra_build_args>> \
+              -f << parameters.dockerfile >> -t \
+              << parameters.registry >>/<< parameters.image >>:<< parameters.tag >> \
+              << parameters.path >>
   deploy:
     description: Deploy docker image to a registry.
     parameters:
