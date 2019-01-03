@@ -20,6 +20,9 @@ examples:
             - aws-s3/sync:
                 from: bucket
                 to: "s3://my-s3-bucket-name/prefix"
+                arguments: |
+                  --acl public-read \
+                  --cache-control "max-age=86400"
                 overwrite: true
             - aws-s3/copy:
                 from: bucket/build_asset.txt
@@ -39,6 +42,10 @@ commands:
       to:
         type: string
         description: A URI to an S3 bucket, i.e. 's3://the-name-my-bucket'
+      arguments:
+        description: If you wish to pass any additional arguments to the aws sync command (i.e. --acl public-read)
+        type: string
+        default: ''
       overwrite:
         default: false
         type: boolean
@@ -47,7 +54,7 @@ commands:
       - aws-cli/configure
       - deploy:
           name: Deploy to S3
-          command: "aws s3 sync << parameters.from >> << parameters.to >><<# parameters.overwrite >> --delete<</ parameters.overwrite >>"
+          command: "aws s3 sync << parameters.from >> << parameters.to >><<# parameters.arguments >> << parameters.arguments >><</parameters.arguments >><<# parameters.overwrite >> --delete<</ parameters.overwrite >>"
 
 
   copy:
