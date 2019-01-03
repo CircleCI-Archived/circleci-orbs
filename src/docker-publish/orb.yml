@@ -82,6 +82,46 @@ examples:
                       name: Do this after the build.
                       command: echo "Did this after the build"
 
+  build_without_publishing_job:
+    description: >
+      Build, but don't publish, an image using the publish job.
+
+    usage:
+      version: 2.1
+
+      orbs:
+        docker-publish: circleci/docker-publish@1.0.0
+
+      workflows:
+        build_without_publishing:
+          jobs:
+            - docker-publish/publish:
+                deploy: false
+
+  build_without_publishing_commands:
+    description: >
+      Build, but don't publish, an image using the check and build jobs.
+
+    usage:
+      version: 2.1
+
+      orbs:
+        docker-publish: circleci/docker-publish@1.0.0
+
+      jobs:
+        check_and_build_only:
+          executor: docker
+          steps:
+            - checkout
+            - setup_remote_docker
+            - docker-publish/check
+            - docker-publish/build
+
+      workflows:
+        build_without_publishing:
+          jobs:
+            - check_and_build_only
+
 executors:
   docker:
     description: The docker container to use when running docker-publish builds
@@ -168,7 +208,7 @@ commands:
 
 jobs:
   publish:
-    description: Check, Build, and Deploy a Docker Image.
+    description: Check, build, and optionally deploy a Docker image.
     executor: docker
     parameters:
       dockerfile:
@@ -207,6 +247,10 @@ jobs:
         description: Optional steps to run after building the docker image.
         type: steps
         default: []
+      deploy:
+        description: Whether or not to push image to a registry.
+        type: boolean
+        default: true
     steps:
       - checkout
       - when:
@@ -231,6 +275,9 @@ jobs:
           name: Run after_build lifecycle hook steps.
           condition: << parameters.after_build >>
           steps: << parameters.after_build >>
-      - deploy:
-          registry: << parameters.registry >>
-          image: << parameters.image >>
+      - when:
+          condition: <<parameters.deploy>>
+          steps:
+            - deploy:
+                registry: << parameters.registry >>
+                image: << parameters.image >>
