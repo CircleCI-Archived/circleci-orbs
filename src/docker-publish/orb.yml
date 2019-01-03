@@ -257,7 +257,7 @@ jobs:
       extra_build_args:
         description: Name of environment file to pass to docker.
         type: env_var_name
-        default: __EMPTY
+        default: ""
       after_checkout:
         description: Optional steps to run after checking out the code.
         type: steps
