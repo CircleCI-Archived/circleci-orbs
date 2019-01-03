@@ -129,14 +129,14 @@ examples:
     usage:
       version: 2.1
 
-    orbs:
-      docker-publish: circleci/docker-publish@1.0.0
+      orbs:
+        docker-publish: circleci/docker-publish@1.0.0
 
-    workflows:
-      extra_build_args:
-        jobs:
-          - docker-publish/publish:
-              extra_build_args: --build-arg FOO=bar --build-arg BAZ=qux
+      workflows:
+        extra_build_args:
+          jobs:
+            - docker-publish/publish:
+                extra_build_args: --build-arg FOO=bar --build-arg BAZ=qux
 
 executors:
   docker:
