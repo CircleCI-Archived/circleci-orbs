@@ -84,7 +84,7 @@ jobs:
 
                 (ls ${ORB}orb.yml && echo "orb.yml found, attempting to publish...") || echo "No orb.yml file was found - the next line is expected to fail."
 
-                circleci orb publish ${ORB}orb.yml circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1} --token $CIRCLECI_API_TOKEN
+                circleci orb publish ${ORB}orb.yml circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1:0:7} --token $CIRCLECI_API_TOKEN
               else
                 echo "${orbname} not modified; no need to promote"
               fi
@@ -137,9 +137,9 @@ jobs:
               orbname=$(basename $ORB)
               if [[ $(git diff $COMMIT_RANGE --name-status | grep "$orbname") ]]; then
 
-                echo "promoting circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1} as patch release"
+                echo "promoting circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1:0:7} as patch release"
 
-                circleci orb publish promote circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1} patch --token $CIRCLECI_API_TOKEN
+                circleci orb publish promote circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1:0:7} patch --token $CIRCLECI_API_TOKEN
               else
                 echo "${orbname} not modified; no need to promote"
               fi
