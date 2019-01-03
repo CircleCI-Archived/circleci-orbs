@@ -281,8 +281,11 @@ jobs:
           condition: << parameters.after_checkout >>
           steps: << parameters.after_checkout >>
       - setup_remote_docker
-      - check:
-          registry: << parameters.registry >>
+      - when:
+          condition: <<parameters.deploy>>
+          steps:
+            - check:
+                registry: << parameters.registry >>
       - when:
           name: Run before_build lifecycle hook steps.
           condition: << parameters.before_build >>
