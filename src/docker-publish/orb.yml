@@ -110,7 +110,7 @@ examples:
 
       jobs:
         check_and_build_only:
-          executor: docker
+          executor: docker-publish/docker
           steps:
             - checkout
             - setup_remote_docker
