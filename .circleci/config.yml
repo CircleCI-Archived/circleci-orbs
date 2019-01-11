@@ -29,17 +29,17 @@ workflows:
               only: master
           context: orb-publishing
 
-      - hold:
-          type: approval
-          requires:
-            - trigger-downstream
-          filters:
-            branches:
-              only: master
+      # - hold:
+      #     type: approval
+      #     requires:
+      #       - trigger-downstream
+      #     filters:
+      #       branches:
+      #         only: master
 
       - dev-promote-patch:
           requires:
-            - hold
+            - trigger-downstream # hold
           filters:
             branches:
               only: master
