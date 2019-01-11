@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  slack: circleci/slack@0.1.8
+  # slack: circleci/slack@0.1.8
   circle-compare-url: iynere/compare-url@0.1.5
 
 executors:
@@ -102,24 +102,24 @@ jobs:
           PROJECT="circleci/aws-code-deploy-orb-test/build"
           curl -X POST $BASE/$PROJECT?circle-token=$CIRCLECI_API_TOKEN
 
-      - slack/notify:
-          message: "Orbs from
-             *<https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}|commit ${CIRCLE_SHA1:0:7}>*
-             on the *<https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/tree/${CIRCLE_BRANCH}|${CIRCLE_BRANCH} branch>*
-             are ready for review/approval (<https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}|workflow here>)"
-          mentions: "${ORBS_USER_GROUP_UUID}"
+      # - slack/notify:
+      #     message: "Orbs from
+      #        *<https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}|commit ${CIRCLE_SHA1:0:7}>*
+      #        on the *<https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/tree/${CIRCLE_BRANCH}|${CIRCLE_BRANCH} branch>*
+      #        are ready for review/approval (<https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}|workflow here>)"
+      #     mentions: "${ORBS_USER_GROUP_UUID}"
 
   dev-promote-patch:
     executor: cli
     steps:
       - checkout
 
-      - slack/notify:
-          message: "Orb publishing was approved for any orbs modified in
-             *<https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}|commit ${CIRCLE_SHA1:0:7}>*
-             on the *<https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/tree/${CIRCLE_BRANCH}|${CIRCLE_BRANCH} branch>*
-              (<https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}|workflow here>)"
-          mentions: "${ORBS_USER_GROUP_UUID}"
+      # - slack/notify:
+      #     message: "Orb publishing was approved for any orbs modified in
+      #        *<https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}|commit ${CIRCLE_SHA1:0:7}>*
+      #        on the *<https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/tree/${CIRCLE_BRANCH}|${CIRCLE_BRANCH} branch>*
+      #         (<https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}|workflow here>)"
+      #     mentions: "${ORBS_USER_GROUP_UUID}"
       - circle-compare-url/reconstruct
 
       - run:
