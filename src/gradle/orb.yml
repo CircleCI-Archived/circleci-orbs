@@ -114,7 +114,7 @@ commands:
             - store_test_results:
                 path: <<parameters.test_results_path>>
             - store_artifacts:
-                path: /tmp/test_results
+                path: <<parameters.test_results_path>>
                 destination: Results
       - unless:
           condition: <<parameters.test_results_path>>
