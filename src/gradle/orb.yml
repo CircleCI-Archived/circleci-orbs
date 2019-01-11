@@ -129,9 +129,6 @@ commands:
             - store_artifacts:
                 path: /tmp/test_results
                 destination: Results
-            - store_artifacts:
-                path: build/reports/tests/test/
-                destination: Reports
       - when:
           condition: <<parameters.reports_path>>
           steps:
