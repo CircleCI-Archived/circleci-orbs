@@ -122,8 +122,8 @@ commands:
             - run:
                 name: Gather Test Results
                 command: |
-                mkdir -p /tmp/test_results/junit
-                find . -name '*TEST-*.xml' -exec cp -v {} /tmp/test_results/junit \;
+                  mkdir -p /tmp/test_results/junit
+                  find . -name '*TEST-*.xml' -exec cp -v {} /tmp/test_results/junit \;
             - store_test_results:
                 path: /tmp/test_results
             - store_artifacts:
