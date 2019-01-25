@@ -1,4 +1,4 @@
-# CircleCI Orbs [![CircleCI status](https://circleci.com/gh/CircleCI-Public/circleci-orbs.svg "CircleCI status")]
+# CircleCI Orbs ![CircleCI status](https://circleci.com/gh/CircleCI-Public/circleci-orbs.svg "CircleCI status")
 The source code for some of the orbs published by CircleCI.
 
 Some orbs have their own repos under the CircleCI-Public GitHub organization; [use the `circleci-orbs` topic tag](https://github.com/search?q=topic%3Acircleci-orbs+org%3ACircleCI-Public&type=Repositories) to see source repositories for all CircleCI-published orbs.
