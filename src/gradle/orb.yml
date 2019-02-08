@@ -1,7 +1,7 @@
 version: 2.1
 
 description: |
-  Simplify common tasks for building and testing Gradle projects
+  Simplify common tasks for building and testing Java projects using Gradle
 
 examples:
   gradle-workflow:
