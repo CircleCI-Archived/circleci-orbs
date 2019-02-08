@@ -1,7 +1,7 @@
 version: 2.1
 
 description: |
-  Simplify common tasks for building and testing Maven projects
+  Simplify common tasks for building and testing Java projects using Maven
 
 examples:
   standard_maven_project:
