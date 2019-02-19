@@ -11,7 +11,7 @@ executors:
         type: string
         default: latest
         description: >
-          Variant of circleci/clojure image to use: 
+          Variant of circleci/clojure image to use:
           http://hub.docker.com/r/circleci/clojure/tags
 
     docker:
@@ -35,7 +35,7 @@ commands:
             if grep -q ':pedantic? :abort' project.clj; then
               lein change ':pedantic?' set :warn
             fi
-      
+
       - run:
           name: Check for conflicting configuration
           command: |
@@ -47,7 +47,7 @@ commands:
               echo ":nvd found in project.clj, aborting"
               exit 1
             fi
-      
+
       - run:
           name: Add lein-nvd
           command: |
@@ -72,16 +72,16 @@ commands:
               echo " :suppression-file \"${suppress_xml}\"" >> ${profiles}
             fi
             echo "}}}" >> ${profiles}
-      
+
       - restore_cache:
           key: orb-lein-nvd
-      
+
       - run: lein nvd update
-      
+
       - save_cache:
           key: orb-lein-nvd
           paths: /tmp/nvd/data
-      
+
       - run: lein nvd check
 
 jobs:
@@ -101,7 +101,7 @@ jobs:
           the report. The format is documented at
           https://jeremylong.github.io/DependencyCheck/general/suppression.html
         type: string
-        
+
     steps:
       - checkout
 
