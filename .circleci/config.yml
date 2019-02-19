@@ -17,17 +17,18 @@ workflows:
       - build
 
       - dev-release:
+          context: orb-publishing
           requires:
             - build
             - lint
 
       - trigger-downstream:
+          context: orb-publishing
           requires:
             - dev-release
           filters:
             branches:
               only: master
-          context: orb-publishing
 
       # - hold:
       #     type: approval
@@ -38,12 +39,12 @@ workflows:
       #         only: master
 
       - dev-promote-patch:
+          context: orb-publishing
           requires:
             - trigger-downstream # hold
           filters:
             branches:
               only: master
-          context: orb-publishing
 
 jobs:
   lint:
@@ -84,7 +85,7 @@ jobs:
 
                 (ls ${ORB}orb.yml && echo "orb.yml found, attempting to publish...") || echo "No orb.yml file was found - the next line is expected to fail."
 
-                circleci orb publish ${ORB}orb.yml circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1:0:7} --token $CIRCLECI_API_TOKEN
+                circleci orb publish ${ORB}orb.yml circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1:0:7} --token $CIRCLE_TOKEN
               else
                 echo "${orbname} not modified; no need to promote"
               fi
@@ -100,7 +101,7 @@ jobs:
           # the time.
           BASE="https://circleci.com/api/v1.1/project/github"
           PROJECT="circleci/aws-code-deploy-orb-test/build"
-          curl -X POST $BASE/$PROJECT?circle-token=$CIRCLECI_API_TOKEN
+          curl -X POST $BASE/$PROJECT?circle-token=$CIRCLE_TOKEN
 
       # - slack/notify:
       #     message: "Orbs from
@@ -139,7 +140,7 @@ jobs:
 
                 echo "promoting circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1:0:7} as patch release"
 
-                circleci orb publish promote circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1:0:7} patch --token $CIRCLECI_API_TOKEN
+                circleci orb publish promote circleci/${orbname}@dev:${CIRCLE_BRANCH}-${CIRCLE_SHA1:0:7} patch --token $CIRCLE_TOKEN
               else
                 echo "${orbname} not modified; no need to promote"
               fi
