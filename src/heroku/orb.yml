@@ -1,7 +1,8 @@
 version: 2.1
 
 description: |
-  Install the Heroku CLI and deploy applications to Heroku
+  Install the Heroku CLI and deploy applications to Heroku. Source:
+  https://github.com/circleci-public/circleci-orbs
 
 examples:
   use_heroku_job:

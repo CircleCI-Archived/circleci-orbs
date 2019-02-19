@@ -1,7 +1,8 @@
 version: 2.1
 
 description: |
-  A set of commands and jobs for working with the Rollbar API
+  A set of commands and jobs for working with the Rollbar API. Source:
+  https://github.com/circleci-public/circleci-orbs
 
 commands:
   notify_deploy:
