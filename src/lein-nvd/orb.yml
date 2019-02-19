@@ -1,7 +1,9 @@
 version: 2.1
 
 description: >
-  Scan a Clojure project for vulnerabilities using lein-nvd.
+  Scan a Clojure project for vulnerabilities using lein-nvd. Source:
+  https://github.com/circleci-public/circleci-orbs
+
 
 executors:
   lein_nvd_default_executor:

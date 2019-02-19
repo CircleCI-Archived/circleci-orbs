@@ -1,7 +1,8 @@
 version: 2.1
 
 description: |
-  Deploy applications to AWS CodeDeploy
+  Deploy applications to AWS CodeDeploy. Source:
+  https://github.com/circleci-public/circleci-orbs
 
 examples:
   deploy_application:

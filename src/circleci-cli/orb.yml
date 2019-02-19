@@ -1,7 +1,8 @@
 version: 2.1
 
 description: |
-  Install and configure the CircleCI command-line interface
+  Install and configure the CircleCI command-line interface. Source:
+  https://github.com/circleci-public/circleci-orbs
 
 examples:
   executor-command-example:

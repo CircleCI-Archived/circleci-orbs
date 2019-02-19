@@ -1,7 +1,8 @@
 version: 2.1
 
 description: |
-  Upload code coverage results to Codecov
+  Upload code coverage results to Codecov. Source:
+  https://github.com/circleci-public/circleci-orbs
 
 examples:
   upload_results:
