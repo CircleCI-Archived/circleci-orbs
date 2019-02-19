@@ -1,24 +1,34 @@
 ---
 version: 2.1
 
-description: Scan a Clojure project for vulnerabilities using lein-nvd.
+description: >
+  Scan a Clojure project for vulnerabilities using lein-nvd.
 
 executors:
   lein_nvd_default_executor:
-    description: A docker container that can be used to run lein nvd check.
+    description: A Docker container that can be used to run lein nvd check
+    parameters:
+      tag:
+        type: string
+        default: latest
+        description: >
+          Variant of circleci/clojure image to use: 
+          http://hub.docker.com/r/circleci/clojure/tags
+
     docker:
-      - image: circleci/clojure
+      - image: circleci/clojure:<<parameters.tag>>
 
 commands:
   run_lein_nvd:
     description: Scan a Clojure project for vulnerabilities using lein-nvd.
     parameters:
       suppressions_file:
+        type: string
         description: |
           The location of an XML file to suppress false positive results from
           the report. The format is documented at
           https://jeremylong.github.io/DependencyCheck/general/suppression.html
-        type: string
+
     steps:
       - run:
           name: Turn off :pedantic? :abort
@@ -26,6 +36,7 @@ commands:
             if grep -q ':pedantic? :abort' project.clj; then
               lein change ':pedantic?' set :warn
             fi
+      
       - run:
           name: Check for conflicting configuration
           command: |
@@ -37,6 +48,7 @@ commands:
               echo ":nvd found in project.clj, aborting"
               exit 1
             fi
+      
       - run:
           name: Add lein-nvd
           command: |
@@ -61,30 +73,38 @@ commands:
               echo " :suppression-file \"${suppress_xml}\"" >> ${profiles}
             fi
             echo "}}}" >> ${profiles}
+      
       - restore_cache:
           key: orb-lein-nvd
+      
       - run: lein nvd update
+      
       - save_cache:
           key: orb-lein-nvd
           paths: /tmp/nvd/data
+      
       - run: lein nvd check
 
 jobs:
   lein_nvd:
     description: Scan a Clojure project for vulnerabilities using lein-nvd.
     executor: <<parameters.executor>>
+
     parameters:
       executor:
         description: The name of a custom executor to use
         type: executor
         default: lein_nvd_default_executor
+
       suppressions_file:
         description: |
           The location of an XML file to suppress false positive results from
           the report. The format is documented at
           https://jeremylong.github.io/DependencyCheck/general/suppression.html
         type: string
+        
     steps:
       - checkout
+
       - run_lein_nvd:
           suppressions_file: <<parameters.suppressions_file>>
