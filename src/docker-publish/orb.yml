@@ -171,7 +171,7 @@ commands:
             fi
       - run:
           name: Docker Login
-          command: docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD << parameters.registry >>
+          command: docker login -u "${DOCKER_LOGIN}" -p "${DOCKER_PASSWORD}" << parameters.registry >>
   build:
     description: Builds and Tags a Docker Image.
     parameters:
