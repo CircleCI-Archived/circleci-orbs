@@ -87,6 +87,10 @@ commands:
         description:
           Deploy the given branch. The default value is your current branch.
         default: "$CIRCLE_BRANCH"
+      force:
+        type: boolean
+        description: "Whether or not to force the git push (i.e. `git push -f`). Defaults to false."
+        default: false
       only-branch:
         type: string
         description:
@@ -100,8 +104,12 @@ commands:
       - run:
           name: Deploy branch to Heroku via git push
           command: |
+            if << parameters.force >>;then
+              force="-f"
+            fi
+
             if [[ "<< parameters.only-branch >>" == "" ]] || [[ "${CIRCLE_BRANCH}" == "<< parameters.only-branch >>" ]]; then
-              git push https://heroku:<< parameters.api-key >>@git.heroku.com/<< parameters.app-name >>.git << parameters.branch >>:master
+              git push $force https://heroku:<< parameters.api-key >>@git.heroku.com/<< parameters.app-name >>.git << parameters.branch >>:master
             fi
 
 jobs:
