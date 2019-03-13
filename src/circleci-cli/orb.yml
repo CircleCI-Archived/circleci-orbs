@@ -1,8 +1,9 @@
 version: 2.1
 
 description: |
-  Install and configure the CircleCI command-line interface. Source:
-  https://github.com/circleci-public/circleci-orbs
+  "Install and configure the CircleCI command-line interface.
+  The CLI can be authenticated with the CIRCLECI_CLI_TOKEN environment variable.
+  Source: https://github.com/circleci-public/circleci-orbs"
 
 examples:
   executor-command-example:
@@ -38,11 +39,10 @@ commands:
       - run:
           name: "Install `circleci` CLI"
           command: |
-            sudo bash -c "$(curl -fSl https://raw.githubusercontent.com/CircleCI-Public/circleci-cli/master/install.sh)"
-            echo "Print the circleci version"
-            circleci version
-            echo "Run circleci help"
-            circleci help
+            [ -w /usr/local/bin ] && SUDO="" || SUDO=sudo
+            curl -fLSs https://circle.ci/cli | $SUDO bash
+            circleci --skip-update-check version
+
 executors:
   default:
     description:
