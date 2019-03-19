@@ -70,6 +70,10 @@ examples:
         docker_with_lifecycle:
           jobs:
             - docker-publish/publish:
+                before_checkout:
+                  - run:
+                      name: Do this before checkout.
+                      command: echo "Did this before checkout"
                 after_checkout:
                   - run:
                       name: Do this after checkout.
@@ -261,6 +265,10 @@ jobs:
           https://docs.docker.com/engine/reference/commandline/build
         type: string
         default: ""
+      before_checkout:
+        description: Optional steps to run before checking out the code.
+        type: steps
+        default: []
       after_checkout:
         description: Optional steps to run after checking out the code.
         type: steps
@@ -278,6 +286,10 @@ jobs:
         type: boolean
         default: true
     steps:
+      - when:
+          name: Run before_checkout lifecycle hook steps.
+          condition: << parameters.before_checkout >>
+          steps: << parameters.before_checkout >>
       - checkout
       - when:
           name: Run after_checkout lifecycle hook steps.
