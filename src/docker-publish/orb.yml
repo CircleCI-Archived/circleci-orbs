@@ -322,4 +322,3 @@ jobs:
             - deploy:
                 registry: << parameters.registry >>
                 image: << parameters.image >>
-
