@@ -1,7 +1,7 @@
 version: 2.1
 
 description: |
-  Build and publish Docker images to container registries. Source:
+  Build and publish Docker images to container registries.Source:
   https://github.com/circleci-public/circleci-orbs
 
 examples:
@@ -322,3 +322,4 @@ jobs:
             - deploy:
                 registry: << parameters.registry >>
                 image: << parameters.image >>
+
