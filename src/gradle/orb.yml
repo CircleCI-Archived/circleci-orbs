@@ -19,6 +19,16 @@ examples:
           jobs:
             - gradle/test
 
+        checkout-run_task:
+          jobs:
+            - pre-steps:
+                -gradle/configure-artifactory:
+                  url-key: ARTIFACTORY_URL
+                  username-key: ARTIFACTORY_USERNAME
+                  password-key: ARTIFACTORY_PASSWORD
+            - gradle/run:
+                command: build -x test
+
   custom-reports:
     description: Publish custom results and reports
 
@@ -143,6 +153,8 @@ commands:
                 path: build/reports/tests/test/
                 destination: Reports
 
+  configure-artifactory:
+
 jobs:
   test:
     description: |
@@ -172,3 +184,22 @@ jobs:
       - collect_test_results:
           test_results_path: <<parameters.test_results_path>>
           reports_path: <<parameters.reports_path>>
+  run:
+    description: |
+      Checkout and run task in a gradle project.
+    executor: << parameters.executor >>
+    parameters:
+      executor:
+        description: The name of custom executor to use
+        type: executor
+        default: gradle
+      command:
+        type: string
+        default: build
+    steps:
+      - checkout
+      - with_cache:
+          steps:
+            - run:
+                name: Run task
+                command: ./gradlew << parameters.test_command >>
