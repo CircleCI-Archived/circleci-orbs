@@ -196,4 +196,4 @@ jobs:
           steps:
             - run:
                 name: Run Task
-                command: ./gradlew << parameters.test_command >>
+                command: ./gradlew << parameters.command >>
