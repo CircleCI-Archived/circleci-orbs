@@ -19,6 +19,11 @@ examples:
           jobs:
             - gradle/test
 
+        checkout-run_task:
+          jobs:
+            - gradle/run:
+                command: build -x test
+
   custom-reports:
     description: Publish custom results and reports
 
@@ -172,3 +177,23 @@ jobs:
       - collect_test_results:
           test_results_path: <<parameters.test_results_path>>
           reports_path: <<parameters.reports_path>>
+
+  run:
+    description: |
+      Checkout and run task in a gradle project.
+    executor: << parameters.executor >>
+    parameters:
+      executor:
+        description: The name of custom executor to use
+        type: executor
+        default: gradle
+      command:
+        type: string
+        default: build
+    steps:
+      - checkout
+      - with_cache:
+          steps:
+            - run:
+                name: Run Task
+                command: ./gradlew << parameters.command >>
