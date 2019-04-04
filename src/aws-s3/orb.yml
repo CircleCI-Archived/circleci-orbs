@@ -29,6 +29,33 @@ examples:
                 from: bucket/build_asset.txt
                 to: "s3://my-s3-bucket-name"
                 arguments: --dryrun
+  override_credentials:
+    description: "Examples uses aws s3 commands with credentials overriding"
+    usage:
+      version: 2.1
+      orbs:
+        aws-s3: circleci/aws-s3@1.0.0
+      jobs:
+        build:
+          docker:
+            - image: circleci/python:2.7
+          steps:
+            - checkout
+            - run: mkdir bucket && echo "lorum ipsum" > bucket/build_asset.txt
+            - aws-s3/sync:
+                from: bucket
+                to: "s3://my-s3-bucket-name/prefix"
+                aws-access-key-id: AWS_ACCESS_KEY_ID_BLUE
+                aws-secret-access-key: AWS_SECRET_ACCESS_KEY_BLUE
+                aws-region: AWS_REGION_BLUE
+                arguments: |
+                  --acl public-read \
+                  --cache-control "max-age=86400"
+                overwrite: true
+            - aws-s3/copy:
+                from: bucket/build_asset.txt
+                to: "s3://my-s3-bucket-name"
+                arguments: --dryrun
 
 orbs:
   aws-cli: circleci/aws-cli@0.1.4
@@ -50,9 +77,24 @@ commands:
       overwrite:
         default: false
         type: boolean
+      aws-access-key-id:
+        type: env_var_name
+        description: aws access key id override
+        default: AWS_ACCESS_KEY
+      aws-secret-access-key:
+        type: env_var_name
+        description: aws secret access key override
+        default: AWS_SECRET_ACCESS_KEY
+      aws-region:
+        type: env_var_name
+        description: aws region override
+        default: AWS_DEFAULT_REGION
     steps:
       - aws-cli/install
-      - aws-cli/configure
+      - aws-cli/configure:
+          aws-access-key-id: << parameters.aws-access-key-id >>
+          aws-secret-access-key: << parameters.aws-secret-access-key >>
+          aws-region: << parameters.aws-region >>
       - deploy:
           name: Deploy to S3
           command: "aws s3 sync << parameters.from >> << parameters.to >><<# parameters.arguments >> << parameters.arguments >><</parameters.arguments >><<# parameters.overwrite >> --delete<</ parameters.overwrite >>"
@@ -71,9 +113,24 @@ commands:
         description: If you wish to pass any additional arguments to the aws copy command (i.e. -sse)
         default: ''
         type: string
+      aws-access-key-id:
+        type: env_var_name
+        description: aws access key id override
+        default: AWS_ACCESS_KEY
+      aws-secret-access-key:
+        type: env_var_name
+        description: aws secret access key override
+        default: AWS_SECRET_ACCESS_KEY
+      aws-region:
+        type: env_var_name
+        description: aws region override
+        default: AWS_DEFAULT_REGION
     steps:
       - aws-cli/install
-      - aws-cli/configure
+      - aws-cli/configure:
+          aws-access-key-id: << parameters.aws-access-key-id >>
+          aws-secret-access-key: << parameters.aws-secret-access-key >>
+          aws-region: << parameters.aws-region >>
       - run:
           name: S3 Copy << parameters.from >> -> << parameters.to >>
           command: "aws s3 cp << parameters.from >> << parameters.to >><<# parameters.arguments >> << parameters.arguments >><</ parameters.arguments >>"
