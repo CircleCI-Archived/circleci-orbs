@@ -22,6 +22,24 @@ examples:
                 service-role-arn: myDeploymentGroupRoleARN
                 bundle-bucket: myApplicationS3Bucket
                 bundle-key: myS3BucketKey
+  override_credentials:
+    description: Deploy an application to AWS CodeDeploy with specific aws profile
+    usage:
+      version: 2.1
+
+      orbs:
+        aws-code-deploy: circleci/aws-code-deploy@1.0.0
+
+      workflows:
+        deploy_application:
+          jobs:
+            - aws-code-deploy/deploy:
+                application-name: myApplication
+                deployment-group: myDeploymentGroup
+                service-role-arn: myDeploymentGroupRoleARN
+                bundle-bucket: myApplicationS3Bucket
+                bundle-key: myS3BucketKey
+                arguments: '--profile assume_role'
 
 orbs:
   aws-cli: circleci/aws-cli@0.1.6
