@@ -80,7 +80,7 @@ commands:
       aws-access-key-id:
         type: env_var_name
         description: aws access key id override
-        default: AWS_ACCESS_KEY
+        default: AWS_ACCESS_KEY_ID
       aws-secret-access-key:
         type: env_var_name
         description: aws secret access key override
@@ -116,7 +116,7 @@ commands:
       aws-access-key-id:
         type: env_var_name
         description: aws access key id override
-        default: AWS_ACCESS_KEY
+        default: AWS_ACCESS_KEY_ID
       aws-secret-access-key:
         type: env_var_name
         description: aws secret access key override
