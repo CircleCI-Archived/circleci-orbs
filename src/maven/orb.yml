@@ -76,6 +76,22 @@ examples:
             - maven/test:
                 executor: my-executor
 
+  custom_settings_file:
+    description: |
+      If you want to use a custom maven settings file.
+
+    usage:
+      version: 2.1
+
+      orbs:
+        maven: circleci/maven@1.0.0
+
+      workflows:
+        maven_test:
+          jobs:
+            - maven/test:
+                settings_file: .circleci/settings.xml
+
 executors:
   maven:
     description: The docker container to use when running Maven builds
@@ -97,6 +113,9 @@ commands:
       The cache-key is generated from any files named `pom.xml` that are
       present in the `working_directory`.
     parameters:
+      settings_file:
+        description: Specify a custom settings file to use (optional)
+        type: string
       steps:
         type: steps
     steps:
@@ -105,9 +124,18 @@ commands:
           command: find . -name 'pom.xml' -exec cat {} + | shasum | awk '{print $1}' > /tmp/maven_cache_seed
       - restore_cache:
           key: maven-{{ checksum "/tmp/maven_cache_seed" }}
-      - run:
-          name: Install Dependencies
-          command: mvn dependency:go-offline
+      - when:
+          condition: << parameters.settings_file >>
+          steps:
+            - run:
+                name: Install Dependencies
+                command: mvn dependency:go-offline --settings '<< parameters.settings_file >>'
+      - unless:
+          condition: << parameters.settings_file >>
+          steps:
+            - run:
+                name: Install Dependencies
+                command: mvn dependency:go-offline
       - steps: << parameters.steps >>
       - save_cache:
           paths:
@@ -145,14 +173,27 @@ jobs:
         description: The path to the test results.
         type: string
         default: target/surefire-reports
+      settings_file:
+        description: Specify a custom settings file to use (optional)
+        type: string
 
     steps:
       - checkout
       - with_cache:
+          settings_file: << parameters.settings_file >>
           steps:
-            - run:
-                name: Run Tests
-                command: mvn << parameters.command >>
+            - when:
+                condition: << parameters.settings_file >>
+                steps:
+                  - run:
+                      name: Run Tests
+                      command: mvn << parameters.command >> --settings '<< parameters.settings_file >>'
+            - unless:
+                condition: << parameters.settings_file >>
+                steps:
+                  - run:
+                      name: Run Tests
+                      command: mvn << parameters.command >>
       - process_test_results:
           test_results_path: << parameters.test_results_path >>
 
@@ -171,6 +212,9 @@ jobs:
         description: The maven command to run.
         type: string
         default: verify
+      settings_file:
+        description: Specify a custom settings file to use (optional)
+        type: string
       test_results_path:
         description: The path to the test results.
         type: string
@@ -232,9 +276,19 @@ jobs:
       - store_artifacts:
           path: .circleci/tests/
       - with_cache:
+          settings_file: << parameters.settings_file >>
           steps:
-            - run:
-                name: Run Tests
-                command: mvn << parameters.command >> -Dsurefire.excludesFile=.circleci/tests/surefire_classnames_ignore_list -Dfailsafe.excludesFile=.circleci/tests/failsafe_classnames_ignore_list
+            - when:
+                condition: << parameters.settings_file >>
+                steps:
+                  - run:
+                      name: Run Tests
+                      command: mvn << parameters.command >> -Dsurefire.excludesFile=.circleci/tests/surefire_classnames_ignore_list -Dfailsafe.excludesFile=.circleci/tests/failsafe_classnames_ignore_list --settings '<< parameters.settings_file >>'
+            - unless:
+                condition: << parameters.settings_file >>
+                steps:
+                  - run:
+                      name: Run Tests
+                      command: mvn << parameters.command >> -Dsurefire.excludesFile=.circleci/tests/surefire_classnames_ignore_list -Dfailsafe.excludesFile=.circleci/tests/failsafe_classnames_ignore_list
       - process_test_results:
           test_results_path: << parameters.test_results_path >>
