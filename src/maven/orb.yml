@@ -90,7 +90,7 @@ examples:
         maven_test:
           jobs:
             - maven/test:
-                settings_file: .circleci/settings.xml
+                settings_file: ci-settings.xml
 
 executors:
   maven:
