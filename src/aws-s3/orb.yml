@@ -97,8 +97,11 @@ commands:
           aws-region: << parameters.aws-region >>
       - deploy:
           name: Deploy to S3
-          command: "aws s3 sync << parameters.from >> << parameters.to >><<# parameters.arguments >> << parameters.arguments >><</parameters.arguments >><<# parameters.overwrite >> --delete<</ parameters.overwrite >>"
-
+          command: |
+            aws s3 sync \
+              <<parameters.from>> <<parameters.to>> \
+              <<#parameters.arguments>><<parameters.arguments>><</parameters.arguments>><<#parameters.overwrite>> \
+              --delete<</parameters.overwrite>>
 
   copy:
     description: "Copies a local file or S3 object to another location locally or in S3. https://docs.aws.amazon.com/cli/latest/reference/s3/cp.html"
