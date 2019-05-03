@@ -146,33 +146,6 @@ executors:
       - image: circleci/python:3.6
 
 commands:
-  check:
-    description: |
-      Sanity check to make sure you can build a docker image.
-
-        * check that $DOCKER_LOGIN and $DOCKER_PASSWORD environment variables are set
-        * run docker login to ensure that you can push the built image
-    parameters:
-      registry:
-        description: Name of registry to use. Defaults to docker.io.
-        type: string
-        default: docker.io
-    steps:
-      - run:
-          name: Check Environment Variables
-          command: |
-            if [[ -z "${DOCKER_LOGIN}" ]]; then
-              echo "DOCKER_LOGIN is not set, will not be able to push image."
-              exit 1
-            fi
-
-            if [[ -z "${DOCKER_PASSWORD}" ]]; then
-              echo "DOCKER_PASSWORD is not set, will not be able to push image."
-              exit 1
-            fi
-      - run:
-          name: Docker Login
-          command: docker login -u "${DOCKER_LOGIN}" -p "${DOCKER_PASSWORD}" << parameters.registry >>
   build:
     description: Builds and Tags a Docker Image.
     parameters:
