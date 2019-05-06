@@ -70,10 +70,16 @@ commands:
       to:
         type: string
         description: A URI to an S3 bucket, i.e. 's3://the-name-my-bucket'
+
       arguments:
-        description: If you wish to pass any additional arguments to the aws sync command (i.e. --acl public-read)
         type: string
-        default: ''
+        default: ""
+        description: >
+          Optional additional arguments to pass to the `aws sync` command
+          (e.g., `--acl public-read`). Note: if passing a multi-line value
+          to this parameter, include `\` characters after each line, so the
+          Bash shell can correctly interpret the entire command.
+
       overwrite:
         default: false
         type: boolean
