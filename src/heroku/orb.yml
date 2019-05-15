@@ -76,6 +76,12 @@ commands:
           variable called HEROKU_APP_NAME"
         type: string
         default: $HEROKU_APP_NAME
+      maintenance-mode:
+        description:
+          "Use this to automatically enable mantainance mode before pre-deploy steps
+           and have it disabled after post-deploy steps have been run."
+        type: boolean
+        default: false
       api-key:
         description:
           "The API key to use. defaulting to the literal value $HEROKU_API_KEY, so you can
@@ -101,6 +107,10 @@ commands:
           out deploys for all but one branch (a typical use would be to pass `master` as the value."
         default: ""
     steps:
+      - when:
+          condition: << parameters.maintenance-mode >>
+          steps:
+            - run: heroku maintenance:on --app << parameters.app-name >>
       - run:
           name: Deploy branch to Heroku via git push
           command: |
@@ -111,6 +121,10 @@ commands:
             if [[ "<< parameters.only-branch >>" == "" ]] || [[ "${CIRCLE_BRANCH}" == "<< parameters.only-branch >>" ]]; then
               git push $force https://heroku:<< parameters.api-key >>@git.heroku.com/<< parameters.app-name >>.git << parameters.branch >>:master
             fi
+      - when:
+          condition: << parameters.maintenance-mode >>
+          steps:
+            - run: heroku maintenance:off --app << parameters.app-name >>
 
 jobs:
   deploy-via-git:
@@ -146,15 +160,8 @@ jobs:
     steps:
       - install
       - checkout
-      - when:
-          condition: << parameters.maintenance-mode >>
-          steps:
-            - run: heroku maintenance:on --app << parameters.app-name >>
       - steps: << parameters.pre-deploy >>
       - deploy-via-git:
           app-name: << parameters.app-name >>
+          maintenance-mode: << parameters.maintenance-mode >>
       - steps: << parameters.post-deploy >>
-      - when:
-          condition: << parameters.maintenance-mode >>
-          steps:
-            - run: heroku maintenance:off --app << parameters.app-name >>
