@@ -1,8 +1,8 @@
 version: 2.1
 
 description: |
-  A set of tools for working with Amazon S3. Source:
-  https://github.com/circleci-public/circleci-orbs
+  A set of tools for working with Amazon S3. Requirements: bash
+  Source: https://github.com/circleci-public/circleci-orbs
 
 examples:
   basic_commands:
