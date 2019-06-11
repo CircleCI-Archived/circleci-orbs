@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   # slack: circleci/slack@0.1.8
-  circle-compare-url: iynere/compare-url@0.1.5
+  circle-compare-url: iynere/compare-url@1.1.0
 
 executors:
   cli:
