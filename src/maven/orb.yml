@@ -118,6 +118,10 @@ commands:
         type: string
       steps:
         type: steps
+      maven_command:
+        description: Specify a custom path for invoking maven
+        type: string
+        default: mvn
     steps:
       - run:
           name: Generate Cache Checksum
@@ -129,13 +133,13 @@ commands:
           steps:
             - run:
                 name: Install Dependencies
-                command: mvn dependency:go-offline --settings '<< parameters.settings_file >>'
+                command: << parameters.maven_command >> dependency:go-offline --settings '<< parameters.settings_file >>'
       - unless:
           condition: << parameters.settings_file >>
           steps:
             - run:
                 name: Install Dependencies
-                command: mvn dependency:go-offline
+                command: << parameters.maven_command >> dependency:go-offline
       - steps: << parameters.steps >>
       - save_cache:
           paths:
@@ -176,6 +180,10 @@ jobs:
       settings_file:
         description: Specify a custom settings file to use (optional)
         type: string
+      maven_command:
+        description: Specify a custom path for invoking maven
+        type: string
+        default: mvn
 
     steps:
       - checkout
@@ -187,13 +195,13 @@ jobs:
                 steps:
                   - run:
                       name: Run Tests
-                      command: mvn << parameters.command >> --settings '<< parameters.settings_file >>'
+                      command: << parameters.maven_command >> << parameters.command >> --settings '<< parameters.settings_file >>'
             - unless:
                 condition: << parameters.settings_file >>
                 steps:
                   - run:
                       name: Run Tests
-                      command: mvn << parameters.command >>
+                      command: << parameters.maven_command >> << parameters.command >>
       - process_test_results:
           test_results_path: << parameters.test_results_path >>
 
@@ -215,6 +223,10 @@ jobs:
       settings_file:
         description: Specify a custom settings file to use (optional)
         type: string
+      maven_command:
+        description: Specify a custom path for invoking maven
+        type: string
+        default: mvn
       test_results_path:
         description: The path to the test results.
         type: string
@@ -283,12 +295,12 @@ jobs:
                 steps:
                   - run:
                       name: Run Tests
-                      command: mvn << parameters.command >> -Dsurefire.excludesFile=.circleci/tests/surefire_classnames_ignore_list -Dfailsafe.excludesFile=.circleci/tests/failsafe_classnames_ignore_list --settings '<< parameters.settings_file >>'
+                      command: << parameters.maven_command >> << parameters.command >> -Dsurefire.excludesFile=.circleci/tests/surefire_classnames_ignore_list -Dfailsafe.excludesFile=.circleci/tests/failsafe_classnames_ignore_list --settings '<< parameters.settings_file >>'
             - unless:
                 condition: << parameters.settings_file >>
                 steps:
                   - run:
                       name: Run Tests
-                      command: mvn << parameters.command >> -Dsurefire.excludesFile=.circleci/tests/surefire_classnames_ignore_list -Dfailsafe.excludesFile=.circleci/tests/failsafe_classnames_ignore_list
+                      command: << parameters.maven_command >> << parameters.command >> -Dsurefire.excludesFile=.circleci/tests/surefire_classnames_ignore_list -Dfailsafe.excludesFile=.circleci/tests/failsafe_classnames_ignore_list
       - process_test_results:
           test_results_path: << parameters.test_results_path >>
