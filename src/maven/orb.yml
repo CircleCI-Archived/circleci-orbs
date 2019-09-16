@@ -116,6 +116,7 @@ commands:
       settings_file:
         description: Specify a custom settings file to use (optional)
         type: string
+        default: pom.xml
       steps:
         type: steps
       maven_command:
@@ -180,6 +181,7 @@ jobs:
       settings_file:
         description: Specify a custom settings file to use (optional)
         type: string
+        default: pom.xml
       maven_command:
         description: Specify a custom path for invoking maven
         type: string
@@ -223,6 +225,7 @@ jobs:
       settings_file:
         description: Specify a custom settings file to use (optional)
         type: string
+        default: pom.xml
       maven_command:
         description: Specify a custom path for invoking maven
         type: string
