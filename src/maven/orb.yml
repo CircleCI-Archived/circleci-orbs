@@ -189,6 +189,7 @@ jobs:
       - checkout
       - with_cache:
           settings_file: << parameters.settings_file >>
+          maven_command: << parameters.maven_command >>
           steps:
             - when:
                 condition: << parameters.settings_file >>
