@@ -116,6 +116,7 @@ commands:
       settings_file:
         description: Specify a custom settings file to use (optional)
         type: string
+        default: pom.xml
       steps:
         type: steps
       maven_command:
@@ -125,7 +126,7 @@ commands:
     steps:
       - run:
           name: Generate Cache Checksum
-          command: find . -name 'pom.xml' -exec cat {} + | shasum | awk '{print $1}' > /tmp/maven_cache_seed
+          command: find . -name 'pom.xml' | sort | xargs cat > /tmp/maven_cache_seed
       - restore_cache:
           key: maven-{{ checksum "/tmp/maven_cache_seed" }}
       - when:
@@ -180,6 +181,7 @@ jobs:
       settings_file:
         description: Specify a custom settings file to use (optional)
         type: string
+        default: pom.xml
       maven_command:
         description: Specify a custom path for invoking maven
         type: string
@@ -223,6 +225,7 @@ jobs:
       settings_file:
         description: Specify a custom settings file to use (optional)
         type: string
+        default: pom.xml
       maven_command:
         description: Specify a custom path for invoking maven
         type: string
