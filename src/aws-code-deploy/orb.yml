@@ -46,6 +46,9 @@ orbs:
 
 commands:
   create-application:
+    description: |
+      Will check to see if a CodeDeploy application with the given name exists already.
+      If it does will exit, if not it will try to create the new CodeDeploy application.
     parameters:
       application-name:
         description:
@@ -70,7 +73,10 @@ commands:
               echo "Application named << parameters.application-name >> already exists. Skipping creation."
             fi
 
-  create-deployment-group:
+  create-deployment-group: 
+    description: |
+      Will check to see if the deployment group is created, if it is not then
+      it will create a CodeDeploy deployment group.
     parameters:
       application-name:
         description:
@@ -115,6 +121,8 @@ commands:
             fi
 
   push-bundle:
+    description: |
+      Bundles and uploads the application revision to a passed in S3 bucket.
     parameters:
       application-name:
         description:
@@ -152,6 +160,9 @@ commands:
               --s3-location s3://<< parameters.bundle-bucket >>/<< parameters.bundle-key >>.<< parameters.bundle-type >><<# parameters.arguments >> << parameters.arguments >><</parameters.arguments >>
 
   deploy-bundle:
+    description:
+      Will first create a deployment group then try and deploy that group. Will update status
+      of deployment in either 'Deployment failed' or 'Deployment finished'.
     parameters:
       application-name:
         description:
