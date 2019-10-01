@@ -46,6 +46,7 @@ executors:
 
 jobs:
   code-coverage:
+    description: Run lein cloverage, save cache and use codecov to upload coverage results
     parameters:
       coverage-file:
         description: the path to coverage.json
