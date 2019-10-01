@@ -73,7 +73,7 @@ commands:
               echo "Application named << parameters.application-name >> already exists. Skipping creation."
             fi
 
-  create-deployment-group: 
+  create-deployment-group:
     description: |
       Will check to see if the deployment group is created, if it is not then
       it will create a CodeDeploy deployment group.
