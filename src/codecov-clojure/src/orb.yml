@@ -1,0 +1,68 @@
+version: 2.1
+
+description: |
+  Upload code coverage results to Codecov. Source:
+  https://github.com/circleci-public/circleci-orbs
+
+examples:
+  upload_results:
+    description: Upload some coverage results to Codecov
+    usage:
+      version: 2.1
+
+      orbs:
+        codecov: circleci/codecov@1.0.0
+        node: circleci/node@1.0.0
+
+      workflows:
+        build-test:
+          jobs:
+            - build
+
+            - test:
+                requires:
+                  - build
+
+      jobs:
+        build:
+          executor: node/default
+          steps:
+            - checkout
+
+            # do some building
+
+        test:
+          executor: node/default
+          steps:
+            - checkout
+
+            # do some testing
+
+            - codecov/upload:
+                path: test-coverage-path
+
+commands:
+  upload:
+    parameters:
+      token:
+        description: The API token to use for uploading to Codecov.
+        type: string
+        default: $CODECOV_TOKEN
+      path:
+        description: Path to the code coverage data file to upload.
+        type: string
+    steps:
+      - run:
+          name: Upload Coverage Results
+          command: |
+            curl --request POST --retry 3 --silent --show-error --fail \
+            --data-binary @<< parameters.path >> \
+            "https://codecov.io/upload/v2?service=circleci\
+            &token=<< parameters.token >>\
+            &commit=$CIRCLE_SHA1\
+            &branch=$CIRCLE_BRANCH\
+            &build=$CIRCLE_BUILD_NUM\
+            &job=$CIRCLE_NODE_INDEX\
+            &build_url=$CIRCLE_BUILD_URL\
+            &slug=$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME\
+            &pr=$CIRCLE_PR_NUMBER"
