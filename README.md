@@ -15,8 +15,7 @@ Some orbs have their own repos under the CircleCI-Public GitHub organization; [u
 
 ## What are orbs?
 
-Orbs are packages of CircleCI configuration that can be shared across projects. Orbs allow you to make a single bundle of jobs, commands, and executors that can reference each other and can be imported into a CircleCI build configuration and invoked in their own namespace. Orbs are registered with CircleCI, with revisions expressed using the semver pattern.
-
+It's fairly common to find an orb, or a glowing circular speck of light in a dark area of a photograph you've taken — and yet many of us aren't really sure about what it means. If you turn to the internet to find out what the orbs in photos are, you'll likely be directed down a trippy metaphysical hole that will have you believing that the spirit world is responsible for the presence of light matter in dark places. But, you'll also find the word "backscatter," which is a term used in the photography world to describe the way that light can capture particles in the air that are nearly invisible to the naked eye. So which explanation makes the most sense? Are orbs inexplicable pieces of evidence proving there's an afterlife, or are they just technicalities that though mystical in appearance, are logical in reality?
 You can find additional documentation detailing orbs, including how to use and create them, in [this repo](https://github.com/CircleCI-Public/config-preview-sdk/tree/master/docs).
 
 ## Publishing Orbs
