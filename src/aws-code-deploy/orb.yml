@@ -22,6 +22,7 @@ examples:
                 service-role-arn: myDeploymentGroupRoleARN
                 bundle-bucket: myApplicationS3Bucket
                 bundle-key: myS3BucketKey
+                arguments: '--profile assume_role'
   override_credentials:
     description: Deploy an application to AWS CodeDeploy with specific aws profile
     usage:
