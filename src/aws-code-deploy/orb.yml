@@ -39,22 +39,22 @@ examples:
                 service-role-arn: myDeploymentGroupRoleARN
                 bundle-bucket: myApplicationS3Bucket
                 bundle-key: myS3BucketKey
-                arguments: '--profile assume_role'
+                arguments: "--profile assume_role"
 
 orbs:
   aws-cli: circleci/aws-cli@0.1.6
 
 commands:
   create-application:
+    description: "Creates a Code Deploy application. https://docs.aws.amazon.com/cli/latest/reference/deploy/create-application.html"
     parameters:
       application-name:
-        description:
-          "The name of an AWS CodeDeploy application associated with the applicable IAM user or AWS account."
+        description: "The name of an AWS CodeDeploy application associated with the applicable IAM user or AWS account."
         type: string
       arguments:
         description: If you wish to pass any additional arguments to the aws deploy command
         type: string
-        default: ''
+        default: ""
     steps:
       - run:
           name: ensure-application-created
@@ -71,28 +71,25 @@ commands:
             fi
 
   create-deployment-group:
+    description: "Creates a deployment group to which application revisions are deployed. https://docs.aws.amazon.com/cli/latest/reference/deploy/create-deployment-group.html"
     parameters:
       application-name:
-        description:
-          "The name of an AWS CodeDeploy application associated with the applicable IAM user or AWS account."
+        description: "The name of an AWS CodeDeploy application associated with the applicable IAM user or AWS account."
         type: string
       deployment-group:
-        description:
-          "The name of a new deployment group for the specified application."
+        description: "The name of a new deployment group for the specified application."
         type: string
       deployment-config:
-        description:
-          "Predefined deployment configuration name."
+        description: "Predefined deployment configuration name."
         type: string
         default: "CodeDeployDefault.OneAtATime"
       service-role-arn:
-        description:
-          "The service role for a deployment group."
+        description: "The service role for a deployment group."
         type: string
       arguments:
         description: If you wish to pass any additional arguments to the aws deploy command
         type: string
-        default: ''
+        default: ""
     steps:
       - run:
           name: ensure-deployment-created
@@ -115,33 +112,29 @@ commands:
             fi
 
   push-bundle:
+    description: "Bundles and uploads to Amazon Simple Storage Service (Amazon S3) an application revision, which is a zip archive file that contains deployable content and an accompanying Application Specification file (AppSpec file). If the upload is successful, a message is returned that describes how to call the create-deployment command to deploy the application revision from Amazon S3 to target Amazon Elastic Compute Cloud (Amazon EC2) instances. https://docs.aws.amazon.com/cli/latest/reference/deploy/push.html"
     parameters:
       application-name:
-        description:
-          "The name of an AWS CodeDeploy application associated with the applicable IAM user or AWS account."
+        description: "The name of an AWS CodeDeploy application associated with the applicable IAM user or AWS account."
         type: string
       bundle-source:
-        description:
-          "The directory relative to your project to package up into an application revision."
+        description: "The directory relative to your project to package up into an application revision."
         type: string
         default: "."
       bundle-bucket:
-        description:
-          "The s3 bucket where an application revision will be stored"
+        description: "The s3 bucket where an application revision will be stored"
         type: string
       bundle-key:
-        description:
-          "A key under the s3 bucket where an application revision will be stored"
+        description: "A key under the s3 bucket where an application revision will be stored"
         type: string
       bundle-type:
-        description:
-          "The file type used for an application revision bundle. Currently defaults to 'zip'"
+        description: "The file type used for an application revision bundle. Currently defaults to 'zip'"
         type: string
         default: "zip"
       arguments:
         description: If you wish to pass any additional arguments to the aws deploy command
         type: string
-        default: ''
+        default: ""
     steps:
       - run:
           name: push-bundle
@@ -152,37 +145,32 @@ commands:
               --s3-location s3://<< parameters.bundle-bucket >>/<< parameters.bundle-key >>.<< parameters.bundle-type >><<# parameters.arguments >> << parameters.arguments >><</parameters.arguments >>
 
   deploy-bundle:
+    description: "Deploys an application revision through the specified deployment group. https://docs.aws.amazon.com/cli/latest/reference/deploy/create-deployment.html"
     parameters:
       application-name:
-        description:
-          "The name of an AWS CodeDeploy application associated with the applicable IAM user or AWS account."
+        description: "The name of an AWS CodeDeploy application associated with the applicable IAM user or AWS account."
         type: string
       deployment-group:
-        description:
-          "The name of a new deployment group for the specified application."
+        description: "The name of a new deployment group for the specified application."
         type: string
       deployment-config:
-        description:
-          "Predefined deployment configuration name."
+        description: "Predefined deployment configuration name."
         type: string
         default: "CodeDeployDefault.OneAtATime"
       bundle-bucket:
-        description:
-          "The s3 bucket where an application revision will be stored"
+        description: "The s3 bucket where an application revision will be stored"
         type: string
       bundle-key:
-        description:
-          "A key under the s3 bucket where an application revision will be stored"
+        description: "A key under the s3 bucket where an application revision will be stored"
         type: string
       bundle-type:
-        description:
-          "The file type used for an application revision bundle. Currently defaults to 'zip'"
+        description: "The file type used for an application revision bundle. Currently defaults to 'zip'"
         type: string
         default: "zip"
       arguments:
         description: If you wish to pass any additional arguments to the aws deploy command
         type: string
-        default: ''
+        default: ""
     steps:
       - run:
           name: deploy-bundle
@@ -222,48 +210,40 @@ jobs:
   deploy:
     description:
       "Ensures an application and deployment group exist then proceeds to
-       bundle and upload an application revision to S3. Once uploaded this
-       job will finally create a deployment based on that revision."
+      bundle and upload an application revision to S3. Once uploaded this
+      job will finally create a deployment based on that revision."
     parameters:
       application-name:
-        description:
-          "The name of an AWS CodeDeploy application associated with the applicable IAM user or AWS account."
+        description: "The name of an AWS CodeDeploy application associated with the applicable IAM user or AWS account."
         type: string
       deployment-group:
-        description:
-          "The name of a new deployment group for the specified application."
+        description: "The name of a new deployment group for the specified application."
         type: string
       deployment-config:
-        description:
-          "Predefined deployment configuration name."
+        description: "Predefined deployment configuration name."
         type: string
         default: "CodeDeployDefault.OneAtATime"
       service-role-arn:
-        description:
-          "The service role for a deployment group."
+        description: "The service role for a deployment group."
         type: string
       bundle-source:
-        description:
-          "The directory relative to your project to package up into an application revision."
+        description: "The directory relative to your project to package up into an application revision."
         type: string
         default: "."
       bundle-bucket:
-        description:
-          "The s3 bucket where an application revision will be stored"
+        description: "The s3 bucket where an application revision will be stored"
         type: string
       bundle-key:
-        description:
-          "A key under the s3 bucket where an application revision will be stored"
+        description: "A key under the s3 bucket where an application revision will be stored"
         type: string
       bundle-type:
-        description:
-          "The file type used for an application revision bundle. Currently defaults to 'zip'"
+        description: "The file type used for an application revision bundle. Currently defaults to 'zip'"
         type: string
         default: "zip"
       arguments:
         description: If you wish to pass any additional arguments to the aws deploy command
         type: string
-        default: ''
+        default: ""
     executor: aws-cli/default
     steps:
       - checkout
