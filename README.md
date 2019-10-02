@@ -11,7 +11,7 @@
 
 The source code for some of the orbs published by CircleCI.
 
-Some orbs have their own repos under the CircleCI-Public GitHub organization; [use the `circleci-orbs` topic tag](https://github.com/search?q=topic%3Acircleci-orbs+org%3ACircleCI-Public&type=Repositories) to see source repositories for all CircleCI-published orbs.
+Some orbs have their own repos under the CircleCI-Public GitHub organization; [use the `circleci-orbs` topic tag](https://github.com/search?q=topic%3Acircleci-orbs+org%3ACircleCI-Public&type=Repositories) to view the source repositories for all CircleCI-published orbs.
 
 ## What are orbs?
 
@@ -26,11 +26,11 @@ To register an orb via the CLI you can point at a local file containing the YAML
 
 `circleci orb publish $PATH_TO_FILE_WITH_ORB_YAML mynamespace/myorb@dev:mytag`
 
-For more info on use of the CLI see the help on orb publishing inside the CLI:
+For more info on the use of CLI, check the help on orb publishing inside the CLI:
 
 `circleci orb publish --help`
 
-TODO: The above will default to use the main circleci.com service. If you are publishing orbs to a registry on your private CircleCI server installation you can pass your root domain in as an argument or by setting it in your `.circleci/config.yml` file.
+TODO: The above will default to use the main circleci.com service. If you are publishing orbs to a registry on your private CircleCI server installation, you can pass your root domain in as an argument or by setting it in your `.circleci/config.yml` file.
 
 ## Contributing
 We welcome [issues](https://github.com/CircleCI-Public/circleci-orbs/issues) (bugs or feature requests) and [pull requests](https://github.com/CircleCI-Public/circleci-orbs/pulls)!
