@@ -89,7 +89,7 @@ jobs:
               else
                 echo "${orbname} not modified; no need to promote"
               fi
-              echo "------------------------------------------------------"
+              echo "---------------------------------------------------------------"
             done
 
   trigger-downstream:
@@ -146,8 +146,7 @@ jobs:
               fi
               echo "------------------------------------------------------"
             done
-
-      ## walk the tree in orb-releases.yml (the path to which could be fed as a parameter to the command)
+      ## done with the program walk the tree in orb-releases.yml (the path to which could be fed as a parameter to the command)
         ## For each, attempt to build the orb with the CLI, then if that's successful, register it.
         ## would look something like: `circleci orb build $PATH-TO-SRC $ORB-NAMESPACE $ORB-NAME $PATH-TO-BUILT-ORB; circleci orb register $PATH-TO-BUILT-ORB $REVISION`
         ## Perhaps better yet, the "built" orb has its revision baked in? So then we can look directly for a checksum in our data to match the built orb.
