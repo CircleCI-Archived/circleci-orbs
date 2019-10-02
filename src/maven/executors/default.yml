@@ -1,0 +1,14 @@
+# How to author Executors: https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-executors
+description: >
+  This is a sample executor using Docker and Node.
+  # What is this executor?
+  # Descriptions should be short, simple, and clear.
+docker:
+  - image: 'circleci/node:<<parameters.tag>>'
+parameters:
+  tag:
+    default: latest
+    description: >
+      Pick a specific circleci/node image variant:
+      https://hub.docker.com/r/circleci/node/tags
+    type: string
