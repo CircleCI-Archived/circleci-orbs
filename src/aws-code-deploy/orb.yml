@@ -221,7 +221,7 @@ commands:
 jobs:
   deploy:
     description:
-      "Ensures an application and deployment group exist then proceeds to
+      "Ensure an application and deployment group exists then proceed to
        bundle and upload an application revision to S3. Once uploaded this
        job will finally create a deployment based on that revision."
     parameters:
@@ -249,15 +249,15 @@ jobs:
         default: "."
       bundle-bucket:
         description:
-          "The s3 bucket where an application revision will be stored"
+          "The s3 bucket where an application's revision will be stored"
         type: string
       bundle-key:
         description:
-          "A key under the s3 bucket where an application revision will be stored"
+          "A key under the s3 bucket where an application's revision will be stored"
         type: string
       bundle-type:
         description:
-          "The file type used for an application revision bundle. Currently defaults to 'zip'"
+          "The file type used for an application's revision bundle. Currently defaults to 'zip'"
         type: string
         default: "zip"
       arguments:
