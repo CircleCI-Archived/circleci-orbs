@@ -14,7 +14,7 @@ examples:
       jobs:
         build:
           docker:
-            - image: circleci/python:2.7
+            - image: circleci/python:3.0
           steps:
             - checkout
             - run: mkdir bucket && echo "lorum ipsum" > bucket/build_asset.txt
