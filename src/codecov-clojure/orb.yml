@@ -46,7 +46,7 @@ executors:
 
 jobs:
   code-coverage:
-    description: Run lein coverage, Save cache ( if required ) and upload Coverage results.
+  description: Run lein coverage, Save cache ( if required ) and upload Coverage results.
     parameters:
       coverage-file:
         description: the path to coverage.json
