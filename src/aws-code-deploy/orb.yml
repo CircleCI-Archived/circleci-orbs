@@ -200,7 +200,7 @@ commands:
                       --output text \
                       --query '[deploymentInfo.status]'<<# parameters.arguments >> << parameters.arguments >><</parameters.arguments >>)
 
-            while [[ $STATUS == "Created" || $STATUS == "InProgress" || $STATUS == "Pending" ]]; do
+            while [[ $STATUS == "Created" || $STATUS == "InProgress" || $STATUS == "Pending" || $STATUS == "Queued" ]]; do
               echo "Status: $STATUS..."
               STATUS=$(aws deploy get-deployment \
                         --deployment-id $ID \
@@ -209,14 +209,15 @@ commands:
               sleep 5
             done
 
-            if [[ $STATUS == "Failed" ]]; then
-              echo "Deployment failed!"
-              aws deploy get-deployment --deployment-id $ID<<# parameters.arguments >> << parameters.arguments >><</parameters.arguments >>
-              exit 1
-            else
+            if [[ $STATUS == "Ready" ]]; then
+              EXITCODE=0
               echo "Deployment finished."
-              aws deploy get-deployment --deployment-id $ID<<# parameters.arguments >> << parameters.arguments >><</parameters.arguments >>
+            else
+              EXITCODE=1
+              echo "Deployment failed!"
             fi
+            aws deploy get-deployment --deployment-id $ID<<# parameters.arguments >> << parameters.arguments >><</parameters.arguments >>
+            exit $EXITCODE
 
 jobs:
   deploy:
