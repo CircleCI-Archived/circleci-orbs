@@ -31,9 +31,9 @@ For more info on use of the CLI see the help on orb publishing inside the CLI:
 `circleci orb publish --help`
 
 TODO: The above will default to use the main circleci.com service. If you are publishing orbs to a registry on your private CircleCI server installation you can pass your root domain in as an argument or by setting it in your `.circleci/config.yml` file.
-It is deployed on AWS.
+It is deployed on AWS and varous other tech are used there.
 
 ## Contributing
-We welcome [issues](https://github.com/CircleCI-Public/circleci-orbs/issues) (bugs or feature requests) and [pull requests](https://github.com/CircleCI-Public/circleci-orbs/pulls) for this repo!
+We welcome [issues](https://github.com/CircleCI-Public/circleci-orbs/issues) (bugs or feature requests) and [pull requests](https://github.com/CircleCI-Public/circleci-orbs/pulls)!
 
 All pull requests will initially merge to `staging`, triggering automatic dev releases of any modified orbs and allowing open-source contributors working on forks of the repository to test out their code changes. Once we have confirmed the stability/functionality of modifications (via either manual or to-be-added automated integration testing), we will merge the changes in `staging` to `master`.
