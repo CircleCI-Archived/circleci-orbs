@@ -46,6 +46,7 @@ executors:
 
 jobs:
   code-coverage:
+    description: Runs code coverage on the codebase
     parameters:
       coverage-file:
         description: the path to coverage.json
