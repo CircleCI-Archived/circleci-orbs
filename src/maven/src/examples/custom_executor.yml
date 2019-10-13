@@ -1,0 +1,19 @@
+description: |
+  If you want to override the executor used by default.
+
+usage:
+  version: 2.1
+
+  orbs:
+    maven: circleci/maven@1.0.0
+
+  executors:
+    my-executor:
+      docker:
+        - image: circleci/openjdk:9
+
+  workflows:
+    maven_test:
+      jobs:
+        - maven/test:
+            executor: my-executor

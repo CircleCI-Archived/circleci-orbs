@@ -1,0 +1,44 @@
+description: |
+  Checkout, build, test, and upload test results for a Maven project.
+executor: <<parameters.executor>>
+parameters:
+  executor:
+    description: The name of custom executor to use
+    type: executor
+    default: maven
+  command:
+    description: The maven command to run.
+    type: string
+    default: verify
+  test_results_path:
+    description: The path to the test results.
+    type: string
+    default: target/surefire-reports
+  settings_file:
+    description: Specify a custom settings file to use (optional)
+    type: string
+    default: pom.xml
+  maven_command:
+    description: Specify a custom path for invoking maven
+    type: string
+    default: mvn
+
+steps:
+  - checkout
+  - with_cache:
+      settings_file: << parameters.settings_file >>
+      steps:
+        - when:
+            condition: << parameters.settings_file >>
+            steps:
+              - run:
+                  name: Run Tests
+                  command: << parameters.maven_command >> << parameters.command >> --settings '<< parameters.settings_file >>'
+        - unless:
+            condition: << parameters.settings_file >>
+            steps:
+              - run:
+                  name: Run Tests
+                  command: << parameters.maven_command >> << parameters.command >>
+  - process_test_results:
+      test_results_path: << parameters.test_results_path >>

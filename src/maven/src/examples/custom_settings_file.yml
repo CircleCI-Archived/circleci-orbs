@@ -1,0 +1,14 @@
+description: |
+  If you want to use a custom maven settings file.
+
+usage:
+  version: 2.1
+
+  orbs:
+    maven: circleci/maven@1.0.0
+
+  workflows:
+    maven_test:
+      jobs:
+        - maven/test:
+            settings_file: ci-settings.xml

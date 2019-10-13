@@ -1,0 +1,12 @@
+description: |
+  Upload test results.
+
+  This will populate the Test Summary tab in the CircleCI UI. By default it will
+  look in `target/surefire-reports` (the default location for maven test results).
+  You can override where to find the test results with the path parameter.
+parameters:
+  test_results_path:
+    type: string
+steps:
+  - store_test_results:
+      path: << parameters.test_results_path >>

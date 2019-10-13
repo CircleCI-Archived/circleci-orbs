@@ -1,0 +1,5 @@
+version: 2.1
+
+description: |
+  Simplify common tasks for building and testing Java projects using Maven.
+  Source: https://github.com/circleci-public/circleci-orbs

@@ -1,0 +1,46 @@
+description: |
+  Run a set of steps with Maven dependencies cached.
+
+  This command will first restore a cache of maven dependencies, if one was
+  saved by a previous build. The provided `steps` will then be executed, and
+  if successful, then a fresh cache will be saved, if required.
+
+  The contents of the `~/.m2` directory is cached, which will substantially
+  improve build times for projects with many dependencies.
+
+  The cache-key is generated from any files named `pom.xml` that are
+  present in the `working_directory`.
+parameters:
+  settings_file:
+    description: Specify a custom settings file to use (optional)
+    type: string
+    default: pom.xml
+  steps:
+    type: steps
+  maven_command:
+    description: Specify a custom path for invoking maven
+    type: string
+    default: mvn
+steps:
+  - run:
+      name: Generate Cache Checksum
+      command: find . -name 'pom.xml' | sort | xargs cat > /tmp/maven_cache_seed
+  - restore_cache:
+      key: maven-{{ checksum "/tmp/maven_cache_seed" }}
+  - when:
+      condition: << parameters.settings_file >>
+      steps:
+        - run:
+            name: Install Dependencies
+            command: << parameters.maven_command >> dependency:go-offline --settings '<< parameters.settings_file >>'
+  - unless:
+      condition: << parameters.settings_file >>
+      steps:
+        - run:
+            name: Install Dependencies
+            command: << parameters.maven_command >> dependency:go-offline
+  - steps: << parameters.steps >>
+  - save_cache:
+      paths:
+        - ~/.m2
+      key: maven-{{ checksum "/tmp/maven_cache_seed" }}

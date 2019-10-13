@@ -1,0 +1,15 @@
+description: |
+  You could run any custom maven command that you wish. In the example
+  below we are running maven verify with debug mode enabled.
+
+usage:
+  version: 2.1
+
+  orbs:
+    maven: circleci/maven@1.0.0
+
+  workflows:
+    maven_test:
+      jobs:
+        - maven/test:
+            command: -X verify

@@ -1,0 +1,98 @@
+description: |
+  Checkout, build, test, and upload test results for a Maven project spreading tests across multiple nodes
+executor: <<parameters.executor>>
+parallelism: <<parameters.parallelism>>
+parameters:
+  executor:
+    description: The name of custom executor to use
+    type: executor
+    default: maven
+  command:
+    description: The maven command to run.
+    type: string
+    default: verify
+  settings_file:
+    description: Specify a custom settings file to use (optional)
+    type: string
+    default: pom.xml
+  maven_command:
+    description: Specify a custom path for invoking maven
+    type: string
+    default: mvn
+  test_results_path:
+    description: The path to the test results.
+    type: string
+    default: target/surefire-reports
+  parallelism:
+    description: How many nodes should testing be split across?
+    type: integer
+    default: 2
+  parallel_test_pattern:
+    description: |
+      This is the standard Surefire pattern, but you can override
+      if you use alternate <includes> patterns in your pom.xml
+    type: string
+    default: "**/*Test*.java"
+  parallel_it_pattern:
+    description: |
+      This is the standard Failsafe pattern, but you can override
+      if you use alternate <includes> patterns in your pom.xml.
+    type: string
+    default: "**/*IT*.java"
+  test_directory:
+    description: If following standard maven conventions this does not need to be changed.
+    type: string
+    default: "src/test/java"
+steps:
+  - checkout
+  - run:
+      name: Enable Test Splitting
+      command: |
+        echo -e "\033[31m\033[4mOrb Notes on Test Splitting\033[0m
+        \033[34mCaveat 1:\033[0m  CircleCI Test Splitting uses filename by default, but JUnit reports use class names.
+        Therefore this orb uses naive translation of linux file paths to dot separated package names and strips the .java suffix.
+
+        \033[34mCaveat 2:\033[0m  Surefire and Failsafe both allow <includes> in pom configuration (which can come from parent projects).
+        These values are appended to any -DincludeFiles argument (meaning it would still run all tests on every node).
+        Therefore this orb will generate an exclusion list; a list of tests being run on the other nodes, and pass that to surefire/failsafe as an exclusion.
+
+        \033[34mDebugging:\033[0m This orb will place all files used to decide tests in .circleci/tests and export it as an artifact for inspection/debugging.
+        "
+        mkdir -p .circleci/tests/
+
+        # generate excluded surefire tests using provided pattern
+        circleci tests glob <<parameters.test_directory>>/<<parameters.parallel_test_pattern>> | \
+          sed -e 's#^<<parameters.test_directory>>/\(.*\)\.java#\1#' | \
+          tr "/" "." > .circleci/tests/surefire_classnames
+        cat .circleci/tests/surefire_classnames | \
+          circleci tests split --split-by=timings --timings-type=classname > /tmp/this_node_tests
+        cat .circleci/tests/surefire_classnames | \
+          grep -xvf /tmp/this_node_tests > .circleci/tests/surefire_classnames_ignore_list
+
+        # generate excluded failsafe tests using provided pattern
+        circleci tests glob <<parameters.test_directory>>/<<parameters.parallel_it_pattern>> | \
+          sed -e 's#^<<parameters.test_directory>>/\(.*\)\.java#\1#' | \
+          tr "/" "." > .circleci/tests/failsafe_classnames
+        cat .circleci/tests/failsafe_classnames | \
+          circleci tests split --split-by=timings --timings-type=classname > /tmp/this_node_it_tests
+        cat .circleci/tests/failsafe_classnames |  \
+          grep -xvf /tmp/this_node_it_tests > .circleci/tests/failsafe_classnames_ignore_list
+  - store_artifacts:
+      path: .circleci/tests/
+  - with_cache:
+      settings_file: << parameters.settings_file >>
+      steps:
+        - when:
+            condition: << parameters.settings_file >>
+            steps:
+              - run:
+                  name: Run Tests
+                  command: << parameters.maven_command >> << parameters.command >> -Dsurefire.excludesFile=.circleci/tests/surefire_classnames_ignore_list -Dfailsafe.excludesFile=.circleci/tests/failsafe_classnames_ignore_list --settings '<< parameters.settings_file >>'
+        - unless:
+            condition: << parameters.settings_file >>
+            steps:
+              - run:
+                  name: Run Tests
+                  command: << parameters.maven_command >> << parameters.command >> -Dsurefire.excludesFile=.circleci/tests/surefire_classnames_ignore_list -Dfailsafe.excludesFile=.circleci/tests/failsafe_classnames_ignore_list
+  - process_test_results:
+      test_results_path: << parameters.test_results_path >>

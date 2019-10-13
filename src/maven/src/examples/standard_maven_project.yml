@@ -1,0 +1,14 @@
+description: |
+  If you have a standard maven project, you can use this orb to run through
+  a common maven worklow. Without any additional configuration you can
+  build, test, and automatically have your test results uploaded to CircleCI.
+usage:
+  version: 2.1
+
+  orbs:
+    maven: circleci/maven@1.0.0
+
+  workflows:
+    maven_test:
+      jobs:
+        - maven/test
