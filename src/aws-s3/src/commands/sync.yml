@@ -1,0 +1,45 @@
+description: "Syncs directories and S3 prefixes. https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html"
+parameters:
+  from:
+    type: string
+    description: A local *directory* path to sync with S3
+  to:
+    type: string
+    description: A URI to an S3 bucket, i.e. 's3://the-name-my-bucket'
+
+  arguments:
+    type: string
+    default: ""
+    description: >
+      Optional additional arguments to pass to the `aws sync` command
+      (e.g., `--acl public-read`). Note: if passing a multi-line value
+      to this parameter, include `\` characters after each line, so the
+      Bash shell can correctly interpret the entire command.
+
+  overwrite:
+    default: false
+    type: boolean
+  aws-access-key-id:
+    type: env_var_name
+    description: aws access key id override
+    default: AWS_ACCESS_KEY_ID
+  aws-secret-access-key:
+    type: env_var_name
+    description: aws secret access key override
+    default: AWS_SECRET_ACCESS_KEY
+  aws-region:
+    type: env_var_name
+    description: aws region override
+    default: AWS_REGION
+steps:
+  - aws-cli/install
+  - aws-cli/configure:
+      aws-access-key-id: << parameters.aws-access-key-id >>
+      aws-secret-access-key: << parameters.aws-secret-access-key >>
+      aws-region: << parameters.aws-region >>
+  - deploy:
+      name: Deploy to S3
+      command: |
+        aws s3 sync \
+          <<parameters.from>> <<parameters.to>><<#parameters.overwrite>> --delete<</parameters.overwrite>><<#parameters.arguments>> \
+          <<parameters.arguments>><</parameters.arguments>>
