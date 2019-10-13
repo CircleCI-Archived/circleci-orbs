@@ -1,0 +1,7 @@
+parameters:
+  tag:
+    type: string
+    description: Pick a specific circleci/clojure image variant from https://hub.docker.com/r/circleci/clojure/tags
+    default: "latest"
+docker:
+  - image: circleci/clojure:<< parameters.tag >>

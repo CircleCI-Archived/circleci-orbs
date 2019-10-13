@@ -1,0 +1,24 @@
+description: Upload some Clojure coverage results to Codecov
+usage:
+  version: 2.1
+
+  orbs:
+    codecov-clojure: circleci/codecov-clojure@1.0.0
+
+  workflows:
+    build-test:
+      jobs:
+        - build
+
+        - codecov-clojure/code-coverage:
+            requires:
+              - build
+            coverage-file: target/coverage/codecov.json
+            cache-key: code-coverage-{{ checksum "project.clj" }}
+
+  jobs:
+    build:
+      executor: codecov-clojure/default
+      steps:
+        - checkout
+        - run: echo "do some build stuff" # etc

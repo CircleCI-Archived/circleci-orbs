@@ -1,0 +1,8 @@
+version: 2.1
+
+description: |
+  Automate Codecov reporting for Clojure projects. Source:
+  https://github.com/circleci-public/circleci-orbs
+
+orbs:
+  codecov: circleci/codecov@0.0.2
