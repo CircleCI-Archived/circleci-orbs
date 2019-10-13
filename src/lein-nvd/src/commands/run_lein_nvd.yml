@@ -1,0 +1,64 @@
+description: Scan a Clojure project for vulnerabilities using lein-nvd.
+parameters:
+  suppressions_file:
+    type: string
+    description: |
+      The location of an XML file to suppress false positive results from
+      the report. The format is documented at
+      https://jeremylong.github.io/DependencyCheck/general/suppression.html
+
+steps:
+  - run:
+      name: Turn off :pedantic? :abort
+      command: |
+        if grep -q ':pedantic? :abort' project.clj; then
+          lein change ':pedantic?' set :warn
+        fi
+
+  - run:
+      name: Check for conflicting configuration
+      command: |
+        if grep -q 'lein-nvd' project.clj; then
+          echo "lein-nvd found in project.clj, aborting"
+          exit 1
+        fi
+        if grep -q ':nvd' project.clj; then
+          echo ":nvd found in project.clj, aborting"
+          exit 1
+        fi
+
+  - run:
+      name: Add lein-nvd
+      command: |
+        suppress_xml="<<parameters.suppressions_file>>"
+        if [[ -n "${suppress_xml}" ]]; then
+          if [[ ! -f "${suppress_xml}" ]]; then
+            echo "${suppress_xml} does not exist, aborting"
+            exit 1
+          fi
+        else
+          if [[ -f ".nvd/suppression.xml" ]]; then
+            suppress_xml=".nvd/suppression.xml"
+          fi
+        fi
+
+        mkdir -p "${HOME}/.lein"
+        profiles="${HOME}/.lein/profiles"
+        echo "{:user {" > ${profiles}
+        echo ':plugins [[lein-nvd "0.6.0"]]' >> ${profiles}
+        echo ':nvd {:data-directory "/tmp/nvd/data"' >> ${profiles}
+        if [[ -n "${suppress_xml}" ]]; then
+          echo " :suppression-file \"${suppress_xml}\"" >> ${profiles}
+        fi
+        echo "}}}" >> ${profiles}
+
+  - restore_cache:
+      key: orb-lein-nvd
+
+  - run: lein nvd update
+
+  - save_cache:
+      key: orb-lein-nvd
+      paths: /tmp/nvd/data
+
+  - run: lein nvd check

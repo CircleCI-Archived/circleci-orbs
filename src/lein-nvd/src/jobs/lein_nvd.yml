@@ -1,0 +1,21 @@
+description: Scan a Clojure project for vulnerabilities using lein-nvd.
+executor: <<parameters.executor>>
+
+parameters:
+  executor:
+    description: The name of a custom executor to use
+    type: executor
+    default: lein_nvd_default_executor
+
+  suppressions_file:
+    description: |
+      The location of an XML file to suppress false positive results from
+      the report. The format is documented at
+      https://jeremylong.github.io/DependencyCheck/general/suppression.html
+    type: string
+
+steps:
+  - checkout
+
+  - run_lein_nvd:
+      suppressions_file: <<parameters.suppressions_file>>
