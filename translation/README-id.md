@@ -3,7 +3,7 @@
 - `circleci/aws-s3`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/aws-s3)](https://circleci.com/orbs/registry/orb/circleci/aws-s3)
 - `circleci/codecov-clojure`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/codecov-clojure)](https://circleci.com/orbs/registry/orb/circleci/codecov-clojure)
 - `circleci/codecov`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/codecov)](https://circleci.com/orbs/registry/orb/circleci/codecov)
-- `circleci/gradle`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/gradle)](https://circleci.com/orbs/registry/orb/circleci/gradle) 
+- `circleci/gradle`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/gradle)](https://circleci.com/orbs/registry/orb/circleci/gradle)
 - `circleci/heroku`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/heroku)](https://circleci.com/orbs/registry/orb/circleci/heroku)
 - `circleci/lein-nvd`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/lein-nvd)](https://circleci.com/orbs/registry/orb/circleci/lein-nvd)
 - `circleci/maven`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/maven)](https://circleci.com/orbs/registry/orb/circleci/maven)
@@ -18,7 +18,7 @@ Beberapa orbs memliki repo senidiri dibawah CircleCI-Public Github; [gunakan tan
 Orbs adalah paket konfigurasi CircleCI yang dapat dibagikan di seluruh proyek. Orbs memungkinkan Anda untuk membuat satu bundel pekerjaan, perintah, dan pelaksana yang dapat saling referensi dan dapat diimpor ke konfigurasi build CircleCI dan dipanggil di namespace mereka sendiri. Orbs terdaftar di CircleCI, dengan revisi yang diekspresikan menggunakan pola semver.
 
 Kamu dapat menemukan info lebih lanjut tentang orbs ,
-termasuk bagaimana menggunakannya dan membuatnya di [repo ini](https://github.com/CircleCI-Public/config-preview-sdk/tree/master/docs).
+termasuk bagaimana menggunakannya dan membuatnya di [repo ini](https://github.com/CircleCI-Public/config-preview-sdk/tree/v2.1/docs).
 
 ## Menerbitkan Orbs
 Orbs ditambahkan ke registri melalui CircleCI API. Build dalam repositori ini (`.circleci/config.yml`) menggunakan API melalui [CircleCI CLI](https://github.com/CircleCI-Public/circleci-cli) untuk mengambil sumber orbs yang terletak di folder `src` dan mendaftarkannya sebagai orbs.
