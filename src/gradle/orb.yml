@@ -189,7 +189,7 @@ jobs:
         default: gradle
       command:
         type: string
-        default: build
+        default: clean build
     steps:
       - checkout
       - with_cache:
