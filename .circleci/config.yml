@@ -15,12 +15,15 @@ workflows:
     jobs:
       - lint
       - build
-
-      - dev-release:
-          context: orb-publishing
+      - approve:
+          type: approval
           requires:
             - build
             - lint
+      - dev-release:
+          context: orb-publishing
+          requires:
+            - approval
 
       - trigger-downstream:
           context: orb-publishing
