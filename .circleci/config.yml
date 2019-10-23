@@ -23,7 +23,7 @@ workflows:
       - dev-release:
           context: orb-publishing
           requires:
-            - approval
+            - approve
 
       - trigger-downstream:
           context: orb-publishing
