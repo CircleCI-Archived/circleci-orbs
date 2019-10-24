@@ -6,7 +6,7 @@ description: |
 
 examples:
   gradle-workflow:
-    description: Checkout, build, and test a Gradle project
+    description: Checkout, build, test, linting a Gradle project
 
     usage:
       version: 2.1
@@ -22,7 +22,7 @@ examples:
         checkout-run_task:
           jobs:
             - gradle/run:
-                command: build -x test
+                command: build -x check
 
   custom-reports:
     description: Publish custom results and reports
@@ -160,7 +160,7 @@ jobs:
         default: gradle
       test_command:
         type: string
-        default: test
+        default: check
       test_results_path:
         description: Results to be published
         type: string
