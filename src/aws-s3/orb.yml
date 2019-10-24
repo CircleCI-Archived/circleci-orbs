@@ -93,7 +93,7 @@ commands:
         default: AWS_SECRET_ACCESS_KEY
       aws-region:
         type: env_var_name
-        description: aws region override
+        description: aws region https://docs.aws.amazon.com/general/latest/gr/rande.html override
         default: AWS_REGION
     steps:
       - aws-cli/install
