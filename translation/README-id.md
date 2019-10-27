@@ -18,7 +18,7 @@ Beberapa orbs memliki repo senidiri dibawah CircleCI-Public Github; [gunakan tan
 Orbs adalah paket konfigurasi CircleCI yang dapat dibagikan di seluruh proyek. Orbs memungkinkan Anda untuk membuat satu bundel pekerjaan, perintah, dan pelaksana yang dapat saling referensi dan dapat diimpor ke konfigurasi build CircleCI dan dipanggil di namespace mereka sendiri. Orbs terdaftar di CircleCI, dengan revisi yang diekspresikan menggunakan pola semver.
 
 Kamu dapat menemukan info lebih lanjut tentang orbs ,
-termasuk bagaimana menggunakannya dan membuatnya di [repo ini](https://github.com/CircleCI-Public/config-preview-sdk/tree/master/docs).
+termasuk bagaimana menggunakannya dan membuatnya di [situs](https://circleci.com/docs/2.0/orb-intro/).
 
 ## Menerbitkan Orbs
 Orbs ditambahkan ke registri melalui CircleCI API. Build dalam repositori ini (`.circleci/config.yml`) menggunakan API melalui [CircleCI CLI](https://github.com/CircleCI-Public/circleci-cli) untuk mengambil sumber orbs yang terletak di folder `src` dan mendaftarkannya sebagai orbs.
