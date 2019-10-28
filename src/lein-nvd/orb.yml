@@ -14,7 +14,7 @@ executors:
         default: latest
         description: >
           Variant of circleci/clojure image to use:
-          http://hub.docker.com/r/circleci/clojure/tags
+          https://hub.docker.com/r/circleci/clojure/tags
 
     docker:
       - image: circleci/clojure:<<parameters.tag>>
