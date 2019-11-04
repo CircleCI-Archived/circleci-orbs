@@ -17,7 +17,7 @@ CircleCI မှထုတ်လုပ်ထာသေား orbs အချို�
 
 Orbs ဆိုသည်မှာ မိမိတို့၏ပရောဂျက်အချင်းချင်းမျှဝေအသုံးပြုနိုင်သောCircleCI configuration ဖိုင်ဖြစ်သည်။ Orbs များသည်သင့်အတွက် အလုပ်များ ကုဒ်များ အချင်းချင်း reference ပေးနိုင်ရုံသာမက CircleCI ၏ build configuration ထဲသို့လည်းတင်သွင်းပြီးမိမိ၏ကိုယ်ပိုင်အမည်များသတ်မှတ်နိုင်ပါသေးသည်။ Orbs များသည် semver pattern ကိုအသုံးပြု၍ CircleCI တွင်မှတ်ပုံတင်ထားပါသည်။
 
-Orbs နှင့်ပတ်သက်သောအသေးစိတ်အချက်အလက်များ မည်ကဲ့သို့အသုံးပြုရကြောင်း မည်ကဲ့သို့ဖန်တီးနိုင်ကြောင်း စသည့်အကြောင်းအရာများကို ဤ [ရီပို](https://github.com/CircleCI-Public/config-preview-sdk/tree/master/docs) ကြည့်နိုင်ပါသည်။
+Orbs နှင့်ပတ်သက်သောအသေးစိတ်အချက်အလက်များ မည်ကဲ့သို့အသုံးပြုရကြောင်း မည်ကဲ့သို့ဖန်တီးနိုင်ကြောင်း စသည့်အကြောင်းအရာများကို ဤ [ရီပို](https://circleci.com/docs/2.0/orb-intro/) ကြည့်နိုင်ပါသည်။
 
 ##  Orbs များကိုဖန်တီးခြင်း
 Orbs များကို CircleCI API မှတစ်ဆင့် registry ထဲသို့ထည့်သွင်းနိုင်သည်။ ဤ ရီပိုသည် (`.circleci/config.yml`) [CircleCI CLI](https://github.com/CircleCI-Public/circleci-cli) မှ API ကိုအုံးပြု၍ `src` folder မှ orbs များကိုယူကာ orbs အဖြစ်မှတ်ပုံတင်လိုက်သည်။
