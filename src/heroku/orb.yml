@@ -78,7 +78,7 @@ commands:
         default: $HEROKU_APP_NAME
       maintenance-mode:
         description:
-          "Use this to automatically enable mantainance mode before pre-deploy steps
+          "Use this to automatically enable maintenance mode before pre-deploy steps
            and have it disabled after post-deploy steps have been run."
         type: boolean
         default: false

@@ -10,30 +10,31 @@
 - `circleci/maven`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/maven)](https://circleci.com/orbs/registry/orb/circleci/maven)
 - `circleci/rollbar`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/rollbar)](https://circleci.com/orbs/registry/orb/circleci/rollbar)
 
-The source code for some of the orbs published by CircleCI.
+Der Quellcode für die Orbs die CircleCI veröffentlichten gemacht hat.
 
-Some orbs have their own repos under the CircleCI-Public GitHub organization; [use the `circleci-orbs` topic tag](https://github.com/search?q=topic%3Acircleci-orbs+org%3ACircleCI-Public&type=Repositories) to see source repositories for all CircleCI-published orbs.
+Einige Orbs haben ihre eigenen Repos unter der Organisation CircleCI-Public GitHub; Verwenden Sie das Themen-Tag "circleci-orbs", um die Quell-Repositorys für die veröffentlich Orbs von CircleCI anzuzeigen.
 
-## What are orbs?
+## Was sind Orbs?
 
-Orbs are packages of CircleCI configuration that can be shared across projects. Orbs allow you to make a single bundle of jobs, commands, and executors that can reference each other and can be imported into a CircleCI build configuration and invoked in their own namespace. Orbs are registered with CircleCI, with revisions expressed using the SemVer pattern.
+Orbs sind Pakete mit CircleCI-Konfiguration, die projektübergreifend verwendet werden können. Mit Orbs können Sie ein einzelnes Bündel von Jobs, Befehlen und Ausführern erstellen, die aufeinander verweisen und in eine CircleCI-Build-Konfiguration importiert und in ihrem eigenen Namespace aufgerufen werden können. Orbs werden bei CircleCI registriert, wobei Revisionen anhand des SemVer-Musters ausgedrückt werden.
 
-You can find additional documentation detailing orbs, including how to use and create them, on [CircleCI.com](https://circleci.com/docs/2.0/orb-intro/).
+Auf [CircleCI.com](https://circleci.com/docs/2.0/orb-intro/) finden Sie zusätzliche Dokumentationen zu Orbs, einschließlich deren Verwendung und Erstellung.
 
-## Publishing Orbs
-Orbs are added to the registry through the CircleCI API. The build in this repository (`.circleci/config.yml`) uses that API via the [CircleCI CLI](https://github.com/CircleCI-Public/circleci-cli) to take the source of orbs located in the `src` folder and register them as orbs.
+## Orbs Veröffentlichen
 
+Orbs werden der Registrierung über die CircleCI-API hinzugefügt. Der Build in diesem Repository (`.circleci / config.yml`) verwendet diese API über die [CircleCI CLI](https://github.com/CircleCI-Public/circleci-cli), um die Quelle der Kugeln im zu ermitteln `src` ordner und registriere sie als orbs.
 To register an orb via the CLI you can point at a local file containing the YAML of the orb or pass the YAML of your orb to STDIN as a string.
 
 `circleci orb publish $PATH_TO_FILE_WITH_ORB_YAML mynamespace/myorb@dev:mytag`
 
-For more info on use of the CLI see the help on orb publishing inside the CLI:
+Weitere Informationen zur Verwendung der CLI finden Sie in der Hilfe zur Orb-Veröffentlichung in der CLI:
 
 `circleci orb publish --help or -h`
 
-TODO: The above will default to use the main circleci.com service. If you are publishing orbs to a registry on your private CircleCI server installation you can pass your root domain in as an argument or by setting it in your `.circleci/config.yml` file.
+TODO: Mit dem obigen Befehl wird standardmäßig der Hauptdienst circleci.com verwendet. Wenn Sie Orbs in einer Registrierung auf Ihrer privaten CircleCI-Serverinstallation veröffentlichen, können Sie Ihre Stammdomäne als Argument übergeben oder in Ihrer Datei `.circleci / config.yml` festlegen.
 
-## Contributing
-We welcome [issues](https://github.com/CircleCI-Public/circleci-orbs/issues) (bugs or feature requests) and [pull requests](https://github.com/CircleCI-Public/circleci-orbs/pulls)!
+## Mitmachen
 
-All pull requests will initially merge to `staging`, triggering automatic dev releases of any modified orbs and allowing open-source contributors working on forks of the repository to test out their code changes. Once we have confirmed the stability/functionality of modifications (via either manual or to-be-added automated integration testing), we will merge the changes in `staging` to `master`.
+Wir freuen uns über [Issues](https://github.com/CircleCI-Public/circleci-orbs/issues) (Bugs oder Feature Requests) und [Pull Requests](https://github.com/CircleCI-Public/circleci-orbs/pulls)!
+
+Alle Pull-Anforderungen werden anfänglich zu "Staging" zusammengefasst, wodurch automatische Entwicklerfreigaben für modifizierte Orbs ausgelöst werden und Open-Source-Autoren, die an Forks des Repositorys arbeiten, die Möglichkeit erhalten, ihre Codeänderungen zu testen. Sobald wir die Stabilität / Funktionalität von Modifikationen bestätigt haben (entweder manuell oder durch automatisierte Integrationstests), werden wir die Änderungen in "Staging" zu "Master" zusammenführen.

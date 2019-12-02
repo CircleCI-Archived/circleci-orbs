@@ -17,7 +17,7 @@ examples:
             - image: circleci/python:2.7
           steps:
             - checkout
-            - run: mkdir bucket && echo "lorum ipsum" > bucket/build_asset.txt
+            - run: mkdir bucket && echo "lorem ipsum" > bucket/build_asset.txt
             - aws-s3/sync:
                 from: bucket
                 to: "s3://my-s3-bucket-name/prefix"
@@ -41,7 +41,7 @@ examples:
             - image: circleci/python:2.7
           steps:
             - checkout
-            - run: mkdir bucket && echo "lorum ipsum" > bucket/build_asset.txt
+            - run: mkdir bucket && echo "lorem ipsum" > bucket/build_asset.txt
             - aws-s3/sync:
                 from: bucket
                 to: "s3://my-s3-bucket-name/prefix"
