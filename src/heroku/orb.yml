@@ -109,7 +109,7 @@ commands:
       no_output_timeout:
         type: string
         description:
-          "Allows your to specify the no_output_timeout for the `git push` to heroku. Defaults to 10m." 
+          "Allows you to specify the no_output_timeout for the `git push` to heroku. Defaults to 10m."
         default: "10m"
     steps:
       - when:
