@@ -104,14 +104,20 @@ commands:
           an empty string, will result in the command running for all branches.
           This is here mostly because for people moving from CircleCI 1.0 setting up a workflow
           with branch filters may be more than they want to do, and this is a convenient way to filter
-          out deploys for all but one branch (a typical use would be to pass `master` as the value."
+          out deploys for all but one branch (a typical use would be to pass `master` as the value)."
         default: ""
+      no_output_timeout:
+        type: string
+        description:
+          "Allows you to specify the no_output_timeout for the `git push` to heroku. Defaults to 10m."
+        default: "10m"
     steps:
       - when:
           condition: << parameters.maintenance-mode >>
           steps:
             - run: heroku maintenance:on --app << parameters.app-name >>
       - run:
+          no_output_timeout: << parameters.no_output_timeout >>
           name: Deploy branch to Heroku via git push
           command: |
             if << parameters.force >>;then
