@@ -155,7 +155,9 @@ commands:
       You can override where to find the test results with the path parameter.
     parameters:
       test_results_path:
+        description: Specify a custom path for maven test results
         type: string
+        default: target/surefire-reports
     steps:
       - store_test_results:
           path: << parameters.test_results_path >>
