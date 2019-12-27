@@ -102,7 +102,7 @@ commands:
           aws-secret-access-key: << parameters.aws-secret-access-key >>
           aws-region: << parameters.aws-region >>
       - deploy:
-          name: Deploy to S3
+          name: S3 Sync
           command: |
             aws s3 sync \
               <<parameters.from>> <<parameters.to>><<#parameters.overwrite>> --delete<</parameters.overwrite>><<#parameters.arguments>> \
