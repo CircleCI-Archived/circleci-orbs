@@ -212,7 +212,7 @@ commands:
               sleep 5
             done
 
-            if [[ $STATUS == "Ready" ]]; then
+            if [[ $STATUS == "Ready" || $STATUS == "Succeeded" ]]; then
               EXITCODE=0
               echo "Deployment finished."
             else
