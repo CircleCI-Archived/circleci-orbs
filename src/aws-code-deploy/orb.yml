@@ -203,7 +203,7 @@ commands:
                       --output text \
                       --query '[deploymentInfo.status]'<<# parameters.arguments >> << parameters.arguments >><</parameters.arguments >>)
 
-            while [[ $STATUS == "Created" || $STATUS == "InProgress" || $STATUS == "Pending" || $STATUS == "Queued" ]]; do
+            while [[ $STATUS == "Created" || $STATUS == "InProgress" || $STATUS == "Pending" || $STATUS == "Queued" || $STATUS == "Ready" ]]; do
               echo "Status: $STATUS..."
               STATUS=$(aws deploy get-deployment \
                         --deployment-id $ID \
@@ -212,7 +212,7 @@ commands:
               sleep 5
             done
 
-            if [[ $STATUS == "Ready" || $STATUS == "Succeeded" ]]; then
+            if [[ $STATUS == "Succeeded" ]]; then
               EXITCODE=0
               echo "Deployment finished."
             else
