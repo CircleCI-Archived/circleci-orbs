@@ -7,13 +7,16 @@ This repository will be archived.
 
 ## New Repos
 
-- `circleci/aws-code-deploy`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/aws-code-deploy)](https://github.com/CircleCI-Public/aws-code-deploy-orb)
-- `circleci/aws-s3`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/aws-s3)](https://github.com/CircleCI-Public/aws-s3-orb)
+- [circleci/aws-code-deploy](https://github.com/CircleCI-Public/aws-code-deploy-orb): [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/aws-code-deploy)](https://github.com/CircleCI-Public/aws-code-deploy-orb)
+- [circleci/aws-s3](https://github.com/CircleCI-Public/aws-s3-orb): [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/aws-s3)](https://github.com/CircleCI-Public/aws-s3-orb)
 
-- `circleci/gradle`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/gradle)](https://circleci.com/orbs/registry/orb/circleci/gradle) 
-- `circleci/heroku`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/heroku)](https://github.com/CircleCI-Public/heroku-orb/)
-- `circleci/lein-nvd`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/lein-nvd)](CircleCI-Public/lein-nvd_orb)
-- `circleci/maven`: [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/maven)](https://github.com/CircleCI-Public/maven-orb/)
+- [circleci/gradle](https://circleci.com/orbs/registry/orb/circleci/gradle): [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/gradle)](https://circleci.com/orbs/registry/orb/circleci/gradle) 
+
+- [circleci/heroku](https://github.com/CircleCI-Public/heroku-orb/): [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/heroku)](https://github.com/CircleCI-Public/heroku-orb/)
+
+- [circleci/lein-nvd](CircleCI-Public/lein-nvd_orb): [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/lein-nvd)](CircleCI-Public/lein-nvd_orb)
+
+- [circleci/maven](https://github.com/CircleCI-Public/maven-orb/): [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/maven)](https://github.com/CircleCI-Public/maven-orb/)
 
 ---
 ## Partnered
