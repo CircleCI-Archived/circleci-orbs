@@ -1,8 +1,0 @@
-schema-version: 1.0.0
-
-namespaces:
-  circleci:
-    orbs:
-      s3:
-        src: s3
-        revision: 0.0.2
